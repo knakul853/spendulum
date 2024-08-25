@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:budget_buddy/providers/expense_provider.dart';
+import 'package:budget_buddy/providers/account_provider.dart';
 import 'package:budget_buddy/screens/expense_logging_screen.dart';
 import 'package:budget_buddy/screens/category_management_screen.dart';
 import 'package:budget_buddy/widgets/expense_list_item.dart';
@@ -9,30 +10,46 @@ import 'package:budget_buddy/widgets/action_button.dart';
 import 'package:budget_buddy/screens/expense_chart.dart';
 import 'package:budget_buddy/screens/category_pie_chart.dart';
 import 'package:budget_buddy/screens/weekly_bar_chart.dart';
-import "package:budget_buddy/models/expense.dart";
+import 'package:budget_buddy/screens/account_management_screen.dart';
+import 'package:budget_buddy/models/expense.dart';
 import 'package:intl/intl.dart';
+import 'package:budget_buddy/models/account.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context),
-          _buildMonthlyExpenseChart(context),
-          _buildCategoryPieChart(context),
-          _buildWeeklyBarChart(context),
-          _buildSummarySection(),
-          _buildExpenseList(),
-        ],
-      ),
-      floatingActionButton: _buildAddExpenseButton(context),
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, _) {
+        final selectedAccount = accountProvider.getSelectedAccount();
+        return Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              _buildAppBar(context, accountProvider),
+              if (selectedAccount != null) ...[
+                _buildMonthlyExpenseChart(context, selectedAccount.id),
+                _buildCategoryPieChart(context, selectedAccount.id),
+                _buildWeeklyBarChart(context, selectedAccount.id),
+                _buildSummarySection(selectedAccount.id),
+                _buildExpenseList(selectedAccount.id),
+              ] else
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text('Please add an account to get started.'),
+                  ),
+                ),
+            ],
+          ),
+          floatingActionButton: selectedAccount != null
+              ? _buildAddExpenseButton(context, selectedAccount.id)
+              : null,
+        );
+      },
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, AccountProvider accountProvider) {
     return SliverAppBar(
       expandedHeight: 110.0,
       floating: false,
@@ -52,23 +69,105 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(48),
+        child: _buildAccountTabs(context, accountProvider),
+      ),
       actions: [
         ActionButton(
           icon: Icons.category,
           onPressed: () =>
               _navigateTo(context, const CategoryManagementScreen()),
         ),
+        ActionButton(
+          icon: Icons.settings,
+          onPressed: () =>
+              _navigateTo(context, const AccountManagementScreen()),
+        ),
       ],
     );
   }
 
-  Widget _buildSummarySection() {
+  Widget _buildAccountTabs(
+      BuildContext context, AccountProvider accountProvider) {
+    return Container(
+      height: 48,
+      child: accountProvider.accounts.isEmpty
+          ? Center(child: Text('No accounts added'))
+          : ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: accountProvider.accounts.length + 1,
+              itemBuilder: (context, index) {
+                if (index == accountProvider.accounts.length) {
+                  return _buildAddAccountButton(context);
+                }
+                final account = accountProvider.accounts[index];
+                return _buildAccountTab(context, account, accountProvider);
+              },
+            ),
+    );
+  }
+
+  Widget _buildAccountTab(
+      BuildContext context, Account account, AccountProvider accountProvider) {
+    final isSelected = account.id == accountProvider.selectedAccountId;
+    return GestureDetector(
+      onTap: () => accountProvider.selectAccount(account.id),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? account.color.withOpacity(0.2) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? account.color : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Text(
+          account.name,
+          style: TextStyle(
+            color: isSelected ? account.color : Colors.white,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddAccountButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _navigateTo(context, const AccountManagementScreen()),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white, width: 2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add, color: Colors.white, size: 18),
+            SizedBox(width: 4),
+            Text('Add Account', style: TextStyle(color: Colors.white)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Update other methods to accept accountId parameter
+  Widget _buildSummarySection(String accountId) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Consumer<ExpenseProvider>(
           builder: (context, expenseProvider, child) {
-            final totalExpenses = expenseProvider.getTotalExpenses();
+            final totalExpenses =
+                expenseProvider.getTotalExpenses(accountId: accountId);
             final monthlyBudget = expenseProvider.getMonthlyBudget();
             final remainingBudget = monthlyBudget - totalExpenses;
 
@@ -95,10 +194,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExpenseList() {
+  Widget _buildExpenseList(String accountId) {
     return Consumer<ExpenseProvider>(
       builder: (context, expenseProvider, child) {
-        final expenses = expenseProvider.expenses;
+        final expenses = expenseProvider.expenses
+            .where((e) => e.accountId == accountId)
+            .toList();
         return SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
@@ -112,20 +213,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMonthlyExpenseChart(BuildContext context) {
+  Widget _buildMonthlyExpenseChart(BuildContext context, String accountId) {
     return Consumer<ExpenseProvider>(
       builder: (context, expenseProvider, child) {
-        final monthlyData = _calculateMonthlyData(expenseProvider.expenses);
+        final monthlyData = _calculateMonthlyData(expenseProvider.expenses
+            .where((e) => e.accountId == accountId)
+            .toList());
 
-        // Check if there is data for at least 2 months
         if (monthlyData.length < 2) {
-          return const SliverToBoxAdapter(
-            child: SizedBox
-                .shrink(), // Returns an empty widget when not enough data
-          );
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
-        // If enough data, show the chart and the title
         return SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -146,7 +244,84 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-// The helper method to calculate monthly data
+  Widget _buildCategoryPieChart(BuildContext context, String accountId) {
+    return Consumer<ExpenseProvider>(
+      builder: (context, expenseProvider, child) {
+        final categoryTotals =
+            expenseProvider.getExpensesByCategory(accountId: accountId);
+
+        if (categoryTotals.isEmpty) {
+          return const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          );
+        }
+
+        return SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Expense Categories',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                CategoryPieChart(categoryTotals: categoryTotals),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWeeklyBarChart(BuildContext context, String accountId) {
+    return Consumer<ExpenseProvider>(
+      builder: (context, expenseProvider, child) {
+        final weeklyData = _calculateWeeklyData(expenseProvider.expenses
+            .where((e) => e.accountId == accountId)
+            .toList());
+
+        bool hasData = weeklyData.any((dayData) => dayData['total'] > 0);
+
+        if (!hasData) {
+          return SliverToBoxAdapter();
+        }
+
+        return SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Weekly Expenses',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SizedBox(height: 8),
+                WeeklyBarChart(weeklyData: weeklyData),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAddExpenseButton(BuildContext context, String accountId) {
+    return FloatingActionButton.extended(
+      onPressed: () => _navigateTo(
+          context, ExpenseLoggingScreen(initialAccountId: accountId)),
+      icon: const Icon(Icons.add),
+      label: const Text('Add Expense'),
+    );
+  }
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
+  }
+
   List<Map<String, dynamic>> _calculateMonthlyData(List<Expense> expenses) {
     Map<String, double> monthlyTotals = {};
 
@@ -168,67 +343,6 @@ class HomeScreen extends StatelessWidget {
     return monthlyData;
   }
 
-  Widget _buildCategoryPieChart(BuildContext context) {
-    final categoryTotals = Provider.of<ExpenseProvider>(context, listen: true)
-        .getExpensesByCategory();
-
-    if (categoryTotals.isEmpty) {
-      // Show nothing if there is no data
-      return const SliverToBoxAdapter(
-        child: SizedBox.shrink(),
-      );
-    }
-
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Expense Categories',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            CategoryPieChart(categoryTotals: categoryTotals),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWeeklyBarChart(BuildContext context) {
-    // Access the ExpenseProvider and calculate the weekly data
-    final expenseProvider = Provider.of<ExpenseProvider>(context, listen: true);
-    final weeklyData = _calculateWeeklyData(expenseProvider.expenses);
-
-    // Check if there is enough data (at least one day with expenses)
-    bool hasData = weeklyData.any((dayData) => dayData['total'] > 0);
-
-    // Return an empty widget if there's no data
-    if (!hasData) {
-      return SliverToBoxAdapter(); // Empty widget, displays nothing
-    }
-
-    // If there is data, display the weekly bar chart
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Weekly Expenses',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            SizedBox(height: 8),
-            WeeklyBarChart(weeklyData: weeklyData), // Pass the calculated data
-          ],
-        ),
-      ),
-    );
-  }
-
   List<Map<String, dynamic>> _calculateWeeklyData(List<Expense> expenses) {
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: now.weekday - 1));
@@ -245,17 +359,5 @@ class HomeScreen extends StatelessWidget {
         'total': dayExpenses.fold(0.0, (sum, expense) => sum + expense.amount),
       };
     }).toList();
-  }
-
-  Widget _buildAddExpenseButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: () => _navigateTo(context, const ExpenseLoggingScreen()),
-      icon: const Icon(Icons.add),
-      label: const Text('Add Expense'),
-    );
-  }
-
-  void _navigateTo(BuildContext context, Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
   }
 }

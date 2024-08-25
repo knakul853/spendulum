@@ -1,12 +1,17 @@
-import 'package:budget_buddy/models/category.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:budget_buddy/providers/expense_provider.dart';
 import 'package:budget_buddy/providers/category_provider.dart';
+import 'package:budget_buddy/providers/account_provider.dart';
+import 'package:budget_buddy/models/category.dart';
+import 'package:budget_buddy/models/account.dart';
 import 'package:intl/intl.dart';
 
 class ExpenseLoggingScreen extends StatefulWidget {
-  const ExpenseLoggingScreen({Key? key}) : super(key: key);
+  final String? initialAccountId;
+
+  const ExpenseLoggingScreen({Key? key, this.initialAccountId})
+      : super(key: key);
 
   @override
   _ExpenseLoggingScreenState createState() => _ExpenseLoggingScreenState();
@@ -15,9 +20,16 @@ class ExpenseLoggingScreen extends StatefulWidget {
 class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _category;
+  String? _accountId;
   double _amount = 0.0;
   DateTime _selectedDate = DateTime.now();
   String _description = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _accountId = widget.initialAccountId;
+  }
 
   Future<void> _presentDatePicker() async {
     final DateTime? pickedDate = await showDatePicker(
@@ -41,9 +53,9 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
 
     _formKey.currentState!.save();
 
-    if (_category == null) {
+    if (_category == null || _accountId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category')),
+        const SnackBar(content: Text('Please select a category and account')),
       );
       return;
     }
@@ -53,18 +65,15 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
       _amount,
       _selectedDate,
       _description,
+      _accountId!,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Expense added successfully!')),
     );
 
-    // Clear form after submission
-    _formKey.currentState!.reset();
-    setState(() {
-      _category = null;
-      _selectedDate = DateTime.now();
-    });
+    // Navigate back to the previous screen (HomeScreen)
+    Navigator.of(context).pop();
   }
 
   @override
@@ -72,29 +81,77 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Log Expense'),
+        elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _buildCategoryDropdown(),
-                const SizedBox(height: 16),
-                _buildAmountField(),
-                const SizedBox(height: 16),
-                _buildDatePicker(),
-                const SizedBox(height: 16),
-                _buildDescriptionField(),
-                const SizedBox(height: 24),
-                _buildSubmitButton(),
-              ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Theme.of(context).primaryColor, Colors.white],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildAccountDropdown(),
+                  const SizedBox(height: 16),
+                  _buildCategoryDropdown(),
+                  const SizedBox(height: 16),
+                  _buildAmountField(),
+                  const SizedBox(height: 16),
+                  _buildDatePicker(),
+                  const SizedBox(height: 16),
+                  _buildDescriptionField(),
+                  const SizedBox(height: 24),
+                  _buildSubmitButton(),
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAccountDropdown() {
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        final accounts = accountProvider.accounts;
+        return DropdownButtonFormField<String>(
+          value: _accountId,
+          decoration: InputDecoration(
+            labelText: 'Account',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            prefixIcon: Icon(
+              Icons.account_balance_wallet,
+              color: Theme.of(context).primaryColor,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+          items: accounts.map((account) {
+            return DropdownMenuItem(
+              value: account.id,
+              child: Text(account.name),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _accountId = value;
+            });
+          },
+          validator: (value) =>
+              value == null ? 'Please select an account' : null,
+        );
+      },
     );
   }
 
@@ -114,9 +171,7 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
               color: Theme.of(context).primaryColor,
             ),
             filled: true,
-            fillColor: Colors.grey[100],
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+            fillColor: Colors.white,
           ),
           items: categories.map((category) {
             return DropdownMenuItem(
@@ -125,7 +180,6 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(8),
-                    margin: EdgeInsets.symmetric(vertical: 10), // Added margin
                     decoration: BoxDecoration(
                       color: Color(int.parse('0xff${category.color}')),
                       borderRadius: BorderRadius.circular(4),
@@ -137,16 +191,7 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
                     ),
                   ),
                   SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      category.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+                  Text(category.name),
                 ],
               ),
             );
@@ -156,48 +201,8 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
               _category = value;
             });
           },
-          selectedItemBuilder: (BuildContext context) {
-            return categories.map<Widget>((Category category) {
-              return Container(
-                alignment: Alignment.centerLeft,
-                constraints: BoxConstraints(minHeight: 240),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Color(int.parse('0xff${category.color}')),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Icon(
-                        category.icon,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        category.name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList();
-          },
           validator: (value) =>
               value == null ? 'Please select a category' : null,
-          icon: Icon(Icons.arrow_drop_down_circle,
-              color: Theme.of(context).primaryColor),
-          isExpanded: true,
-          dropdownColor: Colors.lightBlue[100],
-          style: TextStyle(color: Colors.black87, fontSize: 16),
         );
       },
     );
@@ -205,10 +210,14 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
 
   Widget _buildAmountField() {
     return TextFormField(
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Amount',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         prefixIcon: Icon(Icons.attach_money),
+        filled: true,
+        fillColor: Colors.white,
       ),
       keyboardType: TextInputType.number,
       validator: (value) {
@@ -227,10 +236,14 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
     return InkWell(
       onTap: _presentDatePicker,
       child: InputDecorator(
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           labelText: 'Date',
-          border: OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           prefixIcon: Icon(Icons.calendar_today),
+          filled: true,
+          fillColor: Colors.white,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -245,10 +258,14 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
 
   Widget _buildDescriptionField() {
     return TextFormField(
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Description',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         prefixIcon: Icon(Icons.description),
+        filled: true,
+        fillColor: Colors.white,
       ),
       maxLines: 3,
       onSaved: (value) {
@@ -264,6 +281,9 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen> {
         onPressed: _submitForm,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         child: const Text('Add Expense'),
       ),

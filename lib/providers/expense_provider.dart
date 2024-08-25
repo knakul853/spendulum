@@ -1,68 +1,78 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:budget_buddy/models/expense.dart';
+import 'package:budget_buddy/providers/account_provider.dart';
 
 class ExpenseProvider with ChangeNotifier {
   final List<Expense> _expenses = [];
   double _monthlyBudget = 0.0;
+  final AccountProvider _accountProvider;
+
+  ExpenseProvider(this._accountProvider);
 
   List<Expense> get expenses => _expenses;
   double get monthlyBudget => _monthlyBudget;
 
-  // Method to add a new expense
-  void addExpense(
-      String category, double amount, DateTime date, String description) {
+  void addExpense(String category, double amount, DateTime date,
+      String description, String accountId) {
     final newExpense = Expense(
-      id: const Uuid().v4(), // Generate unique ID for each expense
+      id: const Uuid().v4(),
       category: category,
       amount: amount,
       date: date,
       description: description,
+      accountId: accountId,
     );
 
     _expenses.add(newExpense);
-    notifyListeners(); // Notify listeners about the change
-    debugPrint(
-        'Expense added: $newExpense'); // Log the addition of a new expense
+    _accountProvider.updateAccountBalance(accountId, -amount);
+    notifyListeners();
   }
 
-  // Method to get total expenses
-  double getTotalExpenses() {
-    return _expenses.fold(0, (sum, expense) => sum + expense.amount);
-  }
-
-  // Method to get total expenses for the current month
-  double getCurrentMonthExpenses() {
-    final now = DateTime.now();
+  double getTotalExpenses({String? accountId}) {
+    if (accountId == null) {
+      return _expenses.fold(0, (sum, expense) => sum + expense.amount);
+    }
     return _expenses
-        .where((expense) =>
-            expense.date.year == now.year && expense.date.month == now.month)
+        .where((expense) => expense.accountId == accountId)
         .fold(0, (sum, expense) => sum + expense.amount);
   }
 
-  // Method to set monthly budget
+  void addAll(List<Expense> expenses) {
+    _expenses.addAll(expenses);
+    notifyListeners();
+  }
+
+  double getCurrentMonthExpenses({String? accountId}) {
+    final now = DateTime.now();
+    return _expenses
+        .where((expense) =>
+            expense.date.year == now.year &&
+            expense.date.month == now.month &&
+            (accountId == null || expense.accountId == accountId))
+        .fold(0, (sum, expense) => sum + expense.amount);
+  }
+
   void setMonthlyBudget(double budget) {
     _monthlyBudget = budget;
     notifyListeners();
-    debugPrint('Monthly budget set to: $budget');
   }
 
-  // Method to get monthly budget
   double getMonthlyBudget() {
     return _monthlyBudget;
   }
 
-  // Method to get remaining budget for the current month
-  double getRemainingBudget() {
-    return _monthlyBudget - getCurrentMonthExpenses();
+  double getRemainingBudget({String? accountId}) {
+    return _monthlyBudget - getCurrentMonthExpenses(accountId: accountId);
   }
 
-  // Method to get expenses by category
-  Map<String, double> getExpensesByCategory() {
+  Map<String, double> getExpensesByCategory({String? accountId}) {
     final categoryExpenses = <String, double>{};
     for (var expense in _expenses) {
-      categoryExpenses[expense.category] =
-          (categoryExpenses[expense.category] ?? 0) + expense.amount;
+      if (accountId == null || expense.accountId == accountId) {
+        categoryExpenses[expense.category] =
+            (categoryExpenses[expense.category] ?? 0) + expense.amount;
+      }
     }
     return categoryExpenses;
   }
