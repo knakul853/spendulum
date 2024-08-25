@@ -6,6 +6,7 @@ import 'package:budget_buddy/screens/category_management_screen.dart';
 import 'package:budget_buddy/widgets/expense_list_item.dart';
 import 'package:budget_buddy/widgets/summary_card.dart';
 import 'package:budget_buddy/widgets/action_button.dart';
+import 'package:budget_buddy/screens/expense_chart.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           _buildAppBar(context),
+          _buildExpenseChart(), // Add this new section
           _buildSummarySection(),
           _buildExpenseList(),
         ],
@@ -26,7 +28,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 200.0,
+      expandedHeight: 110.0,
       floating: false,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
@@ -114,5 +116,37 @@ class HomeScreen extends StatelessWidget {
 
   void _navigateTo(BuildContext context, Widget screen) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
+  }
+
+  Widget _buildExpenseChart() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Consumer<ExpenseProvider>(
+          builder: (context, expenseProvider, child) {
+            final expenses = expenseProvider.expenses;
+            final chartData = expenses
+                .map((expense) => {
+                      'date': expense.date,
+                      'amount': expense.amount,
+                      // Add other fields you need for the chart
+                    })
+                .toList();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Expense Trend',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                SizedBox(height: 8),
+                ExpenseChart(expenses: chartData),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 }
