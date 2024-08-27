@@ -53,28 +53,20 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
           Provider.of<AccountProvider>(context, listen: false);
       accountProvider.addAccount(
           _name, _accountNumber, _accountType, _balance, _color, _currency);
-      _showSuccessDialog();
+      Navigator.of(context).pop(); // Close the add account dialog
+      _showSuccessSnackBar();
     }
   }
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Text('Account successfully added.'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.of(context).pop(); // Go back to home screen
-              },
-            ),
-          ],
-        );
-      },
+  void _showSuccessSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Account successfully added'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: EdgeInsets.all(10),
+      ),
     );
   }
 
@@ -83,6 +75,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Manage Accounts'),
+        elevation: 0,
       ),
       body: Consumer<AccountProvider>(
         builder: (context, accountProvider, child) {
@@ -91,11 +84,26 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('No accounts found.', style: TextStyle(fontSize: 18)),
+                  Icon(Icons.account_balance_wallet,
+                      size: 80, color: Colors.grey),
                   SizedBox(height: 16),
-                  ElevatedButton(
+                  Text('No accounts found',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  Text('Add an account to get started',
+                      style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  SizedBox(height: 24),
+                  ElevatedButton.icon(
                     onPressed: () => _showAddAccountDialog(),
-                    child: Text('Create an Account'),
+                    icon: Icon(Icons.add),
+                    label: Text('Create an Account'),
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
                   ),
                 ],
               ),
@@ -109,48 +117,89 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddAccountDialog(),
-        child: Icon(Icons.add),
+        icon: Icon(Icons.add),
+        label: Text('Add Account'),
       ),
     );
   }
 
   Widget _buildAccountTile(Account account) {
-    return ListTile(
-      leading: CircleAvatar(backgroundColor: account.color),
-      title: Text(account.name),
-      subtitle: Text('${account.accountType} - ${account.accountNumber}'),
-      trailing:
-          Text('${account.currency} ${account.balance.toStringAsFixed(2)}'),
-      onTap: () => _showEditAccountDialog(account),
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: ListTile(
+        contentPadding: EdgeInsets.all(16),
+        leading: CircleAvatar(
+          backgroundColor: account.color,
+          radius: 25,
+          child: Icon(Icons.account_balance, color: Colors.white),
+        ),
+        title:
+            Text(account.name, style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('${account.accountType} - ${account.accountNumber}'),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text('${account.currency} ${account.balance.toStringAsFixed(2)}',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 4),
+            Text(account.accountType, style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+        onTap: () => _showEditAccountDialog(account),
+      ),
     );
   }
 
   void _showAddAccountDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add New Account'),
-          content: SingleChildScrollView(
-            child: _buildAccountForm(),
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            constraints: BoxConstraints(maxWidth: 400),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Add New Account',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 24),
+                  _buildAccountForm(),
+                  SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      SizedBox(width: 16),
+                      ElevatedButton(
+                        child: Text('Add'),
+                        onPressed: _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            ElevatedButton(
-              child: Text('Add'),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _submitForm();
-                }
-              },
-            ),
-          ],
         );
       },
     );
@@ -166,41 +215,74 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
 
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit Account'),
-          content: SingleChildScrollView(
-            child: _buildAccountForm(isEditing: true),
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            constraints: BoxConstraints(maxWidth: 400),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Edit Account',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 24),
+                  _buildAccountForm(isEditing: true),
+                  SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      SizedBox(width: 16),
+                      ElevatedButton(
+                        child: Text('Save'),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            final accountProvider =
+                                Provider.of<AccountProvider>(context,
+                                    listen: false);
+                            accountProvider.updateAccount(
+                                account.id,
+                                _name,
+                                _accountNumber,
+                                _accountType,
+                                _balance,
+                                _color,
+                                _currency);
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Account updated successfully'),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                margin: EdgeInsets.all(10),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            ElevatedButton(
-              child: Text('Save'),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  final accountProvider =
-                      Provider.of<AccountProvider>(context, listen: false);
-                  accountProvider.updateAccount(
-                      account.id,
-                      _name,
-                      _accountNumber,
-                      _accountType,
-                      _balance,
-                      _color,
-                      _currency);
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Account updated successfully')),
-                  );
-                }
-              },
-            ),
-          ],
         );
       },
     );
@@ -210,7 +292,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
     return Form(
       key: _formKey,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _buildTextFormField('Account Name', (value) => _name = value!,
               initialValue: isEditing ? _name : null),
@@ -243,7 +325,9 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
       ),
       initialValue: initialValue,
       keyboardType: keyboardType,
@@ -258,7 +342,9 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
       ),
       value: initialValue,
       items: items.map((String value) {
@@ -272,15 +358,24 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
   }
 
   Widget _buildColorPicker() {
-    return ListTile(
-      title: Text('Account Color'),
-      trailing: GestureDetector(
-        onTap: _showColorPalette,
-        child: CircleAvatar(
-          backgroundColor: _color,
-          radius: 15,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Account Color',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: _showColorPalette,
+          child: Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: _color,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -296,6 +391,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
               onColorChanged: (Color color) {
                 setState(() => _color = color);
               },
+              pickerAreaHeightPercent: 0.8,
             ),
           ),
           actions: <Widget>[
