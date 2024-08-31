@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:budget_buddy/providers/expense_provider.dart';
 import 'package:budget_buddy/providers/category_provider.dart';
 import 'package:budget_buddy/providers/account_provider.dart';
-import 'package:budget_buddy/models/category.dart';
-import 'package:budget_buddy/models/account.dart';
 import 'package:intl/intl.dart';
 
 class ExpenseLoggingScreen extends StatefulWidget {

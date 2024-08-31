@@ -76,4 +76,18 @@ class ExpenseProvider with ChangeNotifier {
     }
     return categoryExpenses;
   }
+
+  List<Expense> getExpensesForMonth(DateTime month, {String? accountId}) {
+    return _expenses
+        .where((expense) =>
+            expense.date.year == month.year &&
+            expense.date.month == month.month &&
+            (accountId == null || expense.accountId == accountId))
+        .toList();
+  }
+
+  double getTotalExpensesForMonth(DateTime month, {String? accountId}) {
+    return getExpensesForMonth(month, accountId: accountId)
+        .fold(0, (sum, expense) => sum + expense.amount);
+  }
 }
