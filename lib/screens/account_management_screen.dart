@@ -1,25 +1,43 @@
+import 'package:budget_buddy/widgets/animation.dart';
+import 'package:budget_buddy/widgets/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:budget_buddy/providers/account_provider.dart';
 import 'package:budget_buddy/models/account.dart';
+import 'package:budget_buddy/screens/home_screen.dart';
+import 'package:budget_buddy/widgets/custom_color_picker.dart';
+import 'package:budget_buddy/widgets/custom_text_field.dart';
+import 'package:budget_buddy/widgets/custom_dropdown.dart';
+import 'package:flutter/services.dart';
 
 class AccountManagementScreen extends StatefulWidget {
-  const AccountManagementScreen({Key? key}) : super(key: key);
+  final Function? onBackPressed;
+  final bool isInitialSetup;
+
+  const AccountManagementScreen({
+    super.key,
+    this.onBackPressed,
+    this.isInitialSetup = false,
+  });
 
   @override
   _AccountManagementScreenState createState() =>
       _AccountManagementScreenState();
 }
 
-class _AccountManagementScreenState extends State<AccountManagementScreen> {
+class _AccountManagementScreenState extends State<AccountManagementScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  late String _name;
-  late String _accountNumber;
-  late String _accountType;
-  late double _balance;
-  late Color _color;
-  late String _currency;
+  String _name = '';
+  String _accountNumber = '';
+  String _accountType = 'General';
+  double _balance = 0.0;
+  Color _color = Colors.blue;
+  String _currency = 'USD';
+
+  late AnimationController _animationController;
+  late Animation<double> _fadeInAnimation;
 
   final List<String> _accountTypes = [
     'General',
@@ -39,89 +57,196 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
   final List<String> _currencies = ['USD', 'EUR', 'GBP', 'JPY', 'INR', 'Other'];
 
   @override
-  void initState() {
-    super.initState();
-    _color = Colors.blue;
-    _accountType = _accountTypes[0];
-    _currency = _currencies[0];
-  }
+  Widget build(BuildContext context) {
+    AppLogger.info(
+        'AccountManagementScreen build: isInitialSetup = ${widget.isInitialSetup}');
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final accountProvider =
-          Provider.of<AccountProvider>(context, listen: false);
-      accountProvider.addAccount(
-          _name, _accountNumber, _accountType, _balance, _color, _currency);
-      Navigator.of(context).pop(); // Close the add account dialog
-      _showSuccessSnackBar();
-    }
-  }
-
-  void _showSuccessSnackBar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Account successfully added'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: EdgeInsets.all(10),
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.isInitialSetup) {
+          _showExitConfirmationDialog();
+          return false;
+        }
+        return true;
+      },
+      child: Stack(
+        children: [
+          GradientAnimatedBackground(
+              child: Container()), // This will cover the full screen
+          Scaffold(
+            backgroundColor:
+                Colors.transparent, // Make scaffold background transparent
+            appBar: AppBar(
+              backgroundColor:
+                  Colors.transparent, // Make app bar background transparent
+              elevation: 0, // Remove app bar shadow
+              title: Text(widget.isInitialSetup
+                  ? 'Add Your First Account'
+                  : 'Manage Accounts'),
+              leading: widget.isInitialSetup
+                  ? IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: _showExitConfirmationDialog,
+                    )
+                  : null,
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (widget.isInitialSetup) _buildHeaderText(),
+                      SizedBox(height: 24),
+                      _buildAccountForm(),
+                      SizedBox(height: 24),
+                      _buildSubmitButton(),
+                      if (!widget.isInitialSetup) SizedBox(height: 16),
+                      if (!widget.isInitialSetup) _buildSkipButton(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Manage Accounts'),
-        elevation: 0,
-      ),
-      body: Consumer<AccountProvider>(
-        builder: (context, accountProvider, child) {
-          if (accountProvider.accounts.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.account_balance_wallet,
-                      size: 80, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('No accounts found',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  Text('Add an account to get started',
-                      style: TextStyle(fontSize: 16, color: Colors.grey)),
-                  SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () => _showAddAccountDialog(),
-                    icon: Icon(Icons.add),
-                    label: Text('Create an Account'),
-                    style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                    ),
+  void initState() {
+    AppLogger.info(
+        'AccountManagementScreen: isInitialSetup = ${widget.isInitialSetup}');
+
+    super.initState();
+    _accountType = _accountTypes[0];
+    _currency = _currencies[0];
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+    _fadeInAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _animationController.forward();
+
+    // Ensure the widget rebuilds after initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _showExitConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Exit Setup?'),
+          content: Text(
+              'Are you sure you want to exit the account setup? You can always add accounts later.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text('Exit'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                SystemNavigator.pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSetupCompletedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, size: 80, color: Colors.green),
+                SizedBox(height: 24),
+                Text('All set up!',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16),
+                Text('Your account has been created successfully.',
+                    textAlign: TextAlign.center),
+                SizedBox(height: 24),
+                ElevatedButton(
+                  child: Text('Start Budgeting'),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
                   ),
-                ],
-              ),
-            );
-          }
-          return ListView.builder(
-            itemCount: accountProvider.accounts.length,
-            itemBuilder: (context, index) {
-              return _buildAccountTile(accountProvider.accounts[index]);
-            },
-          );
-        },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.account_balance_wallet, size: 80, color: Colors.grey),
+          SizedBox(height: 16),
+          Text('No accounts found',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 8),
+          Text('Add an account to get started',
+              style: TextStyle(fontSize: 16, color: Colors.grey)),
+          SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => _showAddAccountDialog(),
+            icon: Icon(Icons.add),
+            label: Text('Create an Account'),
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30)),
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddAccountDialog(),
-        icon: Icon(Icons.add),
-        label: Text('Add Account'),
-      ),
+    );
+  }
+
+  Widget _buildAccountList(AccountProvider accountProvider) {
+    return ListView.builder(
+      itemCount: accountProvider.accounts.length,
+      itemBuilder: (context, index) {
+        return _buildAccountTile(accountProvider.accounts[index]);
+      },
     );
   }
 
@@ -206,12 +331,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
   }
 
   void _showEditAccountDialog(Account account) {
-    _name = account.name;
-    _accountNumber = account.accountNumber;
-    _accountType = account.accountType;
-    _balance = account.balance;
-    _color = account.color;
-    _currency = account.currency;
+    setState(() {
+      _name = account.name;
+      _accountNumber = account.accountNumber;
+      _accountType = account.accountType;
+      _balance = account.balance;
+      _color = account.color;
+      _currency = account.currency;
+    });
 
     showDialog(
       context: context,
@@ -231,7 +358,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 24),
-                  _buildAccountForm(isEditing: true),
+                  _buildAccountForm(),
                   SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -288,38 +415,6 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
     );
   }
 
-  Widget _buildAccountForm({bool isEditing = false}) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _buildTextFormField('Account Name', (value) => _name = value!,
-              initialValue: isEditing ? _name : null),
-          SizedBox(height: 16),
-          _buildTextFormField(
-              'Account Number', (value) => _accountNumber = value!,
-              initialValue: isEditing ? _accountNumber : null),
-          SizedBox(height: 16),
-          _buildDropdownField(
-              'Account Type', _accountTypes, (value) => _accountType = value!,
-              initialValue: _accountType),
-          SizedBox(height: 16),
-          _buildTextFormField(
-              'Balance', (value) => _balance = double.parse(value!),
-              keyboardType: TextInputType.number,
-              initialValue: isEditing ? _balance.toString() : null),
-          SizedBox(height: 16),
-          _buildDropdownField(
-              'Currency', _currencies, (value) => _currency = value!,
-              initialValue: _currency),
-          SizedBox(height: 16),
-          _buildColorPicker(),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTextFormField(String label, Function(String?) onSaved,
       {TextInputType? keyboardType, String? initialValue}) {
     return TextFormField(
@@ -338,7 +433,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
 
   Widget _buildDropdownField(
       String label, List<String> items, Function(String?) onChanged,
-      {required String initialValue}) {
+      {String? initialValue}) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
@@ -346,7 +441,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
         filled: true,
         fillColor: Colors.grey[100],
       ),
-      value: initialValue,
+      value: initialValue ?? items[0],
       items: items.map((String value) {
         return DropdownMenuItem<String>(
           value: value,
@@ -404,6 +499,116 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final accountProvider =
+          Provider.of<AccountProvider>(context, listen: false);
+      accountProvider.addAccount(
+          _name, _accountNumber, _accountType, _balance, _color, _currency);
+
+      AppLogger.info('Account created: $_name');
+
+      if (widget.isInitialSetup) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  Widget _buildHeaderText() {
+    return AnimatedOpacity(
+      opacity: _fadeInAnimation.value,
+      duration: Duration(milliseconds: 500),
+      child: Text(
+        "Let's set up your first account to get started!",
+        style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue.shade700),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildAccountForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          CustomTextField(
+            label: 'Account Name',
+            onSaved: (value) => _name = value!,
+            initialValue: _name,
+          ),
+          SizedBox(height: 16),
+          CustomTextField(
+            label: 'Account Number',
+            onSaved: (value) => _accountNumber = value!,
+            initialValue: _accountNumber,
+          ),
+          SizedBox(height: 16),
+          CustomDropdown(
+            label: 'Account Type',
+            items: _accountTypes,
+            onChanged: (value) => _accountType = value!,
+            initialValue: _accountType,
+          ),
+          SizedBox(height: 16),
+          CustomTextField(
+            label: 'Balance',
+            onSaved: (value) => _balance = double.parse(value!),
+            keyboardType: TextInputType.number,
+            initialValue: _balance.toString(),
+          ),
+          SizedBox(height: 16),
+          CustomDropdown(
+            label: 'Currency',
+            items: _currencies,
+            onChanged: (value) => _currency = value!,
+            initialValue: _currency,
+          ),
+          SizedBox(height: 16),
+          CustomColorPicker(
+            initialColor: _color,
+            onColorChanged: (color) => setState(() => _color = color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return AnimatedOpacity(
+      opacity: _fadeInAnimation.value,
+      duration: Duration(milliseconds: 500),
+      child: ElevatedButton(
+        child: Text(widget.isInitialSetup ? 'Create Account' : 'Save'),
+        onPressed: _submitForm,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue.shade700,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkipButton() {
+    return TextButton(
+      child: Text('Skip for now'),
+      onPressed: () => Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      ),
     );
   }
 }

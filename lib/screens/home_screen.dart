@@ -23,27 +23,30 @@ class HomeScreen extends StatelessWidget {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
         final selectedAccount = accountProvider.getSelectedAccount();
+
+        if (selectedAccount == null) {
+          // If there's no account, navigate to AccountManagementScreen
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                  builder: (context) => AccountManagementScreen()),
+            );
+          });
+          return Container(); // Return an empty container while navigating
+        }
         return Scaffold(
           body: CustomScrollView(
             slivers: [
               _buildAppBar(context, accountProvider),
-              if (selectedAccount != null) ...[
-                _buildMonthlyExpenseChart(context, selectedAccount.id),
-                _buildCategoryPieChart(context, selectedAccount.id),
-                _buildWeeklyBarChart(context, selectedAccount.id),
-                _buildSummarySection(selectedAccount.id),
-                _buildExpenseList(selectedAccount.id),
-              ] else
-                SliverFillRemaining(
-                  child: Center(
-                    child: Text('Please add an account to get started.'),
-                  ),
-                ),
+              _buildMonthlyExpenseChart(context, selectedAccount.id),
+              _buildCategoryPieChart(context, selectedAccount.id),
+              _buildWeeklyBarChart(context, selectedAccount.id),
+              _buildSummarySection(selectedAccount.id),
+              _buildExpenseList(selectedAccount.id),
             ],
           ),
-          floatingActionButton: selectedAccount != null
-              ? _buildAddExpenseButton(context, selectedAccount.id)
-              : null,
+          floatingActionButton:
+              _buildAddExpenseButton(context, selectedAccount.id),
         );
       },
     );
@@ -54,59 +57,86 @@ class HomeScreen extends StatelessWidget {
       expandedHeight: 110.0,
       floating: false,
       pinned: true,
+      backgroundColor: Theme.of(context).primaryColor,
       flexibleSpace: FlexibleSpaceBar(
-        title: const Text('Budget Buddy'),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColorLight
-              ],
+        background: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Theme.of(context).primaryColor,
+                    Theme.of(context).primaryColorLight
+                  ],
+                ),
+              ),
             ),
-          ),
+            Positioned(
+              top: 40.0,
+              left: 16.0,
+              child: Text(
+                'Budget Buddy',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       bottom: PreferredSize(
-        preferredSize: Size.fromHeight(48),
+        preferredSize: Size.fromHeight(60),
         child: _buildAccountTabs(context, accountProvider),
       ),
-      actions: [
-        ActionButton(
-          icon: Icons.category,
-          onPressed: () =>
-              _navigateTo(context, const CategoryManagementScreen()),
-        ),
-        ActionButton(
-          icon: Icons.settings,
-          onPressed: () =>
-              _navigateTo(context, const AccountManagementScreen()),
-        ),
-      ],
+      // actions: [
+      //   IconButton(
+      //     icon: Icon(Icons.settings),
+      //     onPressed: () =>
+      //         _navigateTo(context, const AccountManagementScreen()),
+      //   ),
+      // ],
     );
   }
 
   Widget _buildAccountTabs(
       BuildContext context, AccountProvider accountProvider) {
     return Container(
-      height: 48,
-      child: accountProvider.accounts.isEmpty
-          ? Center(child: Text('No accounts added'))
-          : ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: accountProvider.accounts.length + 1,
-              itemBuilder: (context, index) {
-                if (index == accountProvider.accounts.length) {
-                  return _buildAddAccountButton(context);
-                }
-                final account = accountProvider.accounts[index];
-                return _buildAccountTab(context, account, accountProvider);
-              },
-            ),
+      height: 60,
+      child: Row(
+        children: [
+          Expanded(
+            child: accountProvider.accounts.isEmpty
+                ? Center(child: Text('No accounts added'))
+                : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: accountProvider.accounts.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == accountProvider.accounts.length) {
+                        return _buildAddAccountButton(context);
+                      }
+                      final account = accountProvider.accounts[index];
+                      return _buildAccountTab(
+                          context, account, accountProvider);
+                    },
+                  ),
+          ),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () =>
+                _navigateTo(context, const AccountManagementScreen()),
+          ),
+        ],
+      ),
     );
   }
+
+  /**
+   * 
+   */
 
   Widget _buildAccountTab(
       BuildContext context, Account account, AccountProvider accountProvider) {
@@ -115,20 +145,15 @@ class HomeScreen extends StatelessWidget {
       onTap: () => accountProvider.selectAccount(account.id),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+        margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         decoration: BoxDecoration(
-          color:
-              isSelected ? account.color.withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? account.color : account.color.withOpacity(0.6),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? account.color : Colors.transparent,
-            width: 2,
-          ),
         ),
         child: Text(
           account.name,
           style: TextStyle(
-            color: isSelected ? account.color : Colors.white,
+            color: Colors.white,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -141,7 +166,7 @@ class HomeScreen extends StatelessWidget {
       onTap: () => _navigateTo(context, const AccountManagementScreen()),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+        margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(20),
