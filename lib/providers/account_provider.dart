@@ -68,4 +68,12 @@ class AccountProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Account? getAccountById(String id) {
+    try {
+      return accounts.firstWhere((account) => account.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }
