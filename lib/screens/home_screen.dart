@@ -3,10 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:budget_buddy/providers/expense_provider.dart';
 import 'package:budget_buddy/providers/account_provider.dart';
 import 'package:budget_buddy/screens/expense_logging_screen.dart';
-import 'package:budget_buddy/screens/category_management_screen.dart';
 import 'package:budget_buddy/widgets/expense_list_item.dart';
 import 'package:budget_buddy/widgets/summary_card.dart';
-import 'package:budget_buddy/widgets/action_button.dart';
 import 'package:budget_buddy/screens/expense_chart.dart';
 import 'package:budget_buddy/screens/category_pie_chart.dart';
 import 'package:budget_buddy/screens/weekly_bar_chart.dart';
@@ -34,20 +32,22 @@ class HomeScreen extends StatelessWidget {
           });
           return Container(); // Return an empty container while navigating
         }
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              _buildAppBar(context, accountProvider),
-              _buildMonthlyExpenseChart(context, selectedAccount.id),
-              _buildCategoryPieChart(context, selectedAccount.id),
-              _buildWeeklyBarChart(context, selectedAccount.id),
-              _buildSummarySection(selectedAccount.id),
-              _buildExpenseList(selectedAccount.id),
-            ],
-          ),
-          floatingActionButton:
-              _buildAddExpenseButton(context, selectedAccount.id),
-        );
+        return WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              body: CustomScrollView(
+                slivers: [
+                  _buildAppBar(context, accountProvider),
+                  _buildMonthlyExpenseChart(context, selectedAccount.id),
+                  _buildCategoryPieChart(context, selectedAccount.id),
+                  _buildWeeklyBarChart(context, selectedAccount.id),
+                  _buildSummarySection(selectedAccount.id),
+                  _buildExpenseList(selectedAccount.id),
+                ],
+              ),
+              floatingActionButton:
+                  _buildAddExpenseButton(context, selectedAccount.id),
+            ));
       },
     );
   }
@@ -58,6 +58,7 @@ class HomeScreen extends StatelessWidget {
       floating: false,
       pinned: true,
       backgroundColor: Theme.of(context).primaryColor,
+      automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           children: [
