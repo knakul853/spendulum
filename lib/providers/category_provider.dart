@@ -1,47 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:budget_buddy/models/category.dart';
-import 'package:uuid/uuid.dart';
+import 'package:budget_buddy/utils/category_utils.dart';
 
 class CategoryProvider with ChangeNotifier {
   final List<Category> _categories = [
-    Category(
-      id: const Uuid().v4(),
-      name: 'Housing',
-      color: 'FFB74D',
-      icon: Icons.home, // Example icon
-    ),
-    Category(
-      id: const Uuid().v4(),
-      name: 'Utilities',
-      color: '4FC3F7',
-      icon: Icons.flash_on, // Example icon
-    ),
-    Category(
-      id: const Uuid().v4(),
-      name: 'Food',
-      color: '81C784',
-      icon: Icons.fastfood, // Example icon
-    ),
-    Category(
-      id: const Uuid().v4(),
-      name: 'Transportation',
-      color: 'FF8A65',
-      icon: Icons.directions_car, // Example icon
-    ),
-    // Add more categories as needed
+    CategoryUtils.createCategory('Housing'),
+    CategoryUtils.createCategory('Utilities'),
+    CategoryUtils.createCategory('Food'),
+    CategoryUtils.createCategory('Transportation'),
+    CategoryUtils.createCategory('Healthcare'),
+    CategoryUtils.createCategory('Entertainment'),
+    CategoryUtils.createCategory('Shopping'),
+    CategoryUtils.createCategory('Education'),
+    CategoryUtils.createCategory('Savings'),
+    CategoryUtils.createCategory('Debt'),
+    CategoryUtils.createCategory('Other'),
   ];
 
   List<Category> get categories => _categories;
 
   // Add a new category
-  void addCategory(String name, String color, IconData iconData) {
-    final newCategory = Category(
-        id: const Uuid().v4(), // Generate a unique ID for each category
-        name: name,
-        color: color,
-        icon: iconData);
+  void addCategory(String name) {
+    final newCategory = CategoryUtils.createCategory(name);
     _categories.add(newCategory);
-    notifyListeners(); // Notify listeners about the state change
+    notifyListeners();
     debugPrint('Category added: $newCategory');
   }
 

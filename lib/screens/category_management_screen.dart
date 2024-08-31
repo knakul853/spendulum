@@ -16,7 +16,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final _formKey = GlobalKey<FormState>();
   String _categoryName = '';
   Color _categoryColor = Colors.blue; // Default color
-  IconData _iconData = Icons.home;
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) {
@@ -27,8 +26,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
 
     Provider.of<CategoryProvider>(context, listen: false).addCategory(
       _categoryName,
-      _categoryColor.value.toRadixString(16).padLeft(6, '0'),
-      _iconData,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
