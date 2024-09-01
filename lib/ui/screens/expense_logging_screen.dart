@@ -37,6 +37,8 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
 
     AppLogger.info('ExpenseLoggingScreen initialized');
     _accountId = widget.initialAccountId;
+
+    Provider.of<CategoryProvider>(context, listen: false).loadCategories();
   }
 
   @override

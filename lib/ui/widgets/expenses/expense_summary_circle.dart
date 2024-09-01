@@ -60,8 +60,15 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
         );
 
         final balance = account.balance;
+        final initialBalance =
+            totalExpenses + balance; // Calculate initial balance
 
-        final progress = (totalExpenses / balance).clamp(0.0, 1.0);
+        final progress = balance > 0
+            ? (totalExpenses / initialBalance).clamp(0.0, 1.0)
+            : 1.0;
+
+        final Color progressColor =
+            _getProgressColor(context, totalExpenses, initialBalance);
 
         return AnimatedBuilder(
           animation: _animation,
@@ -72,7 +79,7 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
               child: CustomPaint(
                 painter: CircleProgressPainter(
                   progress: _animation.value * progress,
-                  color: Theme.of(context).primaryColor,
+                  color: progressColor,
                   strokeWidth: widget.size * 0.15,
                 ),
                 child: Center(
@@ -93,7 +100,7 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
                       ),
                       SizedBox(height: widget.size * 0.02),
                       Text(
-                        'of ${_getCurrencySymbol(widget.currency)}${balance.toStringAsFixed(0)}', // Use currency symbol
+                        'available ${_getCurrencySymbol(widget.currency)}${balance.toStringAsFixed(0)}', // Use currency symbol
                         style: TextStyle(fontSize: widget.size * 0.05),
                       ),
                     ],
@@ -105,6 +112,23 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
         );
       },
     );
+  }
+
+  Color _getProgressColor(
+      BuildContext context, double totalExpenses, double initialBalance) {
+    if (initialBalance <= 0) {
+      return Colors.red;
+    }
+    final ratio = totalExpenses / initialBalance;
+    if (ratio > 0.9) {
+      return Colors.red;
+    } else if (ratio > 0.7) {
+      return Colors.orange;
+    } else if (ratio > 0.5) {
+      return Colors.yellow;
+    } else {
+      return Theme.of(context).primaryColor;
+    }
   }
 
   String _getCurrencySymbol(String currency) {
