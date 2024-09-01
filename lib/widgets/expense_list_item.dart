@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:budget_buddy/models/expense.dart';
 import 'package:intl/intl.dart';
+import 'package:budget_buddy/constants/app_constants.dart';
 
 class ExpenseListItem extends StatefulWidget {
   final Expense expense;
+  final String currency; // Add currency parameter
 
-  const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
+  const ExpenseListItem(
+      {Key? key, required this.expense, required this.currency})
+      : super(key: key);
 
   @override
   _ExpenseListItemState createState() => _ExpenseListItemState();
@@ -15,6 +19,21 @@ class _ExpenseListItemState extends State<ExpenseListItem>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+
+  String _getCurrencySymbol(String currency) {
+    switch (currency.toUpperCase()) {
+      case 'INR':
+        return '₹';
+      case 'USD':
+        return '\$';
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      default:
+        return '\$'; // Default to USD
+    }
+  }
 
   @override
   void initState() {
@@ -89,13 +108,19 @@ class _ExpenseListItemState extends State<ExpenseListItem>
                   ),
                 ],
               ),
-              trailing: Text(
-                '\$${widget.expense.amount.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Theme.of(context).primaryColor,
-                ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(width: 4),
+                  Text(
+                    '${_getCurrencySymbol(widget.currency)}${NumberFormat('#,##0.00').format(widget.expense.amount)}', // Format amount
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ],
               ),
               leading: Container(
                 padding: EdgeInsets.all(8),
@@ -124,36 +149,14 @@ class _ExpenseListItemState extends State<ExpenseListItem>
   }
 
   IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'food':
-        return Icons.restaurant;
-      case 'transport':
-        return Icons.directions_car;
-      case 'shopping':
-        return Icons.shopping_cart;
-      case 'entertainment':
-        return Icons.movie;
-      case 'bills':
-        return Icons.receipt;
-      default:
-        return Icons.attach_money;
-    }
+    final lowercaseCategory = category.toLowerCase();
+    return AppConstants.categoryIcons[lowercaseCategory] ??
+        Icons.category; // Default icon
   }
 
   Color _getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'food':
-        return Colors.orange;
-      case 'transport':
-        return Colors.blue;
-      case 'shopping':
-        return Colors.green;
-      case 'entertainment':
-        return Colors.purple;
-      case 'bills':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
+    final lowercaseCategory = category.toLowerCase();
+    return Color(int.parse(
+        '0xff${AppConstants.categoryColors[lowercaseCategory] ?? 'CCCCCC'}'));
   }
 }

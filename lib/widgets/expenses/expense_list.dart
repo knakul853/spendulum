@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:budget_buddy/providers/expense_provider.dart';
 import 'package:budget_buddy/widgets/expense_list_item.dart';
+import 'package:budget_buddy/providers/account_provider.dart';
 
 class ExpenseList extends StatelessWidget {
   final String accountId;
@@ -19,6 +20,10 @@ class ExpenseList extends StatelessWidget {
       builder: (context, expenseProvider, _) {
         final expenses = expenseProvider.getExpensesForMonth(selectedMonth,
             accountId: accountId);
+        final accountProvider =
+            Provider.of<AccountProvider>(context); // Get account provider
+
+        final accountCurrency = accountProvider.getCurrencyCode(accountId);
 
         return SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -45,7 +50,10 @@ class ExpenseList extends StatelessWidget {
                   ),
                 );
               } else if (index <= expenses.length) {
-                return ExpenseListItem(expense: expenses[index - 1]);
+                return ExpenseListItem(
+                  expense: expenses[index - 1],
+                  currency: accountCurrency,
+                );
               } else {
                 return SizedBox(height: 80); // Adjust this value as needed
               }

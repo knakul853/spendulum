@@ -102,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: ExpenseSummaryCircle(
                               selectedMonth: _selectedMonth,
                               accountId: selectedAccount.id,
+                              currency: selectedAccount.currency,
                               size:
                                   230, // Size of the ExpenseSummaryCircle, adjust as needed
                             ),

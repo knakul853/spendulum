@@ -8,12 +8,14 @@ class ExpenseSummaryCircle extends StatefulWidget {
   final DateTime selectedMonth;
   final String accountId;
   final double size;
+  final String currency; // Add currency parameter
 
   const ExpenseSummaryCircle({
     Key? key,
     required this.selectedMonth,
     required this.accountId,
     this.size = 140,
+    required this.currency, // Update constructor
   }) : super(key: key);
 
   @override
@@ -83,7 +85,7 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
                       ),
                       SizedBox(height: widget.size * 0.02),
                       Text(
-                        '\$${(totalExpenses * _animation.value).toStringAsFixed(0)}',
+                        '${_getCurrencySymbol(widget.currency)}${(totalExpenses * _animation.value).toStringAsFixed(0)}', // Use currency symbol
                         style: TextStyle(
                           fontSize: widget.size * 0.1,
                           fontWeight: FontWeight.bold,
@@ -91,7 +93,7 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
                       ),
                       SizedBox(height: widget.size * 0.02),
                       Text(
-                        'of \$${balance.toStringAsFixed(0)}',
+                        'of ${_getCurrencySymbol(widget.currency)}${balance.toStringAsFixed(0)}', // Use currency symbol
                         style: TextStyle(fontSize: widget.size * 0.05),
                       ),
                     ],
@@ -103,6 +105,21 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
         );
       },
     );
+  }
+
+  String _getCurrencySymbol(String currency) {
+    switch (currency.toUpperCase()) {
+      case 'INR':
+        return '₹';
+      case 'USD':
+        return '\$';
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      default:
+        return '\$'; // Default to USD
+    }
   }
 }
 

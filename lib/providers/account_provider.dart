@@ -76,4 +76,10 @@ class AccountProvider with ChangeNotifier {
       return null;
     }
   }
+
+  String getCurrencyCode(String id) {
+    final account = getAccountById(id);
+    return account?.currency ??
+        'USD'; // Return the currency code of the account
+  }
 }

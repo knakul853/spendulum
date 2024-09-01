@@ -15,6 +15,21 @@ class AccountCard extends StatelessWidget {
     required this.onTap,
   }) : super(key: key);
 
+  String _getCurrencySymbol(String currency) {
+    switch (currency.toUpperCase()) {
+      case 'INR':
+        return '₹';
+      case 'USD':
+        return '\$';
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      default:
+        return '\$'; // Default to USD
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -71,7 +86,7 @@ class AccountCard extends StatelessWidget {
                         ),
                         isSelected
                             ? Text(
-                                '\$${NumberFormat('#,##0').format(account.balance)}',
+                                '${_getCurrencySymbol(account.currency)}${NumberFormat('#,##0').format(account.balance)}', // Use currency symbol
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,

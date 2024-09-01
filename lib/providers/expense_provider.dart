@@ -90,4 +90,10 @@ class ExpenseProvider with ChangeNotifier {
     return getExpensesForMonth(month, accountId: accountId)
         .fold(0, (sum, expense) => sum + expense.amount);
   }
+
+  List<Expense> get sortedExpenses {
+    // Sort expenses by date in descending order
+    _expenses.sort((a, b) => b.date.compareTo(a.date));
+    return _expenses;
+  }
 }
