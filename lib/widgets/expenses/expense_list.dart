@@ -37,11 +37,11 @@ class ExpenseList extends StatelessWidget {
                     children: [
                       Text(
                         'No Spending Found', // Display message when no expenses
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 1.5, // Add letter spacing
+                            ),
                       ),
                       SizedBox(height: 5),
                       Divider(
