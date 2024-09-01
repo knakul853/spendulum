@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/splash_screen.dart';
+import 'ui/screens/splash_screen.dart';
 import 'providers/expense_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/account_provider.dart';

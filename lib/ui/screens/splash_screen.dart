@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/screens/home_screen.dart';
-import 'package:spendulum/screens/account_management_screen.dart';
-import 'package:spendulum/widgets/add_account_dialog.dart';
+import 'package:spendulum/ui/screens/home_screen.dart';
+import 'package:spendulum/ui/screens/account_management_screen.dart';
+import 'package:spendulum/ui/widgets/add_account_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -42,11 +42,41 @@ class _SplashScreenState extends State<SplashScreen>
 
     final accountProvider =
         Provider.of<AccountProvider>(context, listen: false);
-    if (accountProvider.accounts.isEmpty) {
-      _showWelcomeMessage();
-    } else {
-      _navigateToHome();
+
+    try {
+      // Load accounts first
+      await accountProvider.loadAccounts();
+
+      if (accountProvider.accounts.isEmpty) {
+        _showWelcomeMessage();
+      } else {
+        _navigateToHome();
+      }
+    } catch (e) {
+      // Handle error (e.g., show an error message)
+      _showErrorMessage('Failed to load accounts. Please try again.');
     }
+  }
+
+  void _showErrorMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Optionally, you can try to load accounts again or exit the app
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showWelcomeMessage() {

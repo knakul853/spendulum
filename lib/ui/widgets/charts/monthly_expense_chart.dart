@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/expense_provider.dart';
-import 'package:spendulum/widgets/charts/expense_chart.dart';
+import 'package:spendulum/ui/widgets/charts/expense_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/models/expense.dart';
 

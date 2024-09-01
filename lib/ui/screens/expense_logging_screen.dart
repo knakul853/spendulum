@@ -4,8 +4,8 @@ import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/category_provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:spendulum/widgets/animated_background.dart';
-import 'package:spendulum/widgets/logger.dart';
+import 'package:spendulum/ui/widgets/animated_background.dart';
+import 'package:spendulum/ui/widgets/logger.dart';
 
 class ExpenseLoggingScreen extends StatefulWidget {
   final String? initialAccountId;

@@ -8,13 +8,18 @@ class Account {
   double balance;
   final Color color;
   final String currency;
+  final DateTime createdAt;
+  DateTime updatedAt; // New field
 
-  Account(
-      {required this.id,
-      required this.name,
-      required this.accountNumber,
-      required this.accountType,
-      required this.balance,
-      required this.color,
-      required this.currency});
+  Account({
+    required this.id,
+    required this.name,
+    required this.accountNumber,
+    required this.accountType,
+    required this.balance,
+    required this.color,
+    required this.currency,
+    required this.createdAt,
+    required this.updatedAt, // New parameter
+  });
 }

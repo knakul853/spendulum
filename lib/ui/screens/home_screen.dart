@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/screens/expense_logging_screen.dart';
-import 'package:spendulum/screens/account_management_screen.dart';
-import 'package:spendulum/widgets/account_cards/account_cards_list.dart';
-import 'package:spendulum/widgets/expenses/expense_list.dart';
-import 'package:spendulum/widgets/animated_background.dart';
-import 'package:spendulum/widgets/month_selector.dart';
-import 'package:spendulum/widgets/expenses/expense_summary_circle.dart';
+import 'package:spendulum/ui/screens/expense_logging_screen.dart';
+import 'package:spendulum/ui/screens/account_management_screen.dart';
+import 'package:spendulum/ui/widgets/account_cards/account_cards_list.dart';
+import 'package:spendulum/ui/widgets/expenses/expense_list.dart';
+import 'package:spendulum/ui/widgets/animated_background.dart';
+import 'package:spendulum/ui/widgets/month_selector.dart';
+import 'package:spendulum/ui/widgets/expenses/expense_summary_circle.dart';
+import 'package:spendulum/ui/widgets/logger.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key}); // Changed to use 'super.key'
@@ -19,6 +20,25 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedMonth = DateTime.now();
 
+  @override
+  void initState() {
+    super.initState();
+    AppLogger.info("HomeScreen: initState called");
+    // Check if there's a selected account, if not, navigate to AccountManagementScreen
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final accountProvider =
+    //       Provider.of<AccountProvider>(context, listen: false);
+    //   if (accountProvider.getSelectedAccount() == null) {
+    //     Navigator.of(context).pushReplacement(
+    //       MaterialPageRoute(
+    //         builder: (context) =>
+    //             AccountManagementScreen(isInitialSetup: false),
+    //       ),
+    //     );
+    //   }
+    // });
+  }
+
   void _onMonthChanged(DateTime newMonth) {
     setState(() {
       _selectedMonth = newMonth;
@@ -28,20 +48,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppLogger.info("HomeScreen: build method called");
+
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
         final selectedAccount = accountProvider.getSelectedAccount();
 
         if (selectedAccount == null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (context) => const AccountManagementScreen(
-                        isInitialSetup: false,
-                      )),
-            );
-          });
-          return Container();
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text('Loading account...'),
+                ],
+              ),
+            ),
+          );
         }
 
         return Stack(
@@ -65,7 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             PageRouteBuilder(
                               pageBuilder:
                                   (context, animation, secondaryAnimation) =>
-                                      const AccountManagementScreen(),
+                                      const AccountManagementScreen(
+                                isInitialSetup: false,
+                              ),
                               transitionsBuilder: (context, animation,
                                   secondaryAnimation, child) {
                                 const begin =

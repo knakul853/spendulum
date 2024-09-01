@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/category_provider.dart';
-import 'package:spendulum/widgets/category_list.dart';
+import 'package:spendulum/ui/widgets/category_list.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class CategoryManagementScreen extends StatefulWidget {
@@ -16,6 +16,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final _formKey = GlobalKey<FormState>();
   String _categoryName = '';
   Color _categoryColor = Colors.blue; // Default color
+  IconData _icon = Icons.category;
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) {
@@ -25,8 +26,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     _formKey.currentState!.save();
 
     Provider.of<CategoryProvider>(context, listen: false).addCategory(
-      _categoryName,
-    );
+        _categoryName, _categoryColor.value.toRadixString(16), _icon);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Category added successfully!')),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/widgets/account_cards/account_card.dart';
-import 'package:spendulum/widgets/account_cards/add_account_card.dart';
-import 'package:spendulum/screens/account_management_screen.dart';
+import 'package:spendulum/ui/widgets/account_cards/account_card.dart';
+import 'package:spendulum/ui/widgets/account_cards/add_account_card.dart';
+import 'package:spendulum/ui/screens/account_management_screen.dart';
 
 class AccountCardsList extends StatelessWidget {
   const AccountCardsList({Key? key}) : super(key: key);
@@ -24,7 +24,9 @@ class AccountCardsList extends StatelessWidget {
                   child: AddAccountCard(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => AccountManagementScreen()),
+                          builder: (context) => AccountManagementScreen(
+                                isInitialSetup: false,
+                              )),
                     ),
                   ),
                 );

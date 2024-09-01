@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/expense_provider.dart';
-import 'package:spendulum/widgets/expense_list_item.dart';
+import 'package:spendulum/ui/widgets/expense_list_item.dart';
 import 'package:spendulum/providers/account_provider.dart';
 
 class ExpenseList extends StatelessWidget {

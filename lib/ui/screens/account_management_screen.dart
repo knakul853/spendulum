@@ -1,16 +1,16 @@
-import 'package:spendulum/widgets/logger.dart';
+import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/models/account.dart';
-import 'package:spendulum/screens/home_screen.dart';
-import 'package:spendulum/widgets/custom_color_picker.dart';
-import 'package:spendulum/widgets/custom_text_field.dart';
-import 'package:spendulum/widgets/custom_dropdown.dart';
+import 'package:spendulum/ui/screens/home_screen.dart';
+import 'package:spendulum/ui/widgets/custom_color_picker.dart';
+import 'package:spendulum/ui/widgets/custom_text_field.dart';
+import 'package:spendulum/ui/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
-import 'package:spendulum/widgets/account_cards/account_card.dart';
-import 'package:spendulum/widgets/animated_background.dart';
+import 'package:spendulum/ui/widgets/account_cards/account_card.dart';
+import 'package:spendulum/ui/widgets/animated_background.dart';
 
 class AccountManagementScreen extends StatefulWidget {
   final Function? onBackPressed;
@@ -19,7 +19,7 @@ class AccountManagementScreen extends StatefulWidget {
   const AccountManagementScreen({
     super.key,
     this.onBackPressed,
-    this.isInitialSetup = false,
+    required this.isInitialSetup,
   });
 
   @override
@@ -554,10 +554,13 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       AppLogger.info('Account created: $_name');
 
       if (widget.isInitialSetup) {
-        Navigator.of(context).pushReplacement(
+        AppLogger.info("Going to home screen");
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => HomeScreen()),
+          (Route<dynamic> route) => false,
         );
       } else {
+        AppLogger.info("Closing dialog");
         Navigator.of(context).pop();
       }
     }
