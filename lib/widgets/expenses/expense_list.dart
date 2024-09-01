@@ -28,7 +28,29 @@ class ExpenseList extends StatelessWidget {
         return SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              if (index == 0) {
+              if (expenses.isEmpty) {
+                // Check if there are no expenses
+                return Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No Spending Found', // Display message when no expenses
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                      ),
+                      SizedBox(height: 5),
+                      Divider(
+                          thickness: 1,
+                          color: Colors.white.withOpacity(0.5)), // Show divider
+                    ],
+                  ),
+                );
+              } else if (index == 0) {
                 // Return the "Latest Spending" header and divider
                 return Padding(
                   padding: EdgeInsets.all(8),
@@ -45,7 +67,8 @@ class ExpenseList extends StatelessWidget {
                       ),
                       SizedBox(height: 5),
                       Divider(
-                          thickness: 1, color: Colors.white.withOpacity(0.5)),
+                          thickness: 1,
+                          color: Colors.white.withOpacity(0.5)), // Show divider
                     ],
                   ),
                 );
@@ -59,7 +82,9 @@ class ExpenseList extends StatelessWidget {
               }
               // Return expense list items
             },
-            childCount: expenses.length + 2, // +1 for the header
+            childCount: expenses.isEmpty
+                ? 1
+                : expenses.length + 2, // Adjust childCount for no expenses
           ),
         );
       },

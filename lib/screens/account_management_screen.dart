@@ -1,4 +1,3 @@
-import 'package:budget_buddy/widgets/animation.dart';
 import 'package:budget_buddy/widgets/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -10,6 +9,8 @@ import 'package:budget_buddy/widgets/custom_color_picker.dart';
 import 'package:budget_buddy/widgets/custom_text_field.dart';
 import 'package:budget_buddy/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
+import 'package:budget_buddy/widgets/account_cards/account_card.dart';
+import 'package:budget_buddy/widgets/animated_background.dart';
 
 class AccountManagementScreen extends StatefulWidget {
   final Function? onBackPressed;
@@ -32,7 +33,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
   String _name = '';
   String _accountNumber = '';
   String _accountType = 'General';
-  double _balance = 0.0;
+  double _balance = 0;
   Color _color = Colors.blue;
   String _currency = 'USD';
 
@@ -69,48 +70,56 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         }
         return true;
       },
-      child: Stack(
-        children: [
-          GradientAnimatedBackground(
-              child: Container()), // This will cover the full screen
-          Scaffold(
-            backgroundColor:
-                Colors.transparent, // Make scaffold background transparent
-            appBar: AppBar(
-              backgroundColor:
-                  Colors.transparent, // Make app bar background transparent
-              elevation: 0, // Remove app bar shadow
-              title: Text(widget.isInitialSetup
+      child: AnimatedBackground(
+        color: Colors.blue, // Set your desired background color here
+        child: Scaffold(
+          backgroundColor:
+              Colors.transparent, // Make scaffold background transparent
+          appBar: AppBar(
+            backgroundColor: Colors.blue.shade700.withOpacity(
+                0.8), // Set a solid background color with some opacity
+            // Make app bar background transparent
+            elevation: 4, // Remove app bar shadow
+            title: Text(
+              widget.isInitialSetup
                   ? 'Add Your First Account'
-                  : 'Manage Accounts'),
-              leading: widget.isInitialSetup
-                  ? IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: _showExitConfirmationDialog,
-                    )
-                  : null,
+                  : 'Manage Accounts',
+              style: TextStyle(color: Colors.white),
             ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (widget.isInitialSetup) _buildHeaderText(),
-                      SizedBox(height: 24),
-                      _buildAccountForm(),
-                      SizedBox(height: 24),
-                      _buildSubmitButton(),
-                      if (!widget.isInitialSetup) SizedBox(height: 16),
-                      if (!widget.isInitialSetup) _buildSkipButton(),
-                    ],
-                  ),
+            leading: widget.isInitialSetup
+                ? IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: _showExitConfirmationDialog,
+                  )
+                : null,
+          ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (widget.isInitialSetup) _buildHeaderText(),
+                    SizedBox(height: 24),
+                    if (widget.isInitialSetup)
+                      _buildAccountForm(), // Show the account form
+                    if (widget.isInitialSetup)
+                      SizedBox(height: 24), // Add spacing
+                    if (widget.isInitialSetup)
+                      _buildSubmitButton(), // Show the submit button
+                    if (!widget.isInitialSetup) _buildAccountList(),
+                    if (!widget.isInitialSetup) SizedBox(height: 24),
+                    if (!widget.isInitialSetup) _buildAddAccountButton(),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -241,41 +250,39 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
-  Widget _buildAccountList(AccountProvider accountProvider) {
-    return ListView.builder(
-      itemCount: accountProvider.accounts.length,
-      itemBuilder: (context, index) {
-        return _buildAccountTile(accountProvider.accounts[index]);
+  Widget _buildAddAccountButton() {
+    return FloatingActionButton(
+      onPressed: () => _showAddAccountDialog(),
+      child: Icon(Icons.add),
+    );
+  }
+
+  Widget _buildAccountList() {
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, _) {
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: accountProvider.accounts.length,
+          itemBuilder: (context, index) {
+            return _buildAccountTile(accountProvider.accounts[index]);
+          },
+        );
       },
     );
   }
 
   Widget _buildAccountTile(Account account) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(16),
-        leading: CircleAvatar(
-          backgroundColor: account.color,
-          radius: 25,
-          child: Icon(Icons.account_balance, color: Colors.white),
-        ),
-        title:
-            Text(account.name, style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('${account.accountType} - ${account.accountNumber}'),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text('${account.currency} ${account.balance.toStringAsFixed(2)}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            SizedBox(height: 4),
-            Text(account.accountType, style: TextStyle(color: Colors.grey)),
-          ],
-        ),
-        onTap: () => _showEditAccountDialog(account),
+    return GestureDetector(
+      onTap: () {
+        _showEditAccountDialog(account);
+      },
+      child: AccountCard(
+        account: account,
+        isSelected: true, // Adjust selection logic as needed
+        onTap: () => {
+          _showEditAccountDialog(account)
+        }, // This can be left empty or removed
       ),
     );
   }
@@ -289,7 +296,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             padding: EdgeInsets.all(24),
-            constraints: BoxConstraints(maxWidth: 400),
+            constraints: BoxConstraints(maxWidth: 600),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -305,8 +312,20 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child: Text('Cancel'),
+                        child: Text('Cancel',
+                            style: TextStyle(
+                                color: Colors
+                                    .white)), // Change text color to white
                         onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors
+                              .redAccent, // Background color for the button
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
                       ),
                       SizedBox(width: 16),
                       ElevatedButton(
@@ -314,9 +333,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                         onPressed: _submitForm,
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
+                              horizontal: 25, vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30)),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          backgroundColor: Colors
+                              .blueAccent, // Background color for the button
+                          foregroundColor: Colors.white, // Text color
+                          elevation: 5, // Add elevation for shadow
                         ),
                       ),
                     ],
@@ -567,6 +591,11 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             onSaved: (value) => _balance = double.parse(value!),
             keyboardType: TextInputType.number,
             initialValue: _balance.toString(),
+            onTap: () {
+              setState(() {
+                _balance = 0; // Clear the prefilled value
+              });
+            },
           ),
           SizedBox(height: 16),
           CustomDropdown(

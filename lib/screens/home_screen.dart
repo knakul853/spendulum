@@ -10,7 +10,7 @@ import 'package:budget_buddy/widgets/month_selector.dart';
 import 'package:budget_buddy/widgets/expenses/expense_summary_circle.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key}); // Changed to use 'super.key'
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -36,7 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                  builder: (context) => AccountManagementScreen()),
+                  builder: (context) => const AccountManagementScreen(
+                        isInitialSetup: false,
+                      )),
             );
           });
           return Container();
@@ -49,23 +51,54 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: Colors.transparent,
               body: CustomScrollView(
                 slivers: [
-                  const SliverAppBar(
+                  SliverAppBar(
                     expandedHeight: 160.0,
                     floating: false,
                     pinned: true,
                     automaticallyImplyLeading: false,
                     backgroundColor: Colors.transparent,
-                    flexibleSpace: FlexibleSpaceBar(
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.settings),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const AccountManagementScreen(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin =
+                                    Offset(1.0, 0.0); // Start from the right
+                                const end =
+                                    Offset.zero; // End at the original position
+                                const curve = Curves.easeInOut;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                    flexibleSpace: const FlexibleSpaceBar(
                       background: Padding(
-                        padding: EdgeInsets.only(top: 40.0),
+                        padding: EdgeInsets.only(top: 60.0),
                         child: AccountCardsList(),
                       ),
                     ),
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       child: MonthSelector(
                         selectedMonth: _selectedMonth,
                         onMonthChanged: _onMonthChanged,
@@ -74,8 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                       child: Center(
                         child: Container(
                           width: 230, // Size of the circular background
@@ -94,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
                                 blurRadius: 8,
-                                offset: Offset(0, 4), // Shadow position
+                                offset: const Offset(0, 4), // Shadow position
                               ),
                             ],
                           ),
@@ -147,14 +180,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildAddExpenseButton(BuildContext context, String accountId) {
     return FloatingActionButton.extended(
-      onPressed: () => _navigateTo(
-          context, ExpenseLoggingScreen(initialAccountId: accountId)),
+      onPressed: () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                ExpenseLoggingScreen(initialAccountId: accountId),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0); // Start from the bottom
+              const end = Offset.zero; // End at the original position
+              const curve = Curves.easeInOut;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+          ),
+        );
+      },
       icon: const Icon(Icons.add),
       label: const Text('Add Expense'),
     );
-  }
-
-  void _navigateTo(BuildContext context, Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
   }
 }

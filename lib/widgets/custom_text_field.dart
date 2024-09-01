@@ -5,6 +5,7 @@ class CustomTextField extends StatelessWidget {
   final Function(String?) onSaved;
   final String? initialValue;
   final TextInputType? keyboardType;
+  final VoidCallback? onTap; // Add optional onTap callback
 
   const CustomTextField({
     Key? key,
@@ -12,21 +13,26 @@ class CustomTextField extends StatelessWidget {
     required this.onSaved,
     this.initialValue,
     this.keyboardType,
+    this.onTap, // Include onTap in the constructor
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Colors.grey[100],
+    return GestureDetector(
+      // Wrap in GestureDetector to handle onTap
+      onTap: onTap,
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.grey[100],
+        ),
+        initialValue: initialValue,
+        keyboardType: keyboardType,
+        validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
+        onSaved: onSaved,
       ),
-      initialValue: initialValue,
-      keyboardType: keyboardType,
-      validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
-      onSaved: onSaved,
     );
   }
 }

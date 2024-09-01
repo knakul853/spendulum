@@ -83,7 +83,8 @@ class ExpenseProvider with ChangeNotifier {
             expense.date.year == month.year &&
             expense.date.month == month.month &&
             (accountId == null || expense.accountId == accountId))
-        .toList();
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
   }
 
   double getTotalExpensesForMonth(DateTime month, {String? accountId}) {

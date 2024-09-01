@@ -33,7 +33,10 @@ class AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        print('Account card tapped: ${account.name}');
+        onTap(); // Log statement
+      },
       child: Container(
         width: 160,
         margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
