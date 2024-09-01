@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/account_provider.dart';
+import 'package:spendulum/providers/account_provider.dart';
 
 class AddAccountDialog extends StatefulWidget {
   final Function? onAccountAdded;

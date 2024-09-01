@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/category_provider.dart';
-import 'package:budget_buddy/widgets/category_list.dart';
+import 'package:spendulum/providers/category_provider.dart';
+import 'package:spendulum/widgets/category_list.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class CategoryManagementScreen extends StatefulWidget {

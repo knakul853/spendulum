@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/expense_provider.dart';
-import 'package:budget_buddy/widgets/summary_card.dart';
+import 'package:spendulum/providers/expense_provider.dart';
+import 'package:spendulum/widgets/summary_card.dart';
 
 class SummarySection extends StatelessWidget {
   final String accountId;

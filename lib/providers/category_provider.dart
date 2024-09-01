@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:budget_buddy/models/category.dart';
-import 'package:budget_buddy/utils/category_utils.dart';
+import 'package:spendulum/models/category.dart';
+import 'package:spendulum/utils/category_utils.dart';
 
 class CategoryProvider with ChangeNotifier {
   final List<Category> _categories = [

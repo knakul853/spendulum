@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/account_provider.dart';
-import 'package:budget_buddy/screens/home_screen.dart';
-import 'package:budget_buddy/screens/account_management_screen.dart';
-import 'package:budget_buddy/widgets/add_account_dialog.dart';
+import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/screens/home_screen.dart';
+import 'package:spendulum/screens/account_management_screen.dart';
+import 'package:spendulum/widgets/add_account_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -192,13 +192,17 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.account_balance_wallet,
-                    size: 100, color: Colors.white),
+                Image.asset(
+                  'assets/images/app_icon.png',
+                  width: 100,
+                  height: 100,
+                ),
                 SizedBox(height: 20),
                 Text(
-                  'Budget Buddy',
+                  'Spendulum: Expense and Income Tracker',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
@@ -249,10 +253,10 @@ class WelcomeScreen extends StatelessWidget {
                             child: child,
                           );
                         },
-                        child: Icon(
-                          Icons.account_balance_wallet,
-                          size: 120,
-                          color: Colors.white,
+                        child: Image.asset(
+                          'assets/images/app_icon.png',
+                          width: 100,
+                          height: 100,
                         ),
                       ),
                       SizedBox(height: 40),
@@ -266,7 +270,7 @@ class WelcomeScreen extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          'Welcome to Budget Buddy!',
+                          'Welcome to Spendulum!',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,

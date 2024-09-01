@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/expense_provider.dart';
+import 'package:spendulum/providers/expense_provider.dart';
 import 'package:vector_math/vector_math.dart' as vector;
-import 'package:budget_buddy/providers/account_provider.dart';
+import 'package:spendulum/providers/account_provider.dart';
 
 class ExpenseSummaryCircle extends StatefulWidget {
   final DateTime selectedMonth;

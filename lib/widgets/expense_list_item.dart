@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:budget_buddy/models/expense.dart';
+import 'package:spendulum/models/expense.dart';
 import 'package:intl/intl.dart';
-import 'package:budget_buddy/constants/app_constants.dart';
+import 'package:spendulum/constants/app_constants.dart';
 
 class ExpenseListItem extends StatefulWidget {
   final Expense expense;

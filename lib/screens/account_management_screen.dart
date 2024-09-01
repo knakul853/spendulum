@@ -1,16 +1,16 @@
-import 'package:budget_buddy/widgets/logger.dart';
+import 'package:spendulum/widgets/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/account_provider.dart';
-import 'package:budget_buddy/models/account.dart';
-import 'package:budget_buddy/screens/home_screen.dart';
-import 'package:budget_buddy/widgets/custom_color_picker.dart';
-import 'package:budget_buddy/widgets/custom_text_field.dart';
-import 'package:budget_buddy/widgets/custom_dropdown.dart';
+import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/models/account.dart';
+import 'package:spendulum/screens/home_screen.dart';
+import 'package:spendulum/widgets/custom_color_picker.dart';
+import 'package:spendulum/widgets/custom_text_field.dart';
+import 'package:spendulum/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
-import 'package:budget_buddy/widgets/account_cards/account_card.dart';
-import 'package:budget_buddy/widgets/animated_background.dart';
+import 'package:spendulum/widgets/account_cards/account_card.dart';
+import 'package:spendulum/widgets/animated_background.dart';
 
 class AccountManagementScreen extends StatefulWidget {
   final Function? onBackPressed;

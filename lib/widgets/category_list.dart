@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/category_provider.dart';
+import 'package:spendulum/providers/category_provider.dart';
 
 class CategoryList extends StatelessWidget {
   const CategoryList({super.key});

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/account_provider.dart';
-import 'package:budget_buddy/screens/expense_logging_screen.dart';
-import 'package:budget_buddy/screens/account_management_screen.dart';
-import 'package:budget_buddy/widgets/account_cards/account_cards_list.dart';
-import 'package:budget_buddy/widgets/expenses/expense_list.dart';
-import 'package:budget_buddy/widgets/animated_background.dart';
-import 'package:budget_buddy/widgets/month_selector.dart';
-import 'package:budget_buddy/widgets/expenses/expense_summary_circle.dart';
+import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/screens/expense_logging_screen.dart';
+import 'package:spendulum/screens/account_management_screen.dart';
+import 'package:spendulum/widgets/account_cards/account_cards_list.dart';
+import 'package:spendulum/widgets/expenses/expense_list.dart';
+import 'package:spendulum/widgets/animated_background.dart';
+import 'package:spendulum/widgets/month_selector.dart';
+import 'package:spendulum/widgets/expenses/expense_summary_circle.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key}); // Changed to use 'super.key'

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/expense_provider.dart';
-import 'package:budget_buddy/providers/category_provider.dart';
-import 'package:budget_buddy/providers/account_provider.dart';
+import 'package:spendulum/providers/expense_provider.dart';
+import 'package:spendulum/providers/category_provider.dart';
+import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:budget_buddy/widgets/animated_background.dart';
-import 'package:budget_buddy/widgets/logger.dart';
+import 'package:spendulum/widgets/animated_background.dart';
+import 'package:spendulum/widgets/logger.dart';
 
 class ExpenseLoggingScreen extends StatefulWidget {
   final String? initialAccountId;

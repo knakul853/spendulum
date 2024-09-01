@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:budget_buddy/models/expense.dart';
-import 'package:budget_buddy/providers/account_provider.dart';
+import 'package:spendulum/models/expense.dart';
+import 'package:spendulum/providers/account_provider.dart';
 
 class ExpenseProvider with ChangeNotifier {
   final List<Expense> _expenses = [];

@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:budget_buddy/providers/expense_provider.dart';
+import 'package:spendulum/providers/expense_provider.dart';
 
 class CategoryPieChart extends StatelessWidget {
   final String accountId;

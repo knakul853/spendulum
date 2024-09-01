@@ -1,5 +1,5 @@
-import 'package:budget_buddy/models/category.dart';
-import 'package:budget_buddy/constants/app_constants.dart';
+import 'package:spendulum/models/category.dart';
+import 'package:spendulum/constants/app_constants.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart' show Icons;
 

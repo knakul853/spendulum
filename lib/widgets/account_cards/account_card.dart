@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:budget_buddy/models/account.dart';
-import 'package:budget_buddy/widgets/animated_card_shape.dart';
+import 'package:spendulum/models/account.dart';
+import 'package:spendulum/widgets/animated_card_shape.dart';
 import 'package:intl/intl.dart';
 
 class AccountCard extends StatelessWidget {

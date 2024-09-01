@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'package:budget_buddy/models/account.dart';
+import 'package:spendulum/models/account.dart';
 
 class AccountProvider with ChangeNotifier {
   final List<Account> _accounts = [];
