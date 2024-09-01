@@ -480,8 +480,25 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Account Color',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Container(
+          color: Colors.black54, // Semi-transparent background for contrast
+          padding: EdgeInsets.all(8), // Padding around the text
+          child: const Text(
+            'Account Color',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  blurRadius: 4.0,
+                  color: Colors.black, // Shadow color
+                  offset: Offset(1.0, 1.0), // Shadow offset
+                ),
+              ], // Change to a more visible color
+            ),
+          ),
+        ),
         SizedBox(height: 8),
         GestureDetector(
           onTap: _showColorPalette,
@@ -553,9 +570,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       child: Text(
         "Let's set up your first account to get started!",
         style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue.shade700),
+            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         textAlign: TextAlign.center,
       ),
     );

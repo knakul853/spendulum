@@ -16,9 +16,12 @@ class CustomColorPicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Account Color',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        SizedBox(height: 8),
+        const Text('Account Color',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
+        const SizedBox(height: 8),
         GestureDetector(
           onTap: () => _showColorPalette(context),
           child: Container(
