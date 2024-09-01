@@ -1,6 +1,6 @@
-# Budget Buddy
+# Spendulum: Expense and Income Tracker
 
-![Budget Buddy Logo](path/to/logo.png) <!-- Replace with your logo path -->
+![Spendulum: Expense and Income Tracker](assets/images/app_icon.png) <!-- Replace with your logo path -->
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@
 
 ## Introduction
 
-Budget Buddy is a personal finance management application designed to help users track their expenses, manage budgets, and achieve their financial goals. With an intuitive interface and powerful features, Budget Buddy makes budgeting easy and accessible for everyone.
+Spendulum: Expense and Income Tracker is a personal finance management application designed to help users track their expenses, manage budgets, and achieve their financial goals. With an intuitive interface and powerful features, Spendulum: Expense and Income Tracker makes budgeting easy and accessible for everyone.
 
 ## Features
 
@@ -36,7 +36,7 @@ Budget Buddy is a personal finance management application designed to help users
 
 ## Installation
 
-To get started with Budget Buddy, follow these steps:
+To get started with Spendulum: Expense and Income Tracker, follow these steps:
 
 1. **Clone the repository**:
 
@@ -65,7 +65,7 @@ To get started with Budget Buddy, follow these steps:
 
 ## Contributing
 
-We welcome contributions to Budget Buddy! If you'd like to contribute, please follow these steps:
+We welcome contributions to Spendulum: Expense and Income Tracker! If you'd like to contribute, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/YourFeature`).
@@ -86,4 +86,4 @@ For any inquiries or feedback, please reach out to:
 
 ---
 
-Thank you for using Budget Buddy! We hope it helps you manage your finances effectively.
+Thank you for using Spendulum: Expense and Income Tracker! We hope it helps you manage your finances effectively.
