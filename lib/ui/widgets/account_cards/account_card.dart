@@ -7,12 +7,14 @@ class AccountCard extends StatelessWidget {
   final Account account;
   final bool isSelected;
   final VoidCallback onTap;
+  final Widget? trailing; // Add this line to accept a trailing widget
 
   const AccountCard({
     Key? key,
     required this.account,
     required this.isSelected,
     required this.onTap,
+    this.trailing, // Add this line to the constructor
   }) : super(key: key);
 
   String _getCurrencySymbol(String currency) {
@@ -126,6 +128,12 @@ class AccountCard extends StatelessWidget {
                   color: Colors.white,
                   size: 20,
                 ),
+              ),
+            if (trailing != null) // Check if trailing is provided
+              Positioned(
+                top: 8,
+                right: 8,
+                child: trailing!, // Use the trailing widget
               ),
           ],
         ),

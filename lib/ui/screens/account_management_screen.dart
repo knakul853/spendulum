@@ -272,6 +272,48 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
+  // Add this method to show the delete confirmation dialog
+  void _showDeleteAccountDialog(Account account) {
+    final TextEditingController _accountNumberController =
+        TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Deleting your account will delete your expense details.'),
+              SizedBox(height: 16),
+              TextField(
+                controller: _accountNumberController,
+                decoration: InputDecoration(labelText: 'Enter Account Number'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                final accountProvider =
+                    Provider.of<AccountProvider>(context, listen: false);
+                accountProvider.deleteAccount(
+                    account.id, _accountNumberController.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildAccountTile(Account account) {
     return GestureDetector(
       onTap: () {
@@ -283,6 +325,11 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         onTap: () => {
           _showEditAccountDialog(account)
         }, // This can be left empty or removed
+        trailing: IconButton(
+          icon: Icon(Icons.delete, color: Colors.red),
+          onPressed: () =>
+              _showDeleteAccountDialog(account), // Show delete dialog
+        ),
       ),
     );
   }

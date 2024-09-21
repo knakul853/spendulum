@@ -4,6 +4,7 @@ import 'package:spendulum/models/account.dart';
 import 'package:spendulum/services/database/database_helper.dart';
 import 'package:spendulum/services/database/tables/accounts_table.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/services/database/tables/expense_table.dart';
 
 // AccountProvider class manages the accounts in the application.
 // It handles loading, adding, updating, and selecting accounts,
@@ -133,6 +134,30 @@ class AccountProvider with ChangeNotifier {
       AppLogger.info('Account updated successfully: $id');
     } catch (e) {
       AppLogger.error('Error updating account', error: e);
+    }
+  }
+
+  // Deletes an account and its associated expenses
+  Future<void> deleteAccount(String id, String accountNumber) async {
+    final account = getAccountById(id);
+    if (account != null && account.accountNumber == accountNumber) {
+      AppLogger.info('Deleting account: $id');
+      try {
+        await DatabaseHelper.instance
+            .delete(AccountsTable.tableName, AccountsTable.columnId, id);
+        // Delete associated expenses
+        await DatabaseHelper.instance
+            .delete(ExpensesTable.tableName, ExpensesTable.columnAccountId, id);
+        _accounts.removeWhere(
+            (account) => account.id == id); // Remove from local list
+        notifyListeners(); // Notify listeners of the change
+        AppLogger.info('Account deleted successfully: $id');
+      } catch (e) {
+        AppLogger.error('Error deleting account', error: e);
+      }
+    } else {
+      AppLogger.warn(
+          'Account number does not match for deletion: $accountNumber');
     }
   }
 
