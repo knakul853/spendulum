@@ -9,6 +9,8 @@ import 'package:spendulum/ui/widgets/animated_background.dart';
 import 'package:spendulum/ui/widgets/month_selector.dart';
 import 'package:spendulum/ui/widgets/expenses/expense_summary_circle.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/providers/expense_provider.dart';
+import 'package:spendulum/models/account.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key}); // Changed to use 'super.key'
@@ -18,7 +20,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime _selectedMonth = DateTime.now();
+  DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month,
+      1); // Set to the first day of the current month
+  Account? selectedAccount; // Declare selectedAccount as a member variable
 
   @override
   void initState() {
@@ -37,6 +41,16 @@ class _HomeScreenState extends State<HomeScreen> {
     //     );
     //   }
     // });
+    final accountProvider =
+        Provider.of<AccountProvider>(context, listen: false);
+    selectedAccount = accountProvider.getSelectedAccount();
+
+    if (selectedAccount != null) {
+      final expenseProvider =
+          Provider.of<ExpenseProvider>(context, listen: false);
+      expenseProvider.loadExpenses(selectedAccount!.id,
+          _selectedMonth); // Load expenses for the selected account and month
+    }
   }
 
   void _onMonthChanged(DateTime newMonth) {
@@ -52,8 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
-        final selectedAccount = accountProvider.getSelectedAccount();
-
+        selectedAccount = accountProvider.getSelectedAccount();
         if (selectedAccount == null) {
           return Scaffold(
             body: Center(
@@ -84,7 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: Colors.transparent,
                     actions: [
                       IconButton(
-                        icon: const Icon(Icons.settings),
+                        icon: const Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
                           Navigator.of(context).push(
                             PageRouteBuilder(
@@ -161,8 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Center(
                             child: ExpenseSummaryCircle(
                               selectedMonth: _selectedMonth,
-                              accountId: selectedAccount.id,
-                              currency: selectedAccount.currency,
+                              accountId: selectedAccount!.id,
+                              currency: selectedAccount!.currency,
                               size:
                                   230, // Size of the ExpenseSummaryCircle, adjust as needed
                             ),
@@ -191,13 +207,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   //   ),
                   // ),
                   ExpenseList(
-                    accountId: selectedAccount.id,
+                    accountId: selectedAccount!.id,
                     selectedMonth: _selectedMonth,
                   ),
                 ],
               ),
               floatingActionButton:
-                  _buildAddExpenseButton(context, selectedAccount.id),
+                  _buildAddExpenseButton(context, selectedAccount!.id),
             ),
           ],
         );

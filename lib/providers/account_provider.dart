@@ -42,7 +42,7 @@ class AccountProvider with ChangeNotifier {
 
       // Select the latest account as the selected account
       if (_accounts.isNotEmpty) {
-        _selectedAccountId = getLatestAccount().id;
+        _selectedAccountId = getOldestAccount().id;
         AppLogger.info('Selected latest account: ${_selectedAccountId}');
       }
 
@@ -193,5 +193,10 @@ class AccountProvider with ChangeNotifier {
   // Retrieves the latest account based on the updatedAt timestamp
   Account getLatestAccount() {
     return _accounts.reduce((a, b) => a.updatedAt.isAfter(b.updatedAt) ? a : b);
+  }
+
+  Account getOldestAccount() {
+    return _accounts
+        .reduce((a, b) => a.updatedAt.isBefore(b.updatedAt) ? a : b);
   }
 }

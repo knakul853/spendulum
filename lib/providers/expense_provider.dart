@@ -33,7 +33,7 @@ class ExpenseProvider with ChangeNotifier {
   double get monthlyBudget => _monthlyBudget;
 
   // Load expenses from the database
-  Future<void> loadExpenses() async {
+  Future<void> loadExpenses(String accountId, DateTime month) async {
     AppLogger.info('Loading expenses from the database');
     try {
       // Query all expense records from the database
@@ -41,7 +41,15 @@ class ExpenseProvider with ChangeNotifier {
           await DatabaseHelper.instance.queryAllRows(ExpensesTable.tableName);
       _expenses.clear(); // Clear existing expenses
       // Map the database records to Expense objects
-      _expenses.addAll(expenseMaps.map((map) => Expense(
+
+      // Map the database records to Expense objects, filtering by accountId and month
+      _expenses.addAll(expenseMaps.where((map) {
+        final expenseDate =
+            DateTime.parse(map[ExpensesTable.columnDate] as String);
+        return map[ExpensesTable.columnAccountId] == accountId &&
+            expenseDate.year == month.year &&
+            expenseDate.month == month.month;
+      }).map((map) => Expense(
             id: map[ExpensesTable.columnId] as String,
             category: map[ExpensesTable.columnCategory] as String,
             amount: map[ExpensesTable.columnAmount] as double,
@@ -49,6 +57,15 @@ class ExpenseProvider with ChangeNotifier {
             description: map[ExpensesTable.columnDescription] as String,
             accountId: map[ExpensesTable.columnAccountId] as String,
           )));
+
+      // _expenses.addAll(expenseMaps.map((map) => Expense(
+      //       id: map[ExpensesTable.columnId] as String,
+      //       category: map[ExpensesTable.columnCategory] as String,
+      //       amount: map[ExpensesTable.columnAmount] as double,
+      //       date: DateTime.parse(map[ExpensesTable.columnDate] as String),
+      //       description: map[ExpensesTable.columnDescription] as String,
+      //       accountId: map[ExpensesTable.columnAccountId] as String,
+      //     )));
       AppLogger.info('Loaded ${_expenses.length} expenses from the database');
       notifyListeners(); // Notify listeners of changes
     } catch (e) {
