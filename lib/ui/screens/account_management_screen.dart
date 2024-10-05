@@ -1,6 +1,5 @@
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/models/account.dart';
@@ -178,77 +177,6 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       },
     );
   }
-
-  void _showSetupCompletedDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle, size: 80, color: Colors.green),
-                SizedBox(height: 24),
-                Text('All set up!',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16),
-                Text('Your account has been created successfully.',
-                    textAlign: TextAlign.center),
-                SizedBox(height: 24),
-                ElevatedButton(
-                  child: Text('Start Budgeting'),
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Widget _buildEmptyState() {
-  //   return Center(
-  //     child: Column(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       children: [
-  //         Icon(Icons.account_balance_wallet, size: 80, color: Colors.grey),
-  //         SizedBox(height: 16),
-  //         Text('No accounts found',
-  //             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-  //         SizedBox(height: 8),
-  //         Text('Add an account to get started',
-  //             style: TextStyle(fontSize: 16, color: Colors.grey)),
-  //         SizedBox(height: 24),
-  //         ElevatedButton.icon(
-  //           onPressed: () => _showAddAccountDialog(),
-  //           icon: Icon(Icons.add),
-  //           label: Text('Create an Account'),
-  //           style: ElevatedButton.styleFrom(
-  //             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-  //             shape: RoundedRectangleBorder(
-  //                 borderRadius: BorderRadius.circular(30)),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildAddAccountButton() {
     return FloatingActionButton(
@@ -496,110 +424,6 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
-  Widget _buildTextFormField(String label, Function(String?) onSaved,
-      {TextInputType? keyboardType, String? initialValue}) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
-      initialValue: initialValue,
-      keyboardType: keyboardType,
-      validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
-      onSaved: onSaved,
-    );
-  }
-
-  Widget _buildDropdownField(
-      String label, List<String> items, Function(String?) onChanged,
-      {String? initialValue}) {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
-      value: initialValue ?? items[0],
-      items: items.map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: onChanged,
-    );
-  }
-
-  Widget _buildColorPicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          color: Colors.black54, // Semi-transparent background for contrast
-          padding: EdgeInsets.all(8), // Padding around the text
-          child: const Text(
-            'Account Color',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.normal,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  blurRadius: 4.0,
-                  color: Colors.black, // Shadow color
-                  offset: Offset(1.0, 1.0), // Shadow offset
-                ),
-              ], // Change to a more visible color
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        GestureDetector(
-          onTap: _showColorPalette,
-          child: Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: _color,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showColorPalette() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Select Account Color'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: _color,
-              onColorChanged: (Color color) {
-                setState(() => _color = color);
-              },
-              pickerAreaHeightPercent: 0.8,
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -681,6 +505,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
           ),
           SizedBox(height: 16),
           CustomColorPicker(
+            key: ValueKey(_color),
             initialColor: _color,
             onColorChanged: (color) => setState(() => _color = color),
           ),
@@ -703,15 +528,6 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSkipButton() {
-    return TextButton(
-      child: Text('Skip for now'),
-      onPressed: () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
       ),
     );
   }
