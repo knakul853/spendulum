@@ -53,11 +53,38 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+
+  //   // final accountProvider = Provider.of<AccountProvider>(context, listen: true);
+  //   // selectedAccount = accountProvider.getSelectedAccount();
+
+  //   if (selectedAccount != null) {
+  //     AppLogger.info("Selected account was ${selectedAccount?.accountNumber}");
+  //     final expenseProvider =
+  //         Provider.of<ExpenseProvider>(context, listen: false);
+  //     expenseProvider.loadExpenses(selectedAccount!.id,
+  //         _selectedMonth); // Load expenses for the selected account and month
+  //   }
+  // }
+
   void _onMonthChanged(DateTime newMonth) {
     setState(() {
       _selectedMonth = newMonth;
     });
+    loadExpenses();
     // Here you would typically update your data based on the new month
+  }
+
+  void loadExpenses() {
+    if (selectedAccount != null) {
+      AppLogger.info("Selected account was ${selectedAccount?.accountNumber}");
+      final expenseProvider =
+          Provider.of<ExpenseProvider>(context, listen: false);
+      expenseProvider.loadExpenses(selectedAccount!.id,
+          _selectedMonth); // Load expenses for the selected account and month
+    }
   }
 
   @override
@@ -67,6 +94,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
         selectedAccount = accountProvider.getSelectedAccount();
+        AppLogger.info(
+            "The selected account is: ${selectedAccount?.accountNumber}");
+
+        loadExpenses();
+
         if (selectedAccount == null) {
           return Scaffold(
             body: Center(

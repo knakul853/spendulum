@@ -34,7 +34,8 @@ class ExpenseProvider with ChangeNotifier {
 
   // Load expenses from the database
   Future<void> loadExpenses(String accountId, DateTime month) async {
-    AppLogger.info('Loading expenses from the database');
+    AppLogger.info(
+        'Loading expenses from the database for account $accountId and month $month');
     try {
       // Query all expense records from the database
       final expenseMaps =
@@ -42,6 +43,7 @@ class ExpenseProvider with ChangeNotifier {
       _expenses.clear(); // Clear existing expenses
       // Map the database records to Expense objects
 
+      AppLogger.info("The expense map is: $expenseMaps");
       // Map the database records to Expense objects, filtering by accountId and month
       _expenses.addAll(expenseMaps.where((map) {
         final expenseDate =

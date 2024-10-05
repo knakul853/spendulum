@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/ui/widgets/expense_list_item.dart';
 import 'package:spendulum/providers/account_provider.dart';
+import 'package:intl/intl.dart';
 
 class ExpenseList extends StatelessWidget {
   final String accountId;
@@ -58,7 +59,7 @@ class ExpenseList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Latest Spending',
+                        '${DateFormat.MMMM().format(selectedMonth)} Spending',
                         style:
                             Theme.of(context).textTheme.headlineSmall?.copyWith(
                                   color: Colors.white,
