@@ -655,7 +655,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             label: 'Balance',
             onSaved: (value) => _balance = double.parse(value!),
             keyboardType: TextInputType.number,
-            initialValue: _balance.toString(),
+            initialValue: _balance == 0.0 ? '' : _balance.toString(),
             onTap: () {
               setState(() {
                 _balance = 0; // Clear the prefilled value
