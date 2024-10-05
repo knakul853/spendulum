@@ -222,33 +222,33 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.account_balance_wallet, size: 80, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('No accounts found',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
-          Text('Add an account to get started',
-              style: TextStyle(fontSize: 16, color: Colors.grey)),
-          SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => _showAddAccountDialog(),
-            icon: Icon(Icons.add),
-            label: Text('Create an Account'),
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildEmptyState() {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Icon(Icons.account_balance_wallet, size: 80, color: Colors.grey),
+  //         SizedBox(height: 16),
+  //         Text('No accounts found',
+  //             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+  //         SizedBox(height: 8),
+  //         Text('Add an account to get started',
+  //             style: TextStyle(fontSize: 16, color: Colors.grey)),
+  //         SizedBox(height: 24),
+  //         ElevatedButton.icon(
+  //           onPressed: () => _showAddAccountDialog(),
+  //           icon: Icon(Icons.add),
+  //           label: Text('Create an Account'),
+  //           style: ElevatedButton.styleFrom(
+  //             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+  //             shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(30)),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildAddAccountButton() {
     return FloatingActionButton(
@@ -334,7 +334,17 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
+  void resetAccountForm() {
+    _name = "";
+    _accountNumber = '';
+    _accountType = 'General';
+    _balance = 0;
+    _color = Colors.blue;
+    _currency = 'USD';
+  }
+
   void _showAddAccountDialog() {
+    resetAccountForm();
     showDialog(
       context: context,
       builder: (BuildContext context) {
