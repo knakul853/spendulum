@@ -64,60 +64,91 @@ class AccountCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(12),
               child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      account.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isSelected ? 16 : 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 8),
-                    Column(
+                  fit: BoxFit.scaleDown,
+                  child: Center(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Balance',
+                          account.name,
                           style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isSelected ? 12 : 10),
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: isSelected ? 16 : 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
-                        isSelected
-                            ? Text(
-                                '${_getCurrencySymbol(account.currency)}${NumberFormat('#,##0').format(account.balance)}', // Use currency symbol
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              )
-                            : const Text(
-                                '• • • •',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  letterSpacing: 2,
-                                ),
-                              ),
-                        Text(
-                          account.accountType,
-                          style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isSelected ? 12 : 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Account Number',
+                              style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: isSelected ? 12 : 10),
+                            ),
+                            isSelected
+                                ? Text(
+                                    '${account.accountNumber}', // Use currency symbol
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  )
+                                : const Text(
+                                    '• • • •',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Balance',
+                              style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: isSelected ? 12 : 10),
+                            ),
+                            isSelected
+                                ? Text(
+                                    '${_getCurrencySymbol(account.currency)}${NumberFormat('#,##0').format(account.balance)}', // Use currency symbol
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  )
+                                : const Text(
+                                    '• • • •',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                            Text(
+                              account.accountType,
+                              style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: isSelected ? 12 : 10),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
+                  )),
             ),
             if (isSelected)
               const Positioned(
