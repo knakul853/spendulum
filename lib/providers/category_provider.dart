@@ -38,8 +38,7 @@ class CategoryProvider with ChangeNotifier {
                   id: map[CategoriesTable.columnId] as String,
                   name: map[CategoriesTable.columnName] as String,
                   color: map[CategoriesTable.columnColor] as String,
-                  icon: IconData(map[CategoriesTable.columnIcon] as int,
-                      fontFamily: 'MaterialIcons'),
+                  icon: map[CategoriesTable.columnIcon] as String,
                 ))
             .toList();
       }
@@ -84,13 +83,13 @@ class CategoryProvider with ChangeNotifier {
       CategoriesTable.columnId: category.id,
       CategoriesTable.columnName: category.name,
       CategoriesTable.columnColor: category.color,
-      CategoriesTable.columnIcon: category.icon.codePoint,
+      CategoriesTable.columnIcon: category.icon,
     });
     AppLogger.info('Category added to the database: ${category.id}');
   }
 
   /// Adds a new custom category.
-  Future<void> addCategory(String name, String color, IconData icon) async {
+  Future<void> addCategory(String name, String color, String icon) async {
     AppLogger.info('Adding new custom category: $name');
     try {
       final newCategory = Category(
@@ -131,7 +130,7 @@ class CategoryProvider with ChangeNotifier {
 
   /// Updates a category's details.
   Future<void> updateCategory(
-      String id, String name, String color, IconData icon) async {
+      String id, String name, String color, String icon) async {
     AppLogger.info('Updating category with ID: $id');
     try {
       final updatedCategory = Category(
@@ -147,7 +146,7 @@ class CategoryProvider with ChangeNotifier {
         {
           CategoriesTable.columnName: updatedCategory.name,
           CategoriesTable.columnColor: updatedCategory.color,
-          CategoriesTable.columnIcon: updatedCategory.icon.codePoint,
+          CategoriesTable.columnIcon: updatedCategory.icon,
         },
         CategoriesTable.columnId,
         id,

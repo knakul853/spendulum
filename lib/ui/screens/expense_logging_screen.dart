@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:spendulum/constants/app_constants.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/category_provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
@@ -197,7 +198,7 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Icon(
-                        category.icon,
+                        AppConstants.categoryIcons[category.icon.toLowerCase()],
                         color: Colors.white,
                         size: 16,
                       ),
