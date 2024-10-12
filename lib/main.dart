@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'ui/screens/splash_screen.dart';
 import 'providers/expense_provider.dart';
+import 'providers/income_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/account_provider.dart';
 
@@ -24,6 +25,12 @@ class MyApp extends StatelessWidget {
           update: (context, accountProvider, previous) =>
               ExpenseProvider(accountProvider)
                 ..addAll(previous?.expenses ?? []),
+        ),
+        ChangeNotifierProxyProvider<AccountProvider, IncomeProvider>(
+          create: (context) => IncomeProvider(
+              Provider.of<AccountProvider>(context, listen: false)),
+          update: (context, accountProvider, previous) =>
+              IncomeProvider(accountProvider)..addAll(previous?.incomes ?? []),
         ),
       ],
       child: MaterialApp(

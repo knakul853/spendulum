@@ -92,4 +92,8 @@ class IncomeProvider with ChangeNotifier {
     return getIncomesForMonth(month, accountId: accountId)
         .fold(0, (sum, income) => sum + income.amount);
   }
+
+  void addAll(List<Income> newIncomes) {
+    incomes.addAll(newIncomes);
+  }
 }
