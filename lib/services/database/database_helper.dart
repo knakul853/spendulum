@@ -4,6 +4,7 @@ import 'package:spendulum/services/database/tables/accounts_table.dart';
 import 'package:spendulum/services/database/tables/expense_table.dart';
 import 'package:spendulum/services/database/tables/category_table.dart';
 import 'package:spendulum/services/database/tables/budget_table.dart';
+import 'package:spendulum/services/database/tables/incomes_table.dart';
 
 /// A singleton class that manages the SQLite database for the Spendulum application.
 /// It provides methods to initialize the database, create tables, and perform
@@ -44,7 +45,8 @@ class DatabaseHelper {
     await db.execute(AccountsTable.createTableQuery);
     await db.execute(ExpensesTable.createTableQuery);
     await db.execute(CategoriesTable.createTable);
-    await db.execute(BudgetsTable.createTable); // Add this line
+    await db.execute(BudgetsTable.createTable);
+    await db.execute(IncomesTable.createTableQuery);
 
     // Add other table creation queries here as needed
   }
