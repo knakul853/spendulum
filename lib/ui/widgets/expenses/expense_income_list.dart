@@ -109,30 +109,23 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     required String emptyMessage,
     required String title,
   }) {
-    return CustomScrollView(
-      slivers: [
-        items.isEmpty
-            ? SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    emptyMessage,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 1.5,
-                        ),
-                  ),
-                ),
-              )
-            : SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => itemBuilder(items[index]),
-                  childCount: items.length,
-                ),
+    return Container(
+      color: Colors.black, // Fill the background
+      child: items.isEmpty
+          ? Center(
+              child: Text(
+                emptyMessage,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 1.5,
+                    ),
               ),
-        SliverToBoxAdapter(child: SizedBox(height: 80)),
-      ],
+            )
+          : ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) => itemBuilder(items[index]),
+            ),
     );
   }
 }
