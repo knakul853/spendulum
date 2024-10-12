@@ -7,6 +7,7 @@ import 'package:spendulum/ui/widgets/income_list_item.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/ui/widgets/tabBar.dart';
 
 class ExpenseIncomeList extends StatefulWidget {
   final String accountId;
@@ -45,13 +46,7 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     AppLogger.info('ExpenseIncomeList: Building widget');
     return Column(
       children: [
-        TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: 'Expenses'),
-            Tab(text: 'Income'),
-          ],
-        ),
+        StyledTabBar(controller: _tabController),
         Expanded(
           child: TabBarView(
             controller: _tabController,
@@ -116,25 +111,6 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
   }) {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                      ),
-                ),
-                SizedBox(height: 5),
-                Divider(thickness: 1, color: Colors.white.withOpacity(0.5)),
-              ],
-            ),
-          ),
-        ),
         items.isEmpty
             ? SliverToBoxAdapter(
                 child: Padding(

@@ -149,40 +149,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      child: Center(
-                        child: Container(
-                          width: 230,
-                          height: 230,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const RadialGradient(
-                              colors: [Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
-                              stops: [0.5, 1.0],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: ExpenseSummaryCircle(
-                              selectedMonth: _selectedMonth,
-                              accountId: selectedAccount!.id,
-                              currency: selectedAccount!.currency,
-                              size: 230,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SliverToBoxAdapter(
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 16, vertical: 16),
+                  //     child: Center(
+                  //       child: Container(
+                  //         width: 230,
+                  //         height: 230,
+                  //         decoration: BoxDecoration(
+                  //           shape: BoxShape.circle,
+                  //           gradient: const RadialGradient(
+                  //             colors: [Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
+                  //             stops: [0.5, 1.0],
+                  //           ),
+                  //           boxShadow: [
+                  //             BoxShadow(
+                  //               color: Colors.black.withOpacity(0.1),
+                  //               blurRadius: 8,
+                  //               offset: const Offset(0, 4),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //         child: Center(
+                  //           child: ExpenseSummaryCircle(
+                  //             selectedMonth: _selectedMonth,
+                  //             accountId: selectedAccount!.id,
+                  //             currency: selectedAccount!.currency,
+                  //             size: 230,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SliverFillRemaining(
                     child: ExpenseIncomeList(
                       accountId: selectedAccount!.id,
