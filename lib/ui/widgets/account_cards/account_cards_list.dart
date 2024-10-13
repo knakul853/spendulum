@@ -12,31 +12,38 @@ class AccountCardsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
+        print('Number of accounts: ${accountProvider.accounts.length}');
         return SizedBox(
           height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: accountProvider.accounts.length + 1,
             itemBuilder: (context, index) {
-              if (index == accountProvider.accounts.length) {
-                return Align(
-                  alignment: Alignment.center,
-                  child: AddAccountCard(
-                    onTap: () => Navigator.of(context).push(
+              print('Building item at index: $index');
+              if (index < accountProvider.accounts.length) {
+                final account = accountProvider.accounts[index];
+                print(
+                    'Account ID: ${account.id}, Selected ID: ${accountProvider.selectedAccountId}');
+                return AccountCard(
+                  account: account,
+                  isSelected: account.id == accountProvider.selectedAccountId,
+                  onTap: () => accountProvider.selectAccount(account.id),
+                );
+              } else {
+                print('Building AddAccountCard');
+                return AddAccountCard(
+                  onTap: () {
+                    print('AddAccountCard tapped');
+                    Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => AccountManagementScreen(
-                                isInitialSetup: false,
-                              )),
-                    ),
-                  ),
+                        builder: (context) => const AccountManagementScreen(
+                          isInitialSetup: false,
+                        ),
+                      ),
+                    );
+                  },
                 );
               }
-              final account = accountProvider.accounts[index];
-              return AccountCard(
-                account: account,
-                isSelected: account.id == accountProvider.selectedAccountId,
-                onTap: () => accountProvider.selectAccount(account.id),
-              );
             },
           ),
         );

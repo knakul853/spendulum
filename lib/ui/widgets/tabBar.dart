@@ -10,7 +10,7 @@ class StyledTabBar extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Color(0xFF8E44AD), // Purple background for unselected tabs
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
@@ -24,10 +24,10 @@ class StyledTabBar extends StatelessWidget {
         controller: controller,
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          color: Theme.of(context).primaryColor,
+          color: Color(0xFFE91E63), // Pink color for selected tab indicator
         ),
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.black54,
+        unselectedLabelColor: Colors.white, // White text for unselected tabs
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,

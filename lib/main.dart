@@ -37,6 +37,9 @@ class MyApp extends StatelessWidget {
         title: 'Expense Tracker',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: Colors.red, // Set background color here
+          ),
         ),
         home: const SplashScreen(), // Start with the SplashScreen
         debugShowCheckedModeBanner: false, // Disable debug banner
