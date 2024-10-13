@@ -4,7 +4,6 @@ import 'package:spendulum/models/account.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/income_provider.dart';
 import 'package:spendulum/ui/widgets/month_selector.dart';
-import 'package:spendulum/ui/widgets/expenses/expense_summary_circle.dart';
 import 'package:spendulum/ui/widgets/expenses/expense_income_list.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/ui/widgets/account_cards/account_cards_list.dart';
@@ -96,39 +95,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             child: MonthSelector(
               selectedMonth: _selectedMonth,
               onMonthChanged: _onMonthChanged,
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Center(
-              child: Container(
-                width: 230,
-                height: 230,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const RadialGradient(
-                    colors: [Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
-                    stops: [0.5, 1.0],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: ExpenseSummaryCircle(
-                    selectedMonth: _selectedMonth,
-                    accountId: widget.selectedAccount.id,
-                    currency: widget.selectedAccount.currency,
-                    size: 230,
-                  ),
-                ),
-              ),
             ),
           ),
         ),

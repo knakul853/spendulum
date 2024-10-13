@@ -13,7 +13,7 @@ import 'package:spendulum/ui/widgets/custom_button_tab.dart';
 
 // Import new screens
 import 'package:spendulum/ui/screens/transactions_screen.dart';
-// import 'package:spendulum/ui/screens/stats_screen.dart';
+import 'package:spendulum/ui/screens/stats_screen.dart';
 // import 'package:spendulum/ui/screens/accounts_screen.dart';
 // import 'package:spendulum/ui/screens/more_screen.dart';
 
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 children: [
                   TransactionsScreen(selectedAccount: selectedAccount),
-                  // StatsScreen(selectedAccount: selectedAccount),
+                  StatsScreen(selectedAccount: selectedAccount),
                   // AccountsScreen(),
                   // MoreScreen(),
                 ],
@@ -84,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     curve: Curves.easeInOut,
                   );
                 },
+                selectedAccount: selectedAccount,
               ),
               floatingActionButton: _currentIndex == 0
                   ? _buildAddButton(context, selectedAccount.id)
