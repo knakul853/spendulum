@@ -5,6 +5,7 @@ class CustomDropdown extends StatelessWidget {
   final List<String> items;
   final Function(String?) onChanged;
   final String? initialValue;
+  final Color? textColor; // Add textColor parameter
 
   const CustomDropdown({
     Key? key,
@@ -12,6 +13,7 @@ class CustomDropdown extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.initialValue,
+    this.textColor, // Include textColor in the constructor
   }) : super(key: key);
 
   @override
@@ -23,8 +25,7 @@ class CustomDropdown extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
-            color: Colors
-                .white, // Change label color to white for better visibility
+            color: textColor ?? Colors.white, // Use textColor if provided, otherwise default to white
             shadows: [
               Shadow(
                 blurRadius: 3.0,

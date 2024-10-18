@@ -69,52 +69,48 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         }
         return true;
       },
-      child: AnimatedBackground(
-        color: Colors.blue, // Set your desired background color here
-        child: Scaffold(
-          backgroundColor:
-              Colors.transparent, // Make scaffold background transparent
-          appBar: AppBar(
-            backgroundColor: Colors.blue.shade700.withOpacity(
-                0.8), // Set a solid background color with some opacity
-            // Make app bar background transparent
-            elevation: 4, // Remove app bar shadow
-            title: Text(
-              widget.isInitialSetup
-                  ? 'Add Your First Account'
-                  : 'Manage Accounts',
-              style: TextStyle(color: Colors.white),
-            ),
-            leading: widget.isInitialSetup
-                ? IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                    onPressed: _showExitConfirmationDialog,
-                  )
-                : null,
+      child: Scaffold(
+        backgroundColor: Colors.white, // Changed background to white
+        appBar: AppBar(
+          backgroundColor: Colors.blue.shade700.withOpacity(
+              0.8), // Set a solid background color with some opacity
+          // Make app bar background transparent
+          elevation: 4, // Remove app bar shadow
+          title: Text(
+            widget.isInitialSetup
+                ? 'Add Your First Account'
+                : 'Manage Accounts',
+            style: TextStyle(color: Colors.black), // Changed text color
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (widget.isInitialSetup) _buildHeaderText(),
-                    SizedBox(height: 24),
-                    if (widget.isInitialSetup)
-                      _buildAccountForm(), // Show the account form
-                    if (widget.isInitialSetup)
-                      SizedBox(height: 24), // Add spacing
-                    if (widget.isInitialSetup)
-                      _buildSubmitButton(), // Show the submit button
-                    if (!widget.isInitialSetup) _buildAccountList(),
-                    if (!widget.isInitialSetup) SizedBox(height: 24),
-                    if (!widget.isInitialSetup) _buildAddAccountButton(),
-                  ],
-                ),
+          leading: widget.isInitialSetup
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.black, // Changed icon color
+                  ),
+                  onPressed: _showExitConfirmationDialog,
+                )
+              : null,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.isInitialSetup) _buildHeaderText(),
+                  SizedBox(height: 24),
+                  if (widget.isInitialSetup)
+                    _buildAccountForm(), // Show the account form
+                  if (widget.isInitialSetup)
+                    SizedBox(height: 24), // Add spacing
+                  if (widget.isInitialSetup)
+                    _buildSubmitButton(), // Show the submit button
+                  if (!widget.isInitialSetup) _buildAccountList(),
+                  if (!widget.isInitialSetup) SizedBox(height: 24),
+                  if (!widget.isInitialSetup) _buildAddAccountButton(),
+                ],
               ),
             ),
           ),
@@ -300,7 +296,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                         child: Text('Cancel',
                             style: TextStyle(
                                 color: Colors
-                                    .white)), // Change text color to white
+                                    .black)), // Change text color to black
                         onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
                           backgroundColor: Colors
@@ -454,7 +450,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       child: Text(
         "Let's set up your first account to get started!",
         style: TextStyle(
-            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
         textAlign: TextAlign.center,
       ),
     );
@@ -470,12 +466,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             label: 'Account Name',
             onSaved: (value) => _name = value!,
             initialValue: _name,
+            textColor: Colors.black,
           ),
           SizedBox(height: 16),
           CustomTextField(
             label: 'Account Number',
             onSaved: (value) => _accountNumber = value!,
             initialValue: _accountNumber,
+            textColor: Colors.black,
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -483,6 +481,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _accountTypes,
             onChanged: (value) => _accountType = value!,
             initialValue: _accountType,
+            textColor: Colors.black,
           ),
           SizedBox(height: 16),
           CustomTextField(
@@ -495,6 +494,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                 _balance = 0; // Clear the prefilled value
               });
             },
+            textColor: Colors.black,
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -502,6 +502,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _currencies,
             onChanged: (value) => _currency = value!,
             initialValue: _currency,
+            textColor: Colors.black,
           ),
           SizedBox(height: 16),
           CustomColorPicker(
