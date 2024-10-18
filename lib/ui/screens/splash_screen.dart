@@ -100,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToAccountManagement() {
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push( // Changed to push
       MaterialPageRoute(
         builder: (context) => AccountManagementScreen(
           onBackPressed: _showExitConfirmationDialog,
