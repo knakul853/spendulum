@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class AnimatedCardShape extends StatefulWidget {
   @override
@@ -31,7 +32,7 @@ class _AnimatedCardShapeState extends State<AnimatedCardShape>
       animation: _controller,
       builder: (_, __) {
         return CustomPaint(
-          painter: ShapePainter(_controller.value),
+          painter: ShapePainter(_controller.value, AppColors.primary), // Use AppColors.primary
         );
       },
     );
@@ -40,13 +41,14 @@ class _AnimatedCardShapeState extends State<AnimatedCardShape>
 
 class ShapePainter extends CustomPainter {
   final double animationValue;
+  final Color color; // Add color property
 
-  ShapePainter(this.animationValue);
+  ShapePainter(this.animationValue, this.color); // Add color to constructor
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = color.withOpacity(0.1)
       ..style = PaintingStyle.fill;
 
     final path = Path();

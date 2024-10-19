@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class AnimatedBackground extends StatefulWidget {
   final Widget? child;

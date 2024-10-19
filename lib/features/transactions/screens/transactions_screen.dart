@@ -8,6 +8,7 @@ import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/features/accounts/widgets/account_cards_list.dart';
 import 'package:spendulum/features/expenses/widgets/expense_income_list.dart';
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class TransactionsScreen extends StatefulWidget {
   final Account selectedAccount;
@@ -57,10 +58,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           floating: false,
           pinned: true,
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.primary, // Use AppColors.primary
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
+              icon: const Icon(Icons.settings, color: AppColors.text), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(

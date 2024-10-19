@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_colors.dart';
 
 class StyledTabBar extends StatelessWidget {
   final TabController controller;
@@ -10,7 +11,7 @@ class StyledTabBar extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Color(0xFF8E44AD), // Purple background for unselected tabs
+        color: AppColors.secondary,
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
@@ -24,10 +25,10 @@ class StyledTabBar extends StatelessWidget {
         controller: controller,
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          color: Color(0xFFE91E63), // Pink color for selected tab indicator
+          color: AppColors.pink,
         ),
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white, // White text for unselected tabs
+        unselectedLabelColor: Colors.white,
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,

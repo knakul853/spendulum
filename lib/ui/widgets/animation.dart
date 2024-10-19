@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_background/animated_background.dart' as anim_bg;
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class CustomAnimatedBackground extends StatefulWidget {
   final Widget child;
@@ -17,7 +18,7 @@ class _CustomAnimatedBackgroundState extends State<CustomAnimatedBackground>
   @override
   Widget build(BuildContext context) {
     return anim_bg.AnimatedBackground(
-      behaviour: anim_bg.BubblesBehaviour(),
+      behaviour: anim_bg.BubblesBehaviour(), // Use bubbleColor
       vsync: this,
       child: widget.child,
     );
@@ -67,10 +68,10 @@ class _GradientAnimatedBackgroundState extends State<GradientAnimatedBackground>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color.lerp(
-                    Colors.blue[100], Colors.purple[100], _animation.value)!,
-                Color.lerp(
-                    Colors.purple[100], Colors.blue[100], _animation.value)!,
+                Color.lerp(AppColors.primary, AppColors.secondary,
+                    _animation.value)!, // Use AppColors
+                Color.lerp(AppColors.secondary, AppColors.primary,
+                    _animation.value)!, // Use AppColors
               ],
             ),
           ),
