@@ -9,9 +9,17 @@ class ExpenseChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (monthlyData.isEmpty) {
+      return Center(child: Text('No data available'));
+    }
+
+    final maxY = monthlyData
+        .map((e) => e['total'] as double)
+        .reduce((a, b) => a > b ? a : b);
+
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).cardColor.withOpacity(0.8),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -26,7 +34,18 @@ class ExpenseChart extends StatelessWidget {
         aspectRatio: 2.70,
         child: LineChart(
           LineChartData(
-            gridData: FlGridData(show: false),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval:
+                  maxY > 0 ? maxY / 5 : 1, // Prevent zero interval
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: Colors.white.withOpacity(0.1),
+                  strokeWidth: 1,
+                );
+              },
+            ),
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
@@ -73,14 +92,11 @@ class ExpenseChart extends StatelessWidget {
               rightTitles:
                   AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
-            borderData: FlBorderData(show: false), // Hide the border
+            borderData: FlBorderData(show: false),
             minX: 0,
             maxX: monthlyData.length - 1.0,
             minY: 0,
-            maxY: monthlyData
-                    .map((e) => e['total'] as double)
-                    .reduce((a, b) => a > b ? a : b) *
-                1.2,
+            maxY: maxY * 1.2,
             lineBarsData: [
               LineChartBarData(
                 spots: monthlyData.asMap().entries.map((entry) {

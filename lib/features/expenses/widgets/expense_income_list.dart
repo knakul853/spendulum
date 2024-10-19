@@ -110,7 +110,6 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     required String title,
   }) {
     return Container(
-      color: Colors.black, // Fill the background
       child: items.isEmpty
           ? Center(
               child: Text(
