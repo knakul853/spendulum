@@ -8,8 +8,7 @@ import 'package:spendulum/ui/widgets/custom_color_picker.dart';
 import 'package:spendulum/ui/widgets/custom_text_field.dart';
 import 'package:spendulum/ui/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
-import 'package:spendulum/ui/widgets/account_cards/account_card.dart';
-import 'package:spendulum/ui/widgets/animated_background.dart';
+import "package:spendulum/features/accounts/widgets/account_card.dart";
 
 class AccountManagementScreen extends StatefulWidget {
   final Function? onBackPressed;

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/providers/expense_provider.dart';
-import 'package:spendulum/ui/widgets/charts/category_expense_chart.dart';
-import 'package:spendulum/ui/widgets/expenses/expense_summary_circle.dart';
 import 'package:spendulum/ui/widgets/monthly_expense_chart.dart'; // Import the new widget
+import 'package:spendulum/features/expenses/widgets/expense_summary_circle.dart';
+import 'package:spendulum/features/expenses/widgets/category_expense_chart.dart';
 
 class StatsScreen extends StatefulWidget {
   final Account selectedAccount;
@@ -31,7 +31,8 @@ class _StatsScreenState extends State<StatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(58, 109, 140, 0.5), // Adjusted opacity
+      backgroundColor:
+          const Color.fromRGBO(58, 109, 140, 0.5), // Adjusted opacity
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -44,7 +45,8 @@ class _StatsScreenState extends State<StatsScreen> {
             flexibleSpace: FlexibleSpaceBar(
               background: Container(),
             ),
-            title: const Text('Statistics', style: TextStyle(color: Colors.white)),
+            title:
+                const Text('Statistics', style: TextStyle(color: Colors.white)),
           ),
           SliverToBoxAdapter(
             child: Padding(

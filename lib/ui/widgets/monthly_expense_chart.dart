@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:spendulum/models/expense.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/ui/widgets/charts/expense_bar_chart.dart';
+import 'package:spendulum/features/expenses/widgets/expense_bar_chart.dart';
 
 class EnhancedExpenseTrendChart extends StatefulWidget {
   final String selectedAccountId;
@@ -180,10 +180,15 @@ class _ExpenseTrendChart extends StatelessWidget {
             final expenses = snapshot.data!;
             final groupedExpenses = _groupExpenses(expenses);
 
-            return LineChart(
-              _createChartData(groupedExpenses, context),
-              duration: const Duration(milliseconds: 250),
-            );
+            //Added this check to prevent error when groupedExpenses is empty
+            if (groupedExpenses.isNotEmpty) {
+              return LineChart(
+                _createChartData(groupedExpenses, context),
+                duration: const Duration(milliseconds: 250),
+              );
+            } else {
+              return const Text('No expenses found for this period');
+            }
           },
         );
       },
