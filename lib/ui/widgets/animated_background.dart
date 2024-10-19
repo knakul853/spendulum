@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
+import 'package:spendulum/constants/theme_colors.dart';
 
 class AnimatedBackground extends StatefulWidget {
   final Widget? child;
-  final Color color;
+  final Palette palette;
 
-  const AnimatedBackground({Key? key, this.child, required this.color})
+  const AnimatedBackground({Key? key, this.child, required this.palette})
       : super(key: key);
 
   @override
@@ -40,7 +40,8 @@ class _AnimatedBackgroundState extends State<AnimatedBackground>
           animation: _controller,
           builder: (_, __) {
             return CustomPaint(
-              painter: BackgroundPainter(_controller.value, widget.color),
+              painter:
+                  BackgroundPainter(_controller.value, widget.palette.primary),
               child: Container(),
             );
           },
@@ -60,7 +61,7 @@ class BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withOpacity(1.0)
       ..style = PaintingStyle.fill;
 
     final path = Path();

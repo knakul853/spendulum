@@ -7,6 +7,7 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/animated_background.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/constants/theme_colors.dart'; // Import ThemeColors
 
 class ExpenseLoggingScreen extends StatefulWidget {
   final String? initialAccountId;
@@ -114,7 +115,7 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
         // Use Stack to layer the background
         children: [
           AnimatedBackground(
-            color: Theme.of(context).primaryColor,
+            palette: ThemeColors.palette1,
           ),
           Center(
             // Center the form

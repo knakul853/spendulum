@@ -6,6 +6,7 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/animated_background.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/constants/theme_colors.dart'; // Import ThemeColors
 
 class IncomeLoggingScreen extends StatefulWidget {
   final String? initialAccountId;
@@ -108,7 +109,7 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
       body: Stack(
         children: [
           AnimatedBackground(
-            color: Theme.of(context).primaryColor,
+            palette: ThemeColors.palette1,
           ),
           Center(
             child: SingleChildScrollView(

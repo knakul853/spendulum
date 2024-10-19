@@ -4,6 +4,7 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/expense_logging_screen.dart';
 import 'package:spendulum/ui/screens/income_logging_screen.dart';
 import 'package:spendulum/ui/widgets/animated_background.dart';
+import 'package:spendulum/constants/theme_colors.dart'; // Import ThemeColors
 
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
@@ -57,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Stack(
           children: [
-            AnimatedBackground(color: Theme.of(context).primaryColor),
+            AnimatedBackground(palette: ThemeColors.palette5),
             Scaffold(
               backgroundColor: Colors.transparent,
               body: PageView(

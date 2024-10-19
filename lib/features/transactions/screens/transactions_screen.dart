@@ -58,10 +58,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           floating: false,
           pinned: true,
           automaticallyImplyLeading: false,
-          backgroundColor: AppColors.primary, // Use AppColors.primary
+          backgroundColor: AppColors.transparent, // Use AppColors.primary
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings, color: AppColors.text), // Use AppColors.text
+              icon: const Icon(Icons.settings,
+                  color: AppColors.text), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(
