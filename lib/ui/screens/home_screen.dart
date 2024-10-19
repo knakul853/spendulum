@@ -3,17 +3,15 @@ import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/expense_logging_screen.dart';
 import 'package:spendulum/ui/screens/income_logging_screen.dart';
-import 'package:spendulum/ui/screens/account_management_screen.dart';
 import 'package:spendulum/ui/widgets/animated_background.dart';
-import 'package:spendulum/providers/expense_provider.dart';
-import 'package:spendulum/providers/income_provider.dart';
+
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/ui/widgets/custom_button_tab.dart';
+import 'package:spendulum/features/transactions/screens/transactions_screen.dart';
 
 // Import new screens
-import 'package:spendulum/ui/screens/transactions_screen.dart';
-// import 'package:spendulum/ui/screens/stats_screen.dart';
+import 'package:spendulum/ui/screens/stats_screen.dart';
 // import 'package:spendulum/ui/screens/accounts_screen.dart';
 // import 'package:spendulum/ui/screens/more_screen.dart';
 
@@ -69,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 children: [
                   TransactionsScreen(selectedAccount: selectedAccount),
-                  // StatsScreen(selectedAccount: selectedAccount),
+                  StatsScreen(selectedAccount: selectedAccount),
                   // AccountsScreen(),
                   // MoreScreen(),
                 ],
@@ -84,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     curve: Curves.easeInOut,
                   );
                 },
+                selectedAccount: selectedAccount,
               ),
               floatingActionButton: _currentIndex == 0
                   ? _buildAddButton(context, selectedAccount.id)

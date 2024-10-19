@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/home_screen.dart';
-import 'package:spendulum/ui/screens/account_management_screen.dart';
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/ui/widgets/add_account_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -100,7 +100,8 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToAccountManagement() {
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
+      // Changed to push
       MaterialPageRoute(
         builder: (context) => AccountManagementScreen(
           onBackPressed: _showExitConfirmationDialog,

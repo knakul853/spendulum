@@ -8,8 +8,8 @@ import 'package:spendulum/ui/widgets/custom_color_picker.dart';
 import 'package:spendulum/ui/widgets/custom_text_field.dart';
 import 'package:spendulum/ui/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
-import 'package:spendulum/ui/widgets/account_cards/account_card.dart';
-import 'package:spendulum/ui/widgets/animated_background.dart';
+import "package:spendulum/features/accounts/widgets/account_card.dart";
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class AccountManagementScreen extends StatefulWidget {
   final Function? onBackPressed;
@@ -33,7 +33,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
   String _accountNumber = '';
   String _accountType = 'General';
   double _balance = 0;
-  Color _color = Colors.blue;
+  Color _color = AppColors.primary; // Use AppColors.primary
   String _currency = 'USD';
 
   late AnimationController _animationController;
@@ -69,52 +69,44 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         }
         return true;
       },
-      child: AnimatedBackground(
-        color: Colors.blue, // Set your desired background color here
-        child: Scaffold(
+      child: Scaffold(
+        backgroundColor: AppColors.background, // Use AppColors.background
+        appBar: AppBar(
           backgroundColor:
-              Colors.transparent, // Make scaffold background transparent
-          appBar: AppBar(
-            backgroundColor: Colors.blue.shade700.withOpacity(
-                0.8), // Set a solid background color with some opacity
-            // Make app bar background transparent
-            elevation: 4, // Remove app bar shadow
-            title: Text(
-              widget.isInitialSetup
-                  ? 'Add Your First Account'
-                  : 'Manage Accounts',
-              style: TextStyle(color: Colors.white),
-            ),
-            leading: widget.isInitialSetup
-                ? IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                    onPressed: _showExitConfirmationDialog,
-                  )
-                : null,
+              AppColors.primary.withOpacity(0.8), // Use AppColors.primary
+          elevation: 4,
+          title: Text(
+            widget.isInitialSetup
+                ? 'Add Your First Account'
+                : 'Manage Accounts',
+            style: TextStyle(color: AppColors.text), // Use AppColors.text
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (widget.isInitialSetup) _buildHeaderText(),
-                    SizedBox(height: 24),
-                    if (widget.isInitialSetup)
-                      _buildAccountForm(), // Show the account form
-                    if (widget.isInitialSetup)
-                      SizedBox(height: 24), // Add spacing
-                    if (widget.isInitialSetup)
-                      _buildSubmitButton(), // Show the submit button
-                    if (!widget.isInitialSetup) _buildAccountList(),
-                    if (!widget.isInitialSetup) SizedBox(height: 24),
-                    if (!widget.isInitialSetup) _buildAddAccountButton(),
-                  ],
-                ),
+          leading: widget.isInitialSetup
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.text, // Use AppColors.text
+                  ),
+                  onPressed: _showExitConfirmationDialog,
+                )
+              : null,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.isInitialSetup) _buildHeaderText(),
+                  SizedBox(height: 24),
+                  if (widget.isInitialSetup) _buildAccountForm(),
+                  if (widget.isInitialSetup) SizedBox(height: 24),
+                  if (widget.isInitialSetup) _buildSubmitButton(),
+                  if (!widget.isInitialSetup) _buildAccountList(),
+                  if (!widget.isInitialSetup) SizedBox(height: 24),
+                  if (!widget.isInitialSetup) _buildAddAccountButton(),
+                ],
               ),
             ),
           ),
@@ -249,14 +241,12 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       },
       child: AccountCard(
         account: account,
-        isSelected: true, // Adjust selection logic as needed
-        onTap: () => {
-          _showEditAccountDialog(account)
-        }, // This can be left empty or removed
+        isSelected: true,
+        onTap: () => {_showEditAccountDialog(account)},
         trailing: IconButton(
-          icon: Icon(Icons.delete, color: Colors.red),
-          onPressed: () =>
-              _showDeleteAccountDialog(account), // Show delete dialog
+          icon:
+              Icon(Icons.delete, color: AppColors.error), // Use AppColors.error
+          onPressed: () => _showDeleteAccountDialog(account),
         ),
       ),
     );
@@ -267,7 +257,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     _accountNumber = '';
     _accountType = 'General';
     _balance = 0;
-    _color = Colors.blue;
+    _color = AppColors.primary; // Use AppColors.primary
     _currency = 'USD';
   }
 
@@ -299,12 +289,11 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                       TextButton(
                         child: Text('Cancel',
                             style: TextStyle(
-                                color: Colors
-                                    .white)), // Change text color to white
+                                color: AppColors.text)), // Use AppColors.text
                         onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
-                          backgroundColor: Colors
-                              .redAccent, // Background color for the button
+                          backgroundColor:
+                              AppColors.error, // Use AppColors.error
                           padding: EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -322,10 +311,10 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          backgroundColor: Colors
-                              .blueAccent, // Background color for the button
-                          foregroundColor: Colors.white, // Text color
-                          elevation: 5, // Add elevation for shadow
+                          backgroundColor:
+                              AppColors.primary, // Use AppColors.primary
+                          foregroundColor: AppColors.text, // Use AppColors.text
+                          elevation: 5,
                         ),
                       ),
                     ],
@@ -397,7 +386,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Account updated successfully'),
-                                backgroundColor: Colors.green,
+                                backgroundColor:
+                                    AppColors.primary, // Use AppColors.primary
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
@@ -454,7 +444,9 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       child: Text(
         "Let's set up your first account to get started!",
         style: TextStyle(
-            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.text), // Use AppColors.text
         textAlign: TextAlign.center,
       ),
     );
@@ -470,12 +462,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             label: 'Account Name',
             onSaved: (value) => _name = value!,
             initialValue: _name,
+            textColor: AppColors.text, // Use AppColors.text
           ),
           SizedBox(height: 16),
           CustomTextField(
             label: 'Account Number',
             onSaved: (value) => _accountNumber = value!,
             initialValue: _accountNumber,
+            textColor: AppColors.text, // Use AppColors.text
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -483,6 +477,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _accountTypes,
             onChanged: (value) => _accountType = value!,
             initialValue: _accountType,
+            textColor: AppColors.text, // Use AppColors.text
           ),
           SizedBox(height: 16),
           CustomTextField(
@@ -492,9 +487,10 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             initialValue: _balance == 0.0 ? '' : _balance.toString(),
             onTap: () {
               setState(() {
-                _balance = 0; // Clear the prefilled value
+                _balance = 0;
               });
             },
+            textColor: AppColors.text, // Use AppColors.text
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -502,6 +498,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _currencies,
             onChanged: (value) => _currency = value!,
             initialValue: _currency,
+            textColor: AppColors.text, // Use AppColors.text
           ),
           SizedBox(height: 16),
           CustomColorPicker(
@@ -522,8 +519,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         child: Text(widget.isInitialSetup ? 'Create Account' : 'Save'),
         onPressed: _submitForm,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue.shade700,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary, // Use AppColors.primary
+          foregroundColor: AppColors.text, // Use AppColors.text
           padding: EdgeInsets.symmetric(vertical: 16),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

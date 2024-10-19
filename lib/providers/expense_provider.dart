@@ -212,4 +212,57 @@ class ExpenseProvider with ChangeNotifier {
     this.expenses.addAll(expenses);
     notifyListeners(); // Notify listeners of changes
   }
+
+  Future<List<Expense>> getAllExpenses() async {
+    final expenseMaps =
+        await DatabaseHelper.instance.queryAllRows(ExpensesTable.tableName);
+    return expenseMaps
+        .map((map) => Expense(
+              id: map[ExpensesTable.columnId] as String,
+              category: map[ExpensesTable.columnCategory] as String,
+              amount: map[ExpensesTable.columnAmount] as double,
+              date: DateTime.parse(map[ExpensesTable.columnDate] as String),
+              description: map[ExpensesTable.columnDescription] as String,
+              accountId: map[ExpensesTable.columnAccountId] as String,
+            ))
+        .toList();
+  }
+
+  Future<List<Expense>> getExpensesForAccountAndDateRange(
+    String accountId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    AppLogger.info(
+        'Fetching expenses for account $accountId from $startDate to $endDate');
+    try {
+      // Construct the SQL query
+      final String query = '''
+        SELECT * FROM ${ExpensesTable.tableName}
+        WHERE ${ExpensesTable.columnAccountId} = ? 
+        AND ${ExpensesTable.columnDate} BETWEEN ? AND ?
+      ''';
+
+      // Execute the raw query
+      final expenseMaps = await DatabaseHelper.instance.rawQuery(
+        query,
+        [accountId, startDate.toIso8601String(), endDate.toIso8601String()],
+      );
+
+      return expenseMaps
+          .map((map) => Expense(
+                id: map[ExpensesTable.columnId] as String,
+                category: map[ExpensesTable.columnCategory] as String,
+                amount: map[ExpensesTable.columnAmount] as double,
+                date: DateTime.parse(map[ExpensesTable.columnDate] as String),
+                description: map[ExpensesTable.columnDescription] as String,
+                accountId: map[ExpensesTable.columnAccountId] as String,
+              ))
+          .toList()
+        ..sort((a, b) => a.date.compareTo(b.date)); // Sort by date ascending
+    } catch (e) {
+      AppLogger.error('Error fetching expenses for date range', error: e);
+      return [];
+    }
+  }
 }

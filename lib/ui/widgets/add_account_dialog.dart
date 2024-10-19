@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class AddAccountDialog extends StatefulWidget {
   final Function? onAccountAdded;
@@ -18,7 +19,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   String _accountNumber = '';
   String _accountType = 'General';
   double _balance = 0.0;
-  Color _color = Colors.blue;
+  Color _color = AppColors.primary; // Use AppColors.primary
   String _currency = 'USD';
 
   final List<String> _accountTypes = [
@@ -53,24 +54,39 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Add New Account',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.text)), // Use AppColors.text
                 SizedBox(height: 24),
-                _buildTextField('Account Name', (value) => _name = value!),
+                _buildTextField('Account Name', (value) => _name = value!,
+                    TextInputType.text, AppColors.text), // Corrected to use TextInputType
                 SizedBox(height: 16),
                 _buildTextField(
-                    'Account Number', (value) => _accountNumber = value!),
+                    'Account Number',
+                    (value) => _accountNumber = value!,
+                    TextInputType.text, // Corrected to use TextInputType
+                    AppColors.text), // Use AppColors.text
                 SizedBox(height: 16),
-                _buildDropdownField('Account Type', _accountTypes, _accountType,
-                    (value) => setState(() => _accountType = value!)),
+                _buildDropdownField(
+                    'Account Type',
+                    _accountTypes,
+                    _accountType,
+                    (value) => setState(() => _accountType = value!),
+                    AppColors.text), // Use AppColors.text
                 SizedBox(height: 16),
                 _buildTextField(
                     'Balance',
                     (value) => _balance = double.parse(value!),
-                    TextInputType.number),
+                    TextInputType.number,
+                    AppColors.text), // Use AppColors.text
                 SizedBox(height: 16),
-                _buildDropdownField('Currency', _currencies, _currency,
-                    (value) => setState(() => _currency = value!)),
+                _buildDropdownField(
+                    'Currency',
+                    _currencies,
+                    _currency,
+                    (value) => setState(() => _currency = value!),
+                    AppColors.text), // Use AppColors.text
                 SizedBox(height: 16),
                 _buildColorPicker(),
                 SizedBox(height: 24),
@@ -78,18 +94,32 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      child: Text('Cancel'),
+                      child: Text('Cancel',
+                          style: TextStyle(
+                              color: AppColors.text)), // Use AppColors.text
                       onPressed: () => Navigator.of(context).pop(),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.error, // Use AppColors.error
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                     ),
                     SizedBox(width: 16),
                     ElevatedButton(
-                      child: Text('Add'),
+                      child: Text('Add',
+                          style: TextStyle(
+                              color: AppColors.text)), // Use AppColors.text
                       onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
                         padding:
                             EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
+                        backgroundColor:
+                            AppColors.primary, // Use AppColors.primary
                       ),
                     ),
                   ],
@@ -103,7 +133,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   }
 
   Widget _buildTextField(String label, Function(String?) onSaved,
-      [TextInputType? keyboardType]) {
+      [TextInputType? keyboardType, Color? textColor]) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
@@ -112,11 +142,14 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       keyboardType: keyboardType,
       validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
       onSaved: onSaved,
+      style: TextStyle(
+          color: textColor ??
+              AppColors.text), // Use AppColors.text if textColor is null
     );
   }
 
   Widget _buildDropdownField(String label, List<String> items, String value,
-      Function(String?) onChanged) {
+      Function(String?) onChanged, Color textColor) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
@@ -126,10 +159,12 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       items: items.map((String item) {
         return DropdownMenuItem<String>(
           value: item,
-          child: Text(item),
+          child:
+              Text(item, style: TextStyle(color: textColor)), // Use textColor
         );
       }).toList(),
       onChanged: onChanged,
+      style: TextStyle(color: textColor), // Use textColor
     );
   }
 
@@ -138,7 +173,10 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Account Color',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.text)), // Use AppColors.text
         SizedBox(height: 8),
         GestureDetector(
           onTap: _showColorPalette,
@@ -166,7 +204,8 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Account Color'),
+          title: Text('Select Account Color',
+              style: TextStyle(color: AppColors.text)), // Use AppColors.text
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: _color,
@@ -178,7 +217,9 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: Text('OK',
+                  style:
+                      TextStyle(color: AppColors.text)), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/ui/widgets/account_cards/account_card.dart';
-import 'package:spendulum/ui/widgets/account_cards/add_account_card.dart';
-import 'package:spendulum/ui/screens/account_management_screen.dart';
+import "package:spendulum/features/accounts/widgets/account_card.dart";
+import 'package:spendulum/features/accounts/widgets/add_account_card.dart';
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 
 class AccountCardsList extends StatelessWidget {
   const AccountCardsList({Key? key}) : super(key: key);

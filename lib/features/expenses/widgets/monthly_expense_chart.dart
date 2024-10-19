@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/expense_provider.dart';
-import 'package:spendulum/ui/widgets/charts/expense_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/models/expense.dart';
+import 'package:spendulum/features/expenses/widgets/expense_chart.dart';
 
 class MonthlyExpenseChart extends StatelessWidget {
   final String accountId;

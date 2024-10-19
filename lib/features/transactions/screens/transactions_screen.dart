@@ -4,11 +4,11 @@ import 'package:spendulum/models/account.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/income_provider.dart';
 import 'package:spendulum/ui/widgets/month_selector.dart';
-import 'package:spendulum/ui/widgets/expenses/expense_summary_circle.dart';
-import 'package:spendulum/ui/widgets/expenses/expense_income_list.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/ui/widgets/account_cards/account_cards_list.dart';
-import 'package:spendulum/ui/screens/account_management_screen.dart';
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
+import 'package:spendulum/features/accounts/widgets/account_cards_list.dart';
+import 'package:spendulum/features/expenses/widgets/expense_income_list.dart';
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class TransactionsScreen extends StatefulWidget {
   final Account selectedAccount;
@@ -58,10 +58,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           floating: false,
           pinned: true,
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.primary, // Use AppColors.primary
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
+              icon: const Icon(Icons.settings, color: AppColors.text), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(
@@ -96,39 +96,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             child: MonthSelector(
               selectedMonth: _selectedMonth,
               onMonthChanged: _onMonthChanged,
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Center(
-              child: Container(
-                width: 230,
-                height: 230,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const RadialGradient(
-                    colors: [Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
-                    stops: [0.5, 1.0],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: ExpenseSummaryCircle(
-                    selectedMonth: _selectedMonth,
-                    accountId: widget.selectedAccount.id,
-                    currency: widget.selectedAccount.currency,
-                    size: 230,
-                  ),
-                ),
-              ),
             ),
           ),
         ),

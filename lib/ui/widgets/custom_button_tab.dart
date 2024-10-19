@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:spendulum/models/account.dart';
 
 class AnimatedBottomNav extends StatelessWidget {
   final int currentIndex;
+  final Account selectedAccount;
   final Function(int) onTap;
 
-  AnimatedBottomNav({required this.currentIndex, required this.onTap});
+  AnimatedBottomNav(
+      {required this.currentIndex,
+      required this.onTap,
+      required this.selectedAccount});
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class ActionButton extends StatelessWidget {
   final IconData icon;
@@ -13,7 +14,7 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(icon),
+      icon: Icon(icon, color: AppColors.text), // Use AppColors.text for icon color
       onPressed: onPressed,
     );
   }
