@@ -5,6 +5,7 @@ import 'providers/expense_provider.dart';
 import 'providers/income_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/account_provider.dart';
+import 'providers/theme_provider.dart'; // Import ThemeNotifier
 import 'constants/theme_colors.dart';
 
 void main() {
@@ -48,6 +49,7 @@ class _MyAppState extends State<MyApp> {
           update: (context, accountProvider, previous) =>
               IncomeProvider(accountProvider)..addAll(previous?.incomes ?? []),
         ),
+        ChangeNotifierProvider(create: (context) => ThemeNotifier()), // Add ThemeNotifier provider
       ],
       child: MaterialApp(
         title: 'Expense Tracker',

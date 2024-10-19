@@ -4,49 +4,43 @@ import 'package:spendulum/constants/theme.dart';
 
 class ThemeNotifier with ChangeNotifier {
   ThemeData _currentTheme = AppTheme.lightTheme;
-  String _currentThemeName = 'Light';
+  int _currentThemeIndex = 0; // Index for customThemes
 
   ThemeData get currentTheme => _currentTheme;
-  String get currentThemeName => _currentThemeName;
+  int get currentThemeIndex => _currentThemeIndex;
+
 
   ThemeNotifier() {
     _loadTheme();
   }
 
-  void setTheme(ThemeData theme, String themeName) {
-    _currentTheme = theme;
-    _currentThemeName = themeName;
+  void setTheme(int index) {
+    _currentThemeIndex = index;
+    _currentTheme = _getThemeFromIndex(index);
     _saveTheme();
     notifyListeners();
   }
 
+  ThemeData _getThemeFromIndex(int index) {
+    if (index == 0) {
+      return AppTheme.lightTheme;
+    } else if (index == 1) {
+      return AppTheme.darkTheme;
+    } else {
+      return AppTheme.customThemes[index - 2];
+    }
+  }
+
   Future<void> _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? themeName = prefs.getString('theme');
-    if (themeName != null) {
-      switch (themeName) {
-        case 'Dark':
-          _currentTheme = AppTheme.darkTheme;
-          _currentThemeName = 'Dark';
-          break;
-        case 'Blue':
-          _currentTheme = AppTheme.blueTheme;
-          _currentThemeName = 'Blue';
-          break;
-        case 'Green':
-          _currentTheme = AppTheme.greenTheme;
-          _currentThemeName = 'Green';
-          break;
-        default:
-          _currentTheme = AppTheme.lightTheme;
-          _currentThemeName = 'Light';
-      }
-    }
+    int? themeIndex = prefs.getInt('themeIndex');
+    _currentThemeIndex = themeIndex ?? 0; // Default to light theme
+    _currentTheme = _getThemeFromIndex(_currentThemeIndex);
     notifyListeners();
   }
 
   Future<void> _saveTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('theme', _currentThemeName);
+    await prefs.setInt('themeIndex', _currentThemeIndex);
   }
 }

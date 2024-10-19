@@ -5,16 +5,13 @@ import 'package:spendulum/ui/screens/expense_logging_screen.dart';
 import 'package:spendulum/ui/screens/income_logging_screen.dart';
 import 'package:spendulum/ui/widgets/animated_background.dart';
 import 'package:spendulum/constants/theme_colors.dart'; // Import ThemeColors
-
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/ui/widgets/custom_button_tab.dart';
 import 'package:spendulum/features/transactions/screens/transactions_screen.dart';
-
-// Import new screens
 import 'package:spendulum/ui/screens/stats_screen.dart';
-// import 'package:spendulum/ui/screens/accounts_screen.dart';
-// import 'package:spendulum/ui/screens/more_screen.dart';
+import 'package:spendulum/ui/screens/more_screen.dart'; // Import MoreScreen
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -69,8 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   TransactionsScreen(selectedAccount: selectedAccount),
                   StatsScreen(selectedAccount: selectedAccount),
-                  // AccountsScreen(),
-                  // MoreScreen(),
+                  MoreScreen(),
                 ],
               ),
               bottomNavigationBar: AnimatedBottomNav(

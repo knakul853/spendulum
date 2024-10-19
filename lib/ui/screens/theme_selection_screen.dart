@@ -3,32 +3,65 @@ import 'package:provider/provider.dart';
 import 'package:spendulum/constants/theme.dart';
 import 'package:spendulum/providers/theme_provider.dart';
 
-class ThemeSelectionScreen extends StatelessWidget {
+class ThemeSelectionScreen extends StatefulWidget {
   const ThemeSelectionScreen({Key? key}) : super(key: key);
 
   @override
+  State<ThemeSelectionScreen> createState() => _ThemeSelectionScreenState();
+}
+
+class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
+  @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final themeIndex = themeNotifier.currentThemeIndex;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Select Theme')),
-      body: ListView(
-        children: [
-          _buildThemeItem(context, AppTheme.lightTheme, 'Light'),
-          _buildThemeItem(context, AppTheme.darkTheme, 'Dark'),
-          _buildThemeItem(context, AppTheme.blueTheme, 'Blue'),
-          _buildThemeItem(context, AppTheme.greenTheme, 'Green'),
-        ],
+      appBar: AppBar(title: const Text('Theme Selection')),
+      body: ListView.builder(
+        itemCount: AppTheme.customThemes.length + 2,
+        itemBuilder: (context, index) {
+          final theme = AppTheme.getThemeFromIndex(index);
+          final themeName = AppTheme.getThemeNameFromIndex(index);
+          return ListTile(
+            title: Text(themeName),
+            leading: CircleAvatar(
+                backgroundColor: theme?.primaryColor ?? Colors.grey),
+            onTap: () {
+              themeNotifier.setTheme(index);
+            },
+            trailing: Icon(themeIndex == index ? Icons.check : null),
+          );
+        },
       ),
     );
   }
+}
 
-  Widget _buildThemeItem(BuildContext context, ThemeData theme, String themeName) {
-    return ListTile(
-      title: Text(themeName),
-      leading: Icon(Icons.palette, color: theme.primaryColor),
-      onTap: () {
-        Provider.of<ThemeNotifier>(context, listen: false).setTheme(theme, themeName);
-        Navigator.pop(context);
-      },
-    );
+// Extension methods for AppTheme - defined outside any class
+extension AppThemeExtension on AppTheme {
+  static ThemeData? getThemeFromIndex(int index) {
+    try {
+      if (index == 0) {
+        return AppTheme.lightTheme;
+      } else if (index == 1) {
+        return AppTheme.darkTheme;
+      } else {
+        return AppTheme.customThemes[index - 2];
+      }
+    } catch (e) {
+      print("Error getting theme from index: $e");
+      return null;
+    }
+  }
+
+  static String getThemeNameFromIndex(int index) {
+    if (index == 0) {
+      return 'Light';
+    } else if (index == 1) {
+      return 'Dark';
+    } else {
+      return 'Custom ${index - 1}';
+    }
   }
 }
