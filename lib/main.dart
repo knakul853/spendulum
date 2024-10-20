@@ -5,13 +5,14 @@ import 'providers/expense_provider.dart';
 import 'providers/income_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/account_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +33,17 @@ class MyApp extends StatelessWidget {
           update: (context, accountProvider, previous) =>
               IncomeProvider(accountProvider)..addAll(previous?.incomes ?? []),
         ),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'Expense Tracker',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: Colors.red, // Set background color here
-          ),
-        ),
-        home: const SplashScreen(), // Start with the SplashScreen
-        debugShowCheckedModeBanner: false, // Disable debug banner
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'Expense Tracker',
+            theme: themeProvider.currentTheme,
+            home: const SplashScreen(),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }

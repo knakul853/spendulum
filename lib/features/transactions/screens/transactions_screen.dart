@@ -54,14 +54,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
+          backgroundColor: Colors.transparent,
           expandedHeight: 160.0,
           floating: false,
           pinned: true,
           automaticallyImplyLeading: false,
-          backgroundColor: AppColors.primary, // Use AppColors.primary
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings, color: AppColors.text), // Use AppColors.text
+              icon: const Icon(Icons.settings,
+                  color: AppColors.text), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(

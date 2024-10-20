@@ -9,7 +9,9 @@ import 'package:spendulum/ui/widgets/custom_text_field.dart';
 import 'package:spendulum/ui/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
 import "package:spendulum/features/accounts/widgets/account_card.dart";
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
+
+//Added for error handling
+import 'dart:developer' as developer;
 
 class AccountManagementScreen extends StatefulWidget {
   final Function? onBackPressed;
@@ -33,7 +35,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
   String _accountNumber = '';
   String _accountType = 'General';
   double _balance = 0;
-  Color _color = AppColors.primary; // Use AppColors.primary
+  Color _color = Colors.blue; // Initialize with a default color
   String _currency = 'USD';
 
   late AnimationController _animationController;
@@ -58,6 +60,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get the current theme
+
     AppLogger.info(
         'AccountManagementScreen build: isInitialSetup = ${widget.isInitialSetup}');
 
@@ -70,22 +74,24 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         return true;
       },
       child: Scaffold(
-        backgroundColor: AppColors.background, // Use AppColors.background
+        backgroundColor:
+            theme.colorScheme.background, // Corrected backgroundColor
         appBar: AppBar(
           backgroundColor:
-              AppColors.primary.withOpacity(0.8), // Use AppColors.primary
+              theme.primaryColor.withOpacity(0.8), // Use theme color
           elevation: 4,
           title: Text(
             widget.isInitialSetup
                 ? 'Add Your First Account'
                 : 'Manage Accounts',
-            style: TextStyle(color: AppColors.text), // Use AppColors.text
+            style: theme.textTheme.titleLarge!.copyWith(
+                color: theme.colorScheme.onPrimary), // Use theme color
           ),
           leading: widget.isInitialSetup
               ? IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: AppColors.text, // Use AppColors.text
+                    color: theme.colorScheme.onPrimary, // Use theme color
                   ),
                   onPressed: _showExitConfirmationDialog,
                 )
@@ -98,11 +104,11 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (widget.isInitialSetup) _buildHeaderText(),
+                  if (widget.isInitialSetup) _buildHeaderText(theme),
                   SizedBox(height: 24),
-                  if (widget.isInitialSetup) _buildAccountForm(),
+                  if (widget.isInitialSetup) _buildAccountForm(theme),
                   if (widget.isInitialSetup) SizedBox(height: 24),
-                  if (widget.isInitialSetup) _buildSubmitButton(),
+                  if (widget.isInitialSetup) _buildSubmitButton(theme),
                   if (!widget.isInitialSetup) _buildAccountList(),
                   if (!widget.isInitialSetup) SizedBox(height: 24),
                   if (!widget.isInitialSetup) _buildAddAccountButton(),
@@ -148,17 +154,19 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final theme = Theme.of(context); // Get theme here
         return AlertDialog(
-          title: Text('Exit Setup?'),
+          title: Text('Exit Setup?', style: theme.textTheme.titleMedium),
           content: Text(
-              'Are you sure you want to exit the account setup? You can always add accounts later.'),
+              'Are you sure you want to exit the account setup? You can always add accounts later.',
+              style: theme.textTheme.bodyMedium),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Cancel', style: theme.textTheme.bodyMedium),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text('Exit'),
+              child: Text('Exit', style: theme.textTheme.bodyMedium),
               onPressed: () {
                 Navigator.of(context).pop();
                 SystemNavigator.pop();
@@ -180,12 +188,13 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
   Widget _buildAccountList() {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
+        final theme = Theme.of(context); // Get theme here
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: accountProvider.accounts.length,
           itemBuilder: (context, index) {
-            return _buildAccountTile(accountProvider.accounts[index]);
+            return _buildAccountTile(accountProvider.accounts[index], theme);
           },
         );
       },
@@ -200,12 +209,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final theme = Theme.of(context); // Get theme here
         return AlertDialog(
-          title: Text('Delete Account'),
+          title: Text('Delete Account', style: theme.textTheme.titleMedium),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Deleting your account will delete your expense details.'),
+              Text('Deleting your account will delete your expense details.',
+                  style: theme.textTheme.bodyMedium),
               SizedBox(height: 16),
               TextField(
                 controller: _accountNumberController,
@@ -215,16 +226,26 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Cancel', style: theme.textTheme.bodyMedium),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text('Delete'),
+              child: Text('Delete', style: theme.textTheme.bodyMedium),
               onPressed: () {
                 final accountProvider =
                     Provider.of<AccountProvider>(context, listen: false);
-                accountProvider.deleteAccount(
-                    account.id, _accountNumberController.text);
+                try {
+                  accountProvider.deleteAccount(
+                      account.id, _accountNumberController.text);
+                } catch (e) {
+                  developer.log("Error deleting account: $e");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error deleting account'),
+                      backgroundColor: theme.colorScheme.error,
+                    ),
+                  );
+                }
                 Navigator.of(context).pop();
               },
             ),
@@ -234,7 +255,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
-  Widget _buildAccountTile(Account account) {
+  Widget _buildAccountTile(Account account, ThemeData theme) {
     return GestureDetector(
       onTap: () {
         _showEditAccountDialog(account);
@@ -244,8 +265,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         isSelected: true,
         onTap: () => {_showEditAccountDialog(account)},
         trailing: IconButton(
-          icon:
-              Icon(Icons.delete, color: AppColors.error), // Use AppColors.error
+          icon: Icon(Icons.delete,
+              color: theme.colorScheme.error), // Use theme color
           onPressed: () => _showDeleteAccountDialog(account),
         ),
       ),
@@ -257,7 +278,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     _accountNumber = '';
     _accountType = 'General';
     _balance = 0;
-    _color = AppColors.primary; // Use AppColors.primary
+    _color = Colors.blue; // Initialize with a default color
     _currency = 'USD';
   }
 
@@ -266,6 +287,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final theme = Theme.of(context); // Get theme here
         return Dialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -281,19 +303,18 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 24),
-                  _buildAccountForm(),
+                  _buildAccountForm(theme),
                   SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child: Text('Cancel',
-                            style: TextStyle(
-                                color: AppColors.text)), // Use AppColors.text
+                        child:
+                            Text('Cancel', style: theme.textTheme.bodyMedium),
                         onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
                           backgroundColor:
-                              AppColors.error, // Use AppColors.error
+                              theme.colorScheme.error, // Use theme color
                           padding: EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -303,7 +324,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                       ),
                       SizedBox(width: 16),
                       ElevatedButton(
-                        child: Text('Add'),
+                        child: Text('Add', style: theme.textTheme.bodyMedium),
                         onPressed: _submitForm,
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
@@ -312,8 +333,9 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                             borderRadius: BorderRadius.circular(30),
                           ),
                           backgroundColor:
-                              AppColors.primary, // Use AppColors.primary
-                          foregroundColor: AppColors.text, // Use AppColors.text
+                              theme.primaryColor, // Use theme color
+                          foregroundColor:
+                              theme.colorScheme.onPrimary, // Use theme color
                           elevation: 5,
                         ),
                       ),
@@ -341,6 +363,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final theme = Theme.of(context); // Get theme here
         return Dialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -356,38 +379,49 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 24),
-                  _buildAccountForm(),
+                  _buildAccountForm(theme),
                   SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child: Text('Cancel'),
+                        child:
+                            Text('Cancel', style: theme.textTheme.bodyMedium),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       SizedBox(width: 16),
                       ElevatedButton(
-                        child: Text('Save'),
+                        child: Text('Save', style: theme.textTheme.bodyMedium),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final accountProvider =
                                 Provider.of<AccountProvider>(context,
                                     listen: false);
-                            accountProvider.updateAccount(
-                                account.id,
-                                _name,
-                                _accountNumber,
-                                _accountType,
-                                _balance,
-                                _color,
-                                _currency);
+                            try {
+                              accountProvider.updateAccount(
+                                  account.id,
+                                  _name,
+                                  _accountNumber,
+                                  _accountType,
+                                  _balance,
+                                  _color,
+                                  _currency);
+                            } catch (e) {
+                              developer.log("Error updating account: $e");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error updating account'),
+                                  backgroundColor: theme.colorScheme.error,
+                                ),
+                              );
+                            }
                             Navigator.of(context).pop();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Account updated successfully'),
                                 backgroundColor:
-                                    AppColors.primary, // Use AppColors.primary
+                                    theme.primaryColor, // Use theme color
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
@@ -415,12 +449,23 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
   }
 
   void _submitForm() {
+    final theme = Theme.of(context); // Get theme here
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final accountProvider =
           Provider.of<AccountProvider>(context, listen: false);
-      accountProvider.addAccount(
-          _name, _accountNumber, _accountType, _balance, _color, _currency);
+      try {
+        accountProvider.addAccount(
+            _name, _accountNumber, _accountType, _balance, _color, _currency);
+      } catch (e) {
+        developer.log("Error adding account: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error adding account'),
+            backgroundColor: theme.colorScheme.error,
+          ),
+        );
+      }
 
       AppLogger.info('Account created: $_name');
 
@@ -437,22 +482,20 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     }
   }
 
-  Widget _buildHeaderText() {
+  Widget _buildHeaderText(ThemeData theme) {
     return AnimatedOpacity(
       opacity: _fadeInAnimation.value,
       duration: Duration(milliseconds: 500),
       child: Text(
         "Let's set up your first account to get started!",
-        style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.text), // Use AppColors.text
+        style: theme.textTheme.headlineMedium!
+            .copyWith(color: theme.colorScheme.onBackground), // Use theme color
         textAlign: TextAlign.center,
       ),
     );
   }
 
-  Widget _buildAccountForm() {
+  Widget _buildAccountForm(ThemeData theme) {
     return Form(
       key: _formKey,
       child: Column(
@@ -462,14 +505,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             label: 'Account Name',
             onSaved: (value) => _name = value!,
             initialValue: _name,
-            textColor: AppColors.text, // Use AppColors.text
+            textColor: theme.colorScheme.onBackground, // Use theme color
           ),
           SizedBox(height: 16),
           CustomTextField(
             label: 'Account Number',
             onSaved: (value) => _accountNumber = value!,
             initialValue: _accountNumber,
-            textColor: AppColors.text, // Use AppColors.text
+            textColor: theme.colorScheme.onBackground, // Use theme color
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -477,7 +520,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _accountTypes,
             onChanged: (value) => _accountType = value!,
             initialValue: _accountType,
-            textColor: AppColors.text, // Use AppColors.text
+            textColor: theme.colorScheme.onBackground, // Use theme color
           ),
           SizedBox(height: 16),
           CustomTextField(
@@ -490,7 +533,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                 _balance = 0;
               });
             },
-            textColor: AppColors.text, // Use AppColors.text
+            textColor: theme.colorScheme.onBackground, // Use theme color
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -498,7 +541,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _currencies,
             onChanged: (value) => _currency = value!,
             initialValue: _currency,
-            textColor: AppColors.text, // Use AppColors.text
+            textColor: theme.colorScheme.onBackground, // Use theme color
           ),
           SizedBox(height: 16),
           CustomColorPicker(
@@ -511,16 +554,17 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(ThemeData theme) {
     return AnimatedOpacity(
       opacity: _fadeInAnimation.value,
       duration: Duration(milliseconds: 500),
       child: ElevatedButton(
-        child: Text(widget.isInitialSetup ? 'Create Account' : 'Save'),
+        child: Text(widget.isInitialSetup ? 'Create Account' : 'Save',
+            style: theme.textTheme.bodyMedium),
         onPressed: _submitForm,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary, // Use AppColors.primary
-          foregroundColor: AppColors.text, // Use AppColors.text
+          backgroundColor: theme.primaryColor, // Use theme color
+          foregroundColor: theme.colorScheme.onPrimary, // Use theme color
           padding: EdgeInsets.symmetric(vertical: 16),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

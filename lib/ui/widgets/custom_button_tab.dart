@@ -26,8 +26,9 @@ class AnimatedBottomNav extends StatelessWidget {
               children: [
                 _buildNavItem(Icons.list, 'Transactions', 0),
                 _buildNavItem(Icons.bar_chart, 'Stats', 1),
-                _buildNavItem(Icons.account_balance_wallet, 'Accounts', 2),
-                _buildNavItem(Icons.more_horiz, 'More', 3),
+                _buildNavItem(Icons.account_balance_wallet_outlined, 'Account',
+                    2), // Added Account tab
+                _buildNavItem(Icons.more_horiz, 'More', 3), //Updated index
               ],
             ),
           ),
