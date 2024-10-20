@@ -3,12 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/expense_logging_screen.dart';
 import 'package:spendulum/ui/screens/income_logging_screen.dart';
-import 'package:spendulum/models/account.dart';
-import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/ui/widgets/custom_button_tab.dart';
 import 'package:spendulum/features/transactions/screens/transactions_screen.dart';
 import 'package:spendulum/ui/screens/stats_screen.dart';
 import 'package:spendulum/ui/screens/more_screen.dart';
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart'; // Import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,6 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               TransactionsScreen(selectedAccount: selectedAccount),
               StatsScreen(selectedAccount: selectedAccount),
+              AccountManagementScreen(
+                isInitialSetup: false,
+              ), // Added Account Management Screen
               MoreScreen(),
             ],
           ),
