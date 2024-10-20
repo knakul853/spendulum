@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:spendulum/models/account.dart';
-import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/ui/widgets/monthly_expense_chart.dart';
 import 'package:spendulum/features/expenses/widgets/expense_summary_circle.dart';
 import 'package:spendulum/features/expenses/widgets/category_expense_chart.dart';
@@ -14,11 +12,15 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('Statistics',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onPrimary)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -27,7 +29,10 @@ class StatsScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.blue.shade100, Colors.purple.shade100],
+            colors: [
+              theme.colorScheme.primary.withOpacity(0.1),
+              theme.colorScheme.secondary.withOpacity(0.1),
+            ],
           ),
         ),
         child: SafeArea(
@@ -42,10 +47,10 @@ class StatsScreen extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme.of(context).primaryColor,
+                        color: theme.primaryColor,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: theme.shadowColor.withOpacity(0.1),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -81,7 +86,7 @@ class StatsScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: theme.colorScheme.onBackground,
                           ),
                         ),
                         SizedBox(height: 16),

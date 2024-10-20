@@ -1,67 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spendulum/constants/theme.dart';
-import 'package:spendulum/providers/theme_provider.dart';
+import '../../constants/theme.dart';
+import '../../providers/theme_provider.dart';
 
-class ThemeSelectionScreen extends StatefulWidget {
+class ThemeSelectionScreen extends StatelessWidget {
   const ThemeSelectionScreen({Key? key}) : super(key: key);
 
   @override
-  State<ThemeSelectionScreen> createState() => _ThemeSelectionScreenState();
-}
-
-class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
-  @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
-    final themeIndex = themeNotifier.currentThemeIndex;
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Theme Selection')),
-      body: ListView.builder(
-        itemCount: AppTheme.customThemes.length + 2,
+      appBar: AppBar(
+        title: const Text('Choose Your Theme'),
+        elevation: 0,
+      ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.5,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        itemCount: AppTheme.allThemes.length,
         itemBuilder: (context, index) {
           final theme = AppTheme.getThemeFromIndex(index);
           final themeName = AppTheme.getThemeNameFromIndex(index);
-          return ListTile(
-            title: Text(themeName),
-            leading: CircleAvatar(
-                backgroundColor: theme?.primaryColor ?? Colors.grey),
-            onTap: () {
-              themeNotifier.setTheme(index);
-            },
-            trailing: Icon(themeIndex == index ? Icons.check : null),
+          final isSelected = themeProvider.currentThemeIndex == index;
+
+          return GestureDetector(
+            onTap: () => themeProvider.setTheme(index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.shadowColor.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: isSelected
+                    ? Border.all(color: theme.colorScheme.primary, width: 2)
+                    : null,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: isSelected
+                        ? Icon(Icons.check, color: theme.colorScheme.onPrimary)
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    themeName,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           );
         },
       ),
     );
-  }
-}
-
-// Extension methods for AppTheme - defined outside any class
-extension AppThemeExtension on AppTheme {
-  static ThemeData? getThemeFromIndex(int index) {
-    try {
-      if (index == 0) {
-        return AppTheme.lightTheme;
-      } else if (index == 1) {
-        return AppTheme.darkTheme;
-      } else {
-        return AppTheme.customThemes[index - 2];
-      }
-    } catch (e) {
-      print("Error getting theme from index: $e");
-      return null;
-    }
-  }
-
-  static String getThemeNameFromIndex(int index) {
-    if (index == 0) {
-      return 'Light';
-    } else if (index == 1) {
-      return 'Dark';
-    } else {
-      return 'Custom ${index - 1}';
-    }
   }
 }

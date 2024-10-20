@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/expense_logging_screen.dart';
 import 'package:spendulum/ui/screens/income_logging_screen.dart';
-import 'package:spendulum/constants/theme_colors.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/ui/widgets/custom_button_tab.dart';
@@ -32,64 +31,53 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
-        Account? selectedAccount = accountProvider.getSelectedAccount();
-        AppLogger.info(
-            "The selected account is: ${selectedAccount?.accountNumber}");
-
+        final selectedAccount = accountProvider.getSelectedAccount();
         if (selectedAccount == null) {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading account...'),
-                ],
-              ),
-            ),
-          );
+          return _buildLoadingScreen();
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.blue.shade100, Colors.purple.shade100],
-            ),
+        return Scaffold(
+          body: PageView(
+            controller: _pageController,
+            onPageChanged: (index) => setState(() => _currentIndex = index),
+            children: [
+              TransactionsScreen(selectedAccount: selectedAccount),
+              StatsScreen(selectedAccount: selectedAccount),
+              MoreScreen(),
+            ],
           ),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() => _currentIndex = index);
-              },
-              children: [
-                TransactionsScreen(selectedAccount: selectedAccount),
-                StatsScreen(selectedAccount: selectedAccount),
-                MoreScreen(),
-              ],
-            ),
-            bottomNavigationBar: AnimatedBottomNav(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() => _currentIndex = index);
-                _pageController.animateToPage(
-                  index,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              },
-              selectedAccount: selectedAccount,
-            ),
-            floatingActionButton: _currentIndex == 0
-                ? _buildAddButton(context, selectedAccount.id)
-                : null,
+          bottomNavigationBar: AnimatedBottomNav(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() => _currentIndex = index);
+              _pageController.animateToPage(
+                index,
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+            selectedAccount: selectedAccount,
           ),
+          floatingActionButton: _currentIndex == 0
+              ? _buildAddButton(context, selectedAccount.id)
+              : null,
         );
       },
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text('Loading account...'),
+          ],
+        ),
+      ),
     );
   }
 
