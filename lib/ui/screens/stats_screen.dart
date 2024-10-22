@@ -15,7 +15,6 @@ class StatsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
           'Statistics',
@@ -23,8 +22,8 @@ class StatsScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: theme.primaryColor, // Use theme color for AppBar background
+        elevation: 4, // Add elevation for shadow
       ),
       body: Container(
         decoration: BoxDecoration(
