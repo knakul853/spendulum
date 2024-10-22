@@ -75,7 +75,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       },
       child: Scaffold(
         backgroundColor:
-            theme.colorScheme.background, // Corrected backgroundColor
+            theme.colorScheme.surface, // Corrected backgroundColor
         appBar: AppBar(
           backgroundColor:
               theme.primaryColor.withOpacity(0.8), // Use theme color
@@ -489,7 +489,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
       child: Text(
         "Let's set up your first account to get started!",
         style: theme.textTheme.headlineMedium!
-            .copyWith(color: theme.colorScheme.onBackground), // Use theme color
+            .copyWith(color: theme.colorScheme.onSurface), // Use theme color
         textAlign: TextAlign.center,
       ),
     );
@@ -505,14 +505,14 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             label: 'Account Name',
             onSaved: (value) => _name = value!,
             initialValue: _name,
-            textColor: theme.colorScheme.onBackground, // Use theme color
+            textColor: theme.colorScheme.onSurface, // Use theme color
           ),
           SizedBox(height: 16),
           CustomTextField(
             label: 'Account Number',
             onSaved: (value) => _accountNumber = value!,
             initialValue: _accountNumber,
-            textColor: theme.colorScheme.onBackground, // Use theme color
+            textColor: theme.colorScheme.onSurface, // Use theme color
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -520,7 +520,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _accountTypes,
             onChanged: (value) => _accountType = value!,
             initialValue: _accountType,
-            textColor: theme.colorScheme.onBackground, // Use theme color
+            textColor: theme.colorScheme.onSurface, // Use theme color
           ),
           SizedBox(height: 16),
           CustomTextField(
@@ -533,7 +533,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                 _balance = 0;
               });
             },
-            textColor: theme.colorScheme.onBackground, // Use theme color
+            textColor: theme.colorScheme.onSurface, // Use theme color
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -541,7 +541,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _currencies,
             onChanged: (value) => _currency = value!,
             initialValue: _currency,
-            textColor: theme.colorScheme.onBackground, // Use theme color
+            textColor: theme.colorScheme.onSurface, // Use theme color
           ),
           SizedBox(height: 16),
           CustomColorPicker(

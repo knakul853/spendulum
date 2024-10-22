@@ -17,10 +17,12 @@ class StatsScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Statistics',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onPrimary)),
+        title: Text(
+          'Statistics',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -83,10 +85,8 @@ class StatsScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Expense Trend',
-                          style: TextStyle(
-                            fontSize: 20,
+                          style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onBackground,
                           ),
                         ),
                         SizedBox(height: 16),

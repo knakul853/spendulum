@@ -322,14 +322,12 @@ class AppTheme {
         brightness: brightness,
         primary: primary,
         secondary: secondary,
-        background: background,
         surface: surface,
         onSurface: onSurface,
         error: error,
         onPrimary: brightness == Brightness.dark ? Colors.black : Colors.white,
         onSecondary:
             brightness == Brightness.dark ? Colors.black : Colors.white,
-        onBackground: text,
         onError: brightness == Brightness.dark ? Colors.black : Colors.white,
       ),
       scaffoldBackgroundColor: background,
@@ -353,36 +351,36 @@ class AppTheme {
         unselectedItemColor: disabled,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith<Color>(
+            (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary;
           }
           return disabled;
         }),
-        trackColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith<Color>(
+            (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary.withOpacity(0.5);
           }
           return disabled.withOpacity(0.5);
         }),
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>(
+            (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary;
           }
           return disabled;
         }),
-        checkColor: MaterialStateProperty.all(
+        checkColor: WidgetStateProperty.all(
             brightness == Brightness.dark ? Colors.black : Colors.white),
       ),
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith<Color>(
+            (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary;
           }
           return disabled;
@@ -487,7 +485,7 @@ class AppTheme {
     return {
       'primary': theme.colorScheme.primary,
       'secondary': theme.colorScheme.secondary,
-      'background': theme.colorScheme.background,
+      'background': theme.colorScheme.surface,
       'surface': theme.colorScheme.surface,
       'onSurface': theme.colorScheme.onSurface,
       'error': theme.colorScheme.error,
