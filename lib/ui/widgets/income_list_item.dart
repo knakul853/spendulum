@@ -43,7 +43,7 @@ class _IncomeListItemState extends State<IncomeListItem>
   Widget build(BuildContext context) {
     final dateTimeFormat = DateFormat("MMM d, yyyy 'at' h:mm a");
     final formattedDateTime = dateTimeFormat.format(widget.income.date);
-
+    final theme = Theme.of(context);
     return AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (context, child) => Transform.scale(
@@ -65,7 +65,10 @@ class _IncomeListItemState extends State<IncomeListItem>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white, Colors.white.withOpacity(0.7)],
+                colors: [
+                  theme.primaryColor,
+                  theme.primaryColor.withOpacity(0.7)
+                ],
               ),
             ),
             child: ListTile(
@@ -88,8 +91,9 @@ class _IncomeListItemState extends State<IncomeListItem>
                   Text(
                     formattedDateTime,
                     style: TextStyle(
+                      fontWeight: FontWeight.bold,
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
