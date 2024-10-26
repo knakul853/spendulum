@@ -55,36 +55,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: theme.scaffoldBackgroundColor,
           expandedHeight: 160.0,
           floating: false,
           pinned: true,
           automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings,
-                  color: theme.primaryColor), // Use theme.primaryColor
-              onPressed: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AccountManagementScreen(isInitialSetup: false),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOut;
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-                      return SlideTransition(
-                          position: offsetAnimation, child: child);
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
           flexibleSpace: FlexibleSpaceBar(
             background: Padding(
               padding: const EdgeInsets.only(top: 60.0),
