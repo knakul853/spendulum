@@ -13,12 +13,13 @@ class AnimatedBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Material(
-          color: Color.fromARGB(255, 57, 30, 63),
+          color: theme.colorScheme.secondary,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 0),
             child: Row(

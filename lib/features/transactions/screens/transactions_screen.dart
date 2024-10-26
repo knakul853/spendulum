@@ -8,7 +8,6 @@ import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/features/accounts/widgets/account_cards_list.dart';
 import 'package:spendulum/features/expenses/widgets/expense_income_list.dart';
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class TransactionsScreen extends StatefulWidget {
   final Account selectedAccount;
@@ -51,6 +50,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get the current theme
+
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -61,8 +62,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings,
-                  color: AppColors.text), // Use AppColors.text
+              icon: Icon(Icons.settings,
+                  color: theme.primaryColor), // Use theme.primaryColor
               onPressed: () {
                 Navigator.of(context).push(
                   PageRouteBuilder(

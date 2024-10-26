@@ -18,12 +18,10 @@ class StatsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Statistics',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(
+              fontWeight: FontWeight.bold), // Updated to match MoreScreen style
         ),
-        backgroundColor: theme.primaryColor, // Use theme color for AppBar background
-        elevation: 4, // Add elevation for shadow
+        elevation: 4,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -84,9 +82,9 @@ class StatsScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Expense Trend',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(
+                              fontWeight: FontWeight
+                                  .bold), // Updated to match MoreScreen style
                         ),
                         SizedBox(height: 16),
                         EnhancedExpenseTrendChart(

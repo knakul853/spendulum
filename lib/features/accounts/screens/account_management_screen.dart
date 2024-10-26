@@ -74,8 +74,6 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
         return true;
       },
       child: Scaffold(
-        backgroundColor:
-            theme.colorScheme.surface, // Corrected backgroundColor
         appBar: AppBar(
           backgroundColor:
               theme.primaryColor.withOpacity(0.8), // Use theme color
