@@ -104,6 +104,7 @@ class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
     );
   }
 
+  //Original _updateDateRange method
   void _updateDateRange() {
     final now = DateTime.now();
     switch (selectedPeriod) {
@@ -211,6 +212,8 @@ class _ExpenseTrendChart extends StatelessWidget {
     final groupedExpenses = <String, double>{};
     final now = DateTime.now();
     final currentMonth = now.month;
+    //Added log for debugging
+    AppLogger.info("The expenses are: $expenses");
     for (Expense expense in expenses) {
       AppLogger.info(
           "The grouped expense duration is ${expense.date} and expense is ${expense.amount}");
@@ -232,14 +235,25 @@ class _ExpenseTrendChart extends StatelessWidget {
       case 'Monthly':
         final daysInMonth =
             DateUtils.getDaysInMonth(startDate.year, startDate.month);
+        final today = DateTime.now();
+
         for (int i = 1; i <= daysInMonth; i += 7) {
           final weekStart = DateTime(startDate.year, startDate.month, i);
+
+          // If the weekStart is in the future, skip this iteration
+          if (weekStart.isAfter(today)) break;
+
+          // Calculate the weekEnd as 6 days from weekStart, capped at today if necessary
           final weekEnd = weekStart.add(const Duration(days: 6));
+          final validEndDate = weekEnd.isAfter(today) ? today : weekEnd;
+
           final weekExpenses = expenses.where((e) =>
               e.date.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-              e.date.isBefore(weekEnd.add(const Duration(days: 1))));
+              e.date.isBefore(validEndDate.add(const Duration(days: 1))));
+
           final sum = weekExpenses.fold(0.0, (sum, e) => sum + e.amount);
           groupedExpenses[DateFormat('d').format(weekStart)] = sum;
+
           AppLogger.info(
               "Week starting: ${DateFormat('MMM d').format(weekStart)}, Sum: $sum");
         }
