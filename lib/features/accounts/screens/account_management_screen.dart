@@ -307,35 +307,43 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child:
-                            Text('Cancel', style: theme.textTheme.bodyMedium),
-                        onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
                           backgroundColor:
-                              theme.colorScheme.error, // Use theme color
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
+                              theme.colorScheme.secondary.withOpacity(0.1),
+                          foregroundColor: theme.colorScheme.secondary,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          elevation: 2, // Adds a subtle shadow
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                       SizedBox(width: 16),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.secondary
+                              .withOpacity(0.1), // Same background
+                          foregroundColor: theme
+                              .colorScheme.secondary, // Same text/icon color
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Consistent rounded corners
+                          ),
+                          elevation: 2, // Subtle shadow
+                        ),
                         child: Text('Add', style: theme.textTheme.bodyMedium),
                         onPressed: _submitForm,
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 25, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          backgroundColor:
-                              theme.primaryColor, // Use theme color
-                          foregroundColor:
-                              theme.colorScheme.onPrimary, // Use theme color
-                          elevation: 5,
-                        ),
                       ),
                     ],
                   ),
@@ -383,58 +391,93 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child:
-                            Text('Cancel', style: theme.textTheme.bodyMedium),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          backgroundColor:
+                              theme.colorScheme.secondary.withOpacity(0.1),
+                          foregroundColor: theme.colorScheme.secondary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          elevation: 2, // Adds a subtle shadow
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       SizedBox(width: 16),
                       ElevatedButton(
-                        child: Text('Save', style: theme.textTheme.bodyMedium),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.secondary
+                              .withOpacity(0.1), // Same background
+                          foregroundColor: theme
+                              .colorScheme.secondary, // Same text/icon color
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Consistent rounded corners
+                          ),
+                          elevation: 2, // Subtle shadow
+                        ),
+                        child: Text(
+                          'Save',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             _formKey.currentState!.save();
                             final accountProvider =
-                                Provider.of<AccountProvider>(context,
-                                    listen: false);
+                                Provider.of<AccountProvider>(
+                              context,
+                              listen: false,
+                            );
+
                             try {
                               accountProvider.updateAccount(
-                                  account.id,
-                                  _name,
-                                  _accountNumber,
-                                  _accountType,
-                                  _balance,
-                                  _color,
-                                  _currency);
+                                account.id,
+                                _name,
+                                _accountNumber,
+                                _accountType,
+                                _balance,
+                                _color,
+                                _currency,
+                              );
                             } catch (e) {
                               developer.log("Error updating account: $e");
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Error updating account'),
+                                  content: const Text('Error updating account'),
                                   backgroundColor: theme.colorScheme.error,
                                 ),
                               );
                             }
+
                             Navigator.of(context).pop();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Account updated successfully'),
-                                backgroundColor:
-                                    theme.primaryColor, // Use theme color
+                                content:
+                                    const Text('Account updated successfully'),
+                                backgroundColor: theme.colorScheme.onSurface,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                margin: EdgeInsets.all(10),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                margin: const EdgeInsets.all(10),
                               ),
                             );
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30)),
-                        ),
-                      ),
+                      )
                     ],
                   ),
                 ],

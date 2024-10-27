@@ -26,10 +26,21 @@ class CustomTextField extends StatelessWidget {
       child: TextFormField(
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: textColor), // Apply textColor here
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          labelStyle:
+              Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:
+                BorderSide(color: Theme.of(context).primaryColor, width: 2),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+                color: Theme.of(context).primaryColor.withOpacity(0.5),
+                width: 1),
+          ),
           filled: true,
-          fillColor: Colors.grey[100],
+          fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
         ),
         initialValue: initialValue,
         keyboardType: keyboardType,

@@ -18,8 +18,9 @@ class StatsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Statistics',
-          style: TextStyle(
-              fontWeight: FontWeight.bold), // Updated to match MoreScreen style
+          style: theme.textTheme.titleLarge!.copyWith(
+              color: theme
+                  .colorScheme.onPrimary), // Updated to match MoreScreen style
         ),
         elevation: 4,
       ),
