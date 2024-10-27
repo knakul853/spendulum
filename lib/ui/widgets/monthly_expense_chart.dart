@@ -209,6 +209,8 @@ class _ExpenseTrendChart extends StatelessWidget {
   /// for that period as the value.
   Map<String, double> _groupExpenses(List<Expense> expenses) {
     final groupedExpenses = <String, double>{};
+    final now = DateTime.now();
+    final currentMonth = now.month;
     for (Expense expense in expenses) {
       AppLogger.info(
           "The grouped expense duration is ${expense.date} and expense is ${expense.amount}");
@@ -243,7 +245,7 @@ class _ExpenseTrendChart extends StatelessWidget {
         }
         break;
       case 'Yearly':
-        for (int month = 1; month <= 12; month++) {
+        for (int month = 1; month <= currentMonth; month++) {
           final monthStart = DateTime(startDate.year, month, 1);
           final monthEnd = DateTime(startDate.year, month + 1, 0);
           final monthExpenses = expenses.where((e) =>
