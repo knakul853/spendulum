@@ -8,7 +8,6 @@ import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/features/accounts/widgets/account_cards_list.dart';
 import 'package:spendulum/features/expenses/widgets/expense_income_list.dart';
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class TransactionsScreen extends StatefulWidget {
   final Account selectedAccount;
@@ -51,39 +50,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get the current theme
+
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: theme.scaffoldBackgroundColor,
           expandedHeight: 160.0,
           floating: false,
           pinned: true,
           automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.settings,
-                  color: AppColors.text), // Use AppColors.text
-              onPressed: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AccountManagementScreen(isInitialSetup: false),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOut;
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-                      return SlideTransition(
-                          position: offsetAnimation, child: child);
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
           flexibleSpace: FlexibleSpaceBar(
             background: Padding(
               padding: const EdgeInsets.only(top: 60.0),

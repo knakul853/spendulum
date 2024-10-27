@@ -15,14 +15,14 @@ class StatsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Statistics',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onPrimary)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: Text(
+          'Statistics',
+          style: theme.textTheme.titleLarge!.copyWith(
+              color: theme
+                  .colorScheme.onPrimary), // Updated to match MoreScreen style
+        ),
+        elevation: 4,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -84,10 +84,8 @@ class StatsScreen extends StatelessWidget {
                         Text(
                           'Expense Trend',
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onBackground,
-                          ),
+                              fontWeight: FontWeight
+                                  .bold), // Updated to match MoreScreen style
                         ),
                         SizedBox(height: 16),
                         EnhancedExpenseTrendChart(

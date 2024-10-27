@@ -4,16 +4,16 @@ class AppTheme {
   static final lightTheme = _createTheme(
     name: 'Light',
     brightness: Brightness.light,
-    primary: Colors.blue,
-    secondary: Colors.blueAccent,
-    background: Colors.white,
+    primary: Colors.blue[700]!,
+    secondary: Colors.blueAccent[400]!,
+    background: Colors.grey[50]!,
     surface: Colors.white,
     onSurface: Colors.black87,
-    error: Colors.red,
-    success: Colors.green,
     text: Colors.black87,
-    disabled: Colors.grey[400]!,
-    hint: Colors.grey[600]!,
+    error: Colors.redAccent,
+    success: Colors.green[600]!,
+    disabled: Colors.grey[300]!,
+    hint: Colors.grey[500]!,
   );
 
   static final darkTheme = _createTheme(
@@ -322,14 +322,12 @@ class AppTheme {
         brightness: brightness,
         primary: primary,
         secondary: secondary,
-        background: background,
         surface: surface,
         onSurface: onSurface,
         error: error,
         onPrimary: brightness == Brightness.dark ? Colors.black : Colors.white,
         onSecondary:
             brightness == Brightness.dark ? Colors.black : Colors.white,
-        onBackground: text,
         onError: brightness == Brightness.dark ? Colors.black : Colors.white,
       ),
       scaffoldBackgroundColor: background,
@@ -353,36 +351,36 @@ class AppTheme {
         unselectedItemColor: disabled,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary;
           }
           return disabled;
         }),
-        trackColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary.withOpacity(0.5);
           }
           return disabled.withOpacity(0.5);
         }),
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary;
           }
           return disabled;
         }),
-        checkColor: MaterialStateProperty.all(
+        checkColor: WidgetStateProperty.all(
             brightness == Brightness.dark ? Colors.black : Colors.white),
       ),
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith<Color>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return primary;
           }
           return disabled;
@@ -487,7 +485,7 @@ class AppTheme {
     return {
       'primary': theme.colorScheme.primary,
       'secondary': theme.colorScheme.secondary,
-      'background': theme.colorScheme.background,
+      'background': theme.colorScheme.surface,
       'surface': theme.colorScheme.surface,
       'onSurface': theme.colorScheme.onSurface,
       'error': theme.colorScheme.error,

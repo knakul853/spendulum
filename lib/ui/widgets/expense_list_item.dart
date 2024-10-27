@@ -57,6 +57,7 @@ class _ExpenseListItemState extends State<ExpenseListItem>
   Widget build(BuildContext context) {
     final dateTimeFormat = DateFormat("MMM d, yyyy 'at' h:mm a");
     final formattedDateTime = dateTimeFormat.format(widget.expense.date);
+    final theme = Theme.of(context);
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
@@ -79,14 +80,21 @@ class _ExpenseListItemState extends State<ExpenseListItem>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white, Colors.white.withOpacity(0.7)],
+                colors: [
+                  theme.primaryColor,
+                  theme.primaryColor.withOpacity(0.7)
+                ],
               ),
             ),
             child: ListTile(
               contentPadding: EdgeInsets.fromLTRB(16, 0, 16, 0),
               title: Text(
                 widget.expense.category,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: theme.textTheme.bodyMedium?.color,
+                ),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,14 +104,17 @@ class _ExpenseListItemState extends State<ExpenseListItem>
                       padding: EdgeInsets.only(top: 4, bottom: 8),
                       child: Text(
                         widget.expense.description,
-                        style: TextStyle(fontSize: 14),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
                       ),
                     ),
                   Text(
                     formattedDateTime,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -117,7 +128,7 @@ class _ExpenseListItemState extends State<ExpenseListItem>
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: Theme.of(context).primaryColor,
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                   ),
                 ],
@@ -129,7 +140,7 @@ class _ExpenseListItemState extends State<ExpenseListItem>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: theme.colorScheme.surface.withOpacity(0.1),
                       blurRadius: 4,
                       offset: Offset(0, 2),
                     ),

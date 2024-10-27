@@ -6,10 +6,14 @@ class MoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text('More Options', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          'More Options',
+          style: theme.textTheme.titleLarge!
+              .copyWith(color: theme.colorScheme.onPrimary),
+        ),
         automaticallyImplyLeading: false,
       ),
       body: ListView(

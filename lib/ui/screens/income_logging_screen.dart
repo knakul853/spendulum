@@ -4,9 +4,7 @@ import 'package:spendulum/providers/income_provider.dart';
 import 'package:spendulum/providers/category_provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:spendulum/ui/widgets/animated_background.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/constants/theme_colors.dart'; // Import ThemeColors
 
 class IncomeLoggingScreen extends StatefulWidget {
   final String? initialAccountId;
@@ -99,45 +97,36 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Log Income'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Stack(
-        children: [
-          AnimatedBackground(
-            palette: ThemeColors.palette1,
-          ),
-          Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _buildAccountDropdown(),
-                      const SizedBox(height: 16),
-                      _buildSourceDropdown(),
-                      const SizedBox(height: 16),
-                      _buildAmountField(),
-                      const SizedBox(height: 16),
-                      _buildDatePicker(),
-                      const SizedBox(height: 16),
-                      _buildDescriptionField(),
-                      const SizedBox(height: 24),
-                      _buildSubmitButton(),
-                    ],
-                  ),
-                ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildAccountDropdown(),
+                  const SizedBox(height: 16),
+                  _buildSourceDropdown(),
+                  const SizedBox(height: 16),
+                  _buildAmountField(),
+                  const SizedBox(height: 16),
+                  _buildDatePicker(),
+                  const SizedBox(height: 16),
+                  _buildDescriptionField(),
+                  const SizedBox(height: 24),
+                  _buildSubmitButton(),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -290,6 +279,8 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
   InputDecoration _getInputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
+      labelStyle:
+          Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
@@ -305,7 +296,7 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
       ),
       prefixIcon: Icon(icon, color: Theme.of(context).primaryColor),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
     );
   }
 

@@ -7,7 +7,8 @@ import 'package:spendulum/ui/widgets/custom_button_tab.dart';
 import 'package:spendulum/features/transactions/screens/transactions_screen.dart';
 import 'package:spendulum/ui/screens/stats_screen.dart';
 import 'package:spendulum/ui/screens/more_screen.dart';
-import 'package:spendulum/features/accounts/screens/account_management_screen.dart'; // Import
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
+import 'package:spendulum/ui/widgets/logger.dart'; // Import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppLogger.info(
+        "The scaffold background color is: ${theme.scaffoldBackgroundColor}");
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
         final selectedAccount = accountProvider.getSelectedAccount();
@@ -36,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
           body: PageView(
             controller: _pageController,
             onPageChanged: (index) => setState(() => _currentIndex = index),

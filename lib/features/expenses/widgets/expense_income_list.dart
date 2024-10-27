@@ -115,7 +115,7 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
               child: Text(
                 emptyMessage,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 1.5,
                     ),

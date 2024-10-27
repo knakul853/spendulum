@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
 
 class StyledTabBar extends StatelessWidget {
   final TabController controller;
@@ -8,10 +7,11 @@ class StyledTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
@@ -25,10 +25,10 @@ class StyledTabBar extends StatelessWidget {
         controller: controller,
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          color: AppColors.pink,
+          color: theme.colorScheme.primary,
         ),
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white,
+        labelColor: theme.textTheme.bodyMedium?.color ?? Colors.black,
+        unselectedLabelColor: theme.textTheme.bodyMedium?.color ?? Colors.black,
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 16,

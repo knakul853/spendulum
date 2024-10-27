@@ -30,19 +30,19 @@ class AccountCardsList extends StatelessWidget {
                   onTap: () => accountProvider.selectAccount(account.id),
                 );
               } else {
-                print('Building AddAccountCard');
-                return AddAccountCard(
-                  onTap: () {
-                    print('AddAccountCard tapped');
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AccountManagementScreen(
-                          isInitialSetup: false,
-                        ),
-                      ),
-                    );
-                  },
-                );
+                // print('Building AddAccountCard');
+                // return AddAccountCard(
+                //   onTap: () {
+                //     print('AddAccountCard tapped');
+                //     Navigator.of(context).push(
+                //       MaterialPageRoute(
+                //         builder: (context) => const AccountManagementScreen(
+                //           isInitialSetup: false,
+                //         ),
+                //       ),
+                //     );
+                //   },
+                // );
               }
             },
           ),
