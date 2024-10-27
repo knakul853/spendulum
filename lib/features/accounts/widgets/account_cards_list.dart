@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import "package:spendulum/features/accounts/widgets/account_card.dart";
-import 'package:spendulum/features/accounts/widgets/add_account_card.dart';
-import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 
 class AccountCardsList extends StatelessWidget {
   const AccountCardsList({Key? key}) : super(key: key);
@@ -29,21 +27,8 @@ class AccountCardsList extends StatelessWidget {
                   isSelected: account.id == accountProvider.selectedAccountId,
                   onTap: () => accountProvider.selectAccount(account.id),
                 );
-              } else {
-                // print('Building AddAccountCard');
-                // return AddAccountCard(
-                //   onTap: () {
-                //     print('AddAccountCard tapped');
-                //     Navigator.of(context).push(
-                //       MaterialPageRoute(
-                //         builder: (context) => const AccountManagementScreen(
-                //           isInitialSetup: false,
-                //         ),
-                //       ),
-                //     );
-                //   },
-                // );
               }
+              return null;
             },
           ),
         );

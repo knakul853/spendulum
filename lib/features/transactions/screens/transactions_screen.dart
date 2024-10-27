@@ -5,7 +5,6 @@ import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/income_provider.dart';
 import 'package:spendulum/ui/widgets/month_selector.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/features/accounts/widgets/account_cards_list.dart';
 import 'package:spendulum/features/expenses/widgets/expense_income_list.dart';
 
