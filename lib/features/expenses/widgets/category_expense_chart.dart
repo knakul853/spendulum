@@ -51,47 +51,39 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
             children: <Widget>[
               const SizedBox(height: 10),
               Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: PieChart(
-                        PieChartData(
-                          pieTouchData: PieTouchData(
-                            touchCallback:
-                                (FlTouchEvent event, pieTouchResponse) {
-                              setState(() {
-                                if (!event.isInterestedForInteractions ||
-                                    pieTouchResponse == null ||
-                                    pieTouchResponse.touchedSection == null) {
-                                  touchedIndex = -1;
-                                  return;
-                                }
-                                touchedIndex = pieTouchResponse
-                                    .touchedSection!.touchedSectionIndex;
-                              });
-                            },
-                          ),
-                          borderData: FlBorderData(show: false),
-                          sectionsSpace: 0,
-                          centerSpaceRadius: 0,
-                          sections:
-                              showingSections(categoryExpenses, colorList),
-                        ),
-                      ),
+                flex: 3, // Increased flex for the chart
+                child: PieChart(
+                  PieChartData(
+                    pieTouchData: PieTouchData(
+                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                        setState(() {
+                          if (!event.isInterestedForInteractions ||
+                              pieTouchResponse == null ||
+                              pieTouchResponse.touchedSection == null) {
+                            touchedIndex = -1;
+                            return;
+                          }
+                          touchedIndex = pieTouchResponse
+                              .touchedSection!.touchedSectionIndex;
+                        });
+                      },
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: getLegend(categoryExpenses, colorList),
-                        ),
-                      ),
-                    ),
-                  ],
+                    borderData: FlBorderData(show: false),
+                    sectionsSpace: 0,
+                    centerSpaceRadius: 0,
+                    sections: showingSections(categoryExpenses, colorList),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20), // Spacing between chart and legend
+              Expanded(
+                flex: 1, // Reduced flex for the legend
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: getLegend(categoryExpenses, colorList),
+                  ),
                 ),
               ),
             ],
@@ -134,6 +126,9 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
     List<Widget> legendItems = [];
     int index = 0;
     categoryExpenses.forEach((category, value) {
+      if (index > 0) {
+        legendItems.add(const SizedBox(width: 16)); // Add spacing between items
+      }
       legendItems.add(
         Indicator(
           color: colorList[index % colorList.length],
@@ -141,7 +136,6 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
           isSquare: false,
         ),
       );
-      legendItems.add(const SizedBox(height: 4));
       index++;
     });
     return legendItems;
@@ -167,6 +161,7 @@ class Indicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Container(
           width: size,
