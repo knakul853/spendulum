@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 
-
 class CategoryExpenseChart extends StatefulWidget {
   final Account selectedAccount;
   final double size;
@@ -50,13 +49,6 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
           height: widget.size,
           child: Column(
             children: <Widget>[
-              Text(
-                'Expense By Categories',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               const SizedBox(height: 10),
               Expanded(
                 child: Row(
@@ -130,7 +122,7 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
         titleStyle: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: Theme.of(context).textTheme.bodyMedium?.color,
           shadows: shadows,
         ),
       );
@@ -185,14 +177,7 @@ class Indicator extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        )
+        Text(text, style: Theme.of(context).textTheme.bodySmall)
       ],
     );
   }

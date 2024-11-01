@@ -23,8 +23,14 @@ class EnhancedExpenseTrendChart extends StatefulWidget {
 class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
   DateTime startDate = DateTime.now().subtract(const Duration(days: 365));
   DateTime endDate = DateTime.now();
-  String selectedPeriod = 'Yearly';
+  String selectedPeriod = 'Weekly';
   bool showLineChart = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateDateRange();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +152,7 @@ class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
   }
 }
 
-class _ExpenseTrendChart extends StatelessWidget {
+class _ExpenseTrendChart extends StatefulWidget {
   final String selectedAccountId;
   final DateTime startDate;
   final DateTime endDate;
@@ -160,134 +166,110 @@ class _ExpenseTrendChart extends StatelessWidget {
   });
 
   @override
+  State<_ExpenseTrendChart> createState() => _ExpenseTrendChartState();
+}
+
+class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
+  bool hasError = false;
+  String errorMessage = '';
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ExpenseProvider>(
       builder: (context, expenseProvider, child) {
         return FutureBuilder<List<Expense>>(
           future: expenseProvider.getExpensesForAccountAndDateRange(
-            selectedAccountId,
-            startDate,
-            endDate,
+            widget.selectedAccountId,
+            widget.startDate,
+            widget.endDate,
           ),
           builder: (context, snapshot) {
+            // Handle loading state
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Text('No expenses found for this period');
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading expense data...'),
+                  ],
+                ),
+              );
+            }
+
+            // Handle error state
+            if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading expenses',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      snapshot.error.toString(),
+                      style: Theme.of(context).textTheme.bodySmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {});
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Handle empty data state
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.analytics_outlined,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No expenses found for this period',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+              );
             }
 
             final expenses = snapshot.data!;
             final groupedExpenses = _groupExpenses(expenses);
 
-            //Added this check to prevent error when groupedExpenses is empty
-            if (groupedExpenses.isNotEmpty) {
-              return LineChart(
-                _createChartData(groupedExpenses, context),
-                duration: const Duration(milliseconds: 250),
+            if (groupedExpenses.isEmpty) {
+              return const Center(
+                child: Text('No expenses to display'),
               );
-            } else {
-              return const Text('No expenses found for this period');
             }
+
+            return LineChart(
+              _createChartData(groupedExpenses, context),
+              duration: const Duration(milliseconds: 250),
+            );
           },
         );
       },
     );
-  }
-
-  /// Groups expenses by period.
-  ///
-  /// The period is determined by the `period` argument.
-  ///
-  /// For 'Weekly', the expenses are grouped by day of week.
-  ///
-  /// For 'Monthly', the expenses are grouped by week of month.
-  ///
-  /// For 'Yearly', the expenses are grouped by month of year.
-  ///
-  /// The returned map has the period as the key and the sum of the expenses
-  /// for that period as the value.
-  Map<String, double> _groupExpenses(List<Expense> expenses) {
-    final groupedExpenses = <String, double>{};
-    final now = DateTime.now();
-    final currentMonth = now.month;
-    //Added log for debugging
-    AppLogger.info("The expenses are: $expenses");
-    for (Expense expense in expenses) {
-      AppLogger.info(
-          "The grouped expense duration is ${expense.date} and expense is ${expense.amount}");
-    }
-    switch (period) {
-      case 'Weekly':
-        for (int i = 0; i < 7; i++) {
-          final day = endDate.subtract(Duration(days: 6 - i));
-          final dayExpenses = expenses.where((e) =>
-              e.date.year == day.year &&
-              e.date.month == day.month &&
-              e.date.day == day.day);
-          final sum = dayExpenses.fold(0.0, (sum, e) => sum + e.amount);
-          groupedExpenses[DateFormat('E').format(day)] = sum;
-          AppLogger.info(
-              "Day: ${DateFormat('E, MMM d').format(day)}, Sum: $sum");
-        }
-        break;
-      case 'Monthly':
-        final daysInMonth =
-            DateUtils.getDaysInMonth(startDate.year, startDate.month);
-        final today = DateTime.now();
-
-        for (int i = 1; i <= daysInMonth; i += 7) {
-          final weekStart = DateTime(startDate.year, startDate.month, i);
-
-          // If the weekStart is in the future, skip this iteration
-          if (weekStart.isAfter(today)) break;
-
-          // Calculate the weekEnd as 6 days from weekStart, capped at today if necessary
-          final weekEnd = weekStart.add(const Duration(days: 6));
-          final validEndDate = weekEnd.isAfter(today) ? today : weekEnd;
-
-          final weekExpenses = expenses.where((e) =>
-              e.date.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-              e.date.isBefore(validEndDate.add(const Duration(days: 1))));
-
-          final sum = weekExpenses.fold(0.0, (sum, e) => sum + e.amount);
-          groupedExpenses[DateFormat('d').format(weekStart)] = sum;
-
-          AppLogger.info(
-              "Week starting: ${DateFormat('MMM d').format(weekStart)}, Sum: $sum");
-        }
-        break;
-      case 'Yearly':
-        for (int month = 1; month <= currentMonth; month++) {
-          final monthStart = DateTime(startDate.year, month, 1);
-          final monthEnd = DateTime(startDate.year, month + 1, 0);
-          final monthExpenses = expenses.where((e) =>
-              e.date.isAfter(monthStart.subtract(const Duration(days: 1))) &&
-              e.date.isBefore(monthEnd.add(const Duration(days: 1))));
-          final sum = monthExpenses.fold(0.0, (sum, e) => sum + e.amount);
-          groupedExpenses[DateFormat('MMM').format(monthStart)] = sum;
-          AppLogger.info(
-              "Month: ${DateFormat('MMM').format(monthStart)}, Sum: $sum");
-        }
-        break;
-    }
-
-    AppLogger.info("The expense for the period is: $groupedExpenses");
-
-    return groupedExpenses;
-  }
-
-  DateFormat _getDateFormat() {
-    switch (period) {
-      case 'Weekly':
-        return DateFormat('E');
-      case 'Monthly':
-        return DateFormat('d');
-      case 'Yearly':
-      default:
-        return DateFormat('MMM');
-    }
   }
 
   LineChartData _createChartData(
@@ -310,7 +292,7 @@ class _ExpenseTrendChart extends StatelessWidget {
         horizontalInterval: maxY / 5, // Adjust interval based on max value
         getDrawingHorizontalLine: (value) {
           return FlLine(
-            color: Colors.black12,
+            color: Theme.of(context).colorScheme.onSurface,
             strokeWidth: 1,
           );
         },
@@ -336,22 +318,44 @@ class _ExpenseTrendChart extends StatelessWidget {
         topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
       ),
-      borderData: FlBorderData(show: false),
+      borderData: FlBorderData(
+        show: true,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 1,
+          ),
+          left: BorderSide(
+            color: Colors.transparent,
+          ),
+          right: BorderSide(
+            color: Colors.transparent,
+          ),
+          top: BorderSide(
+            color: Colors.transparent,
+          ),
+        ),
+      ),
       minX: 0,
       maxX: (groupedExpenses.length - 1).toDouble(),
       minY: 0,
       maxY: maxY,
+      clipData: FlClipData.none(),
       lineBarsData: [
         LineChartBarData(
           spots: spots,
           isCurved: true,
-          color: Theme.of(context).primaryColor,
+          preventCurveOverShooting: true,
+          color: Theme.of(context).textTheme.bodyMedium?.color,
           barWidth: 3,
           isStrokeCapRound: true,
           dotData: FlDotData(show: false),
           belowBarData: BarAreaData(
             show: true,
-            color: Theme.of(context).primaryColor.withOpacity(0.2),
+            color:
+                Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.2),
+            cutOffY: 0,
+            applyCutOffY: true,
           ),
         ),
       ],
@@ -374,7 +378,7 @@ class _ExpenseTrendChart extends StatelessWidget {
         horizontalLines: [
           HorizontalLine(
             y: 0,
-            color: Colors.black26,
+            color: Theme.of(context).textTheme.bodyMedium?.color,
             strokeWidth: 1,
           ),
         ],
@@ -395,8 +399,110 @@ class _ExpenseTrendChart extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
+  /// Generates left title widgets for the line chart.
+  ///
+  /// The title is the integer value of [value] prefixed with a dollar sign.
+  ///
+  /// The style of the title is determined by [Theme.of(context).textTheme.bodySmall].
+  ///
+  /// The title is right-aligned.
   Widget _leftTitleWidgets(double value, BuildContext context) {
     final style = Theme.of(context).textTheme.bodySmall;
     return Text('\$${value.toInt()}', style: style, textAlign: TextAlign.right);
+  }
+
+  /// Groups expenses by period.
+  ///
+  /// The period is determined by the `period` argument.
+  ///
+  /// For 'Weekly', the expenses are grouped by day of week.
+  ///
+  /// For 'Monthly', the expenses are grouped by week of month.
+  ///
+  /// For 'Yearly', the expenses are grouped by month of year.
+  ///
+  /// The returned map has the period as the key and the sum of the expenses
+  /// for that period as the value.
+  Map<String, double> _groupExpenses(List<Expense> expenses) {
+    final groupedExpenses = <String, double>{};
+    //Added log for debugging
+    AppLogger.info("The expenses are: $expenses");
+    for (Expense expense in expenses) {
+      AppLogger.info(
+          "The grouped expense duration is ${expense.date} and expense is ${expense.amount}");
+    }
+    switch (widget.period) {
+      case 'Weekly':
+        for (int i = 0; i < 7; i++) {
+          final day = widget.endDate.subtract(Duration(days: 6 - i));
+          final dayExpenses = expenses.where((e) =>
+              e.date.year == day.year &&
+              e.date.month == day.month &&
+              e.date.day == day.day);
+          final sum = dayExpenses.fold(0.0, (sum, e) => sum + e.amount);
+          groupedExpenses[DateFormat('E').format(day)] = sum;
+          AppLogger.info(
+              "Day: ${DateFormat('E, MMM d').format(day)}, Sum: $sum");
+        }
+        break;
+      case 'Monthly':
+        final today = DateTime.now();
+        final startDate = today.subtract(const Duration(days: 30));
+
+        for (int i = 0; i <= 30; i += 7) {
+          final weekStart = startDate.add(Duration(days: i));
+
+          // Stop if the weekStart exceeds today
+          if (weekStart.isAfter(today)) break;
+
+          // Calculate the weekEnd as 6 days from weekStart, capped at today if necessary
+          final weekEnd = weekStart.add(const Duration(days: 6));
+          final validEndDate = weekEnd.isAfter(today) ? today : weekEnd;
+
+          // Filter expenses within the week, only for this specific range
+          final weekExpenses = expenses.where((e) =>
+              e.date.isAfter(weekStart.subtract(const Duration(days: 1))) &&
+              e.date.isBefore(validEndDate.add(const Duration(days: 1))));
+
+          // Sum up the weekly expenses
+          final sum = weekExpenses.fold(0.0, (sum, e) => sum + e.amount);
+
+          // Use both weekStart and validEndDate for clear range in key
+          final key =
+              "${DateFormat('d').format(weekStart)}-${DateFormat('d MMM').format(validEndDate)}";
+          groupedExpenses[key] = sum;
+          AppLogger.info(
+              "Week starting: ${DateFormat('MMM d').format(weekStart)}, Sum: $sum");
+        }
+        break;
+      case 'Yearly':
+        final today = DateTime.now();
+        final currentMonth = today.month;
+
+        for (int month = 1; month <= currentMonth; month++) {
+          final monthStart = DateTime(widget.startDate.year, month, 1);
+          final monthEnd = DateTime(widget.startDate.year, month + 1, 0);
+
+          // Filter expenses within the month
+          final monthExpenses = expenses.where((e) =>
+              e.date.isAfter(monthStart.subtract(const Duration(days: 1))) &&
+              e.date.isBefore(monthEnd.add(const Duration(days: 1))));
+
+          // Sum up the monthly expenses
+          final sum = monthExpenses.fold(0.0, (sum, e) => sum + e.amount);
+
+          // Format key as "Jan" or another abbreviation for the month
+          final key = DateFormat('MMM').format(monthStart);
+          groupedExpenses[key] = sum;
+
+          AppLogger.info(
+              "Month: ${DateFormat('d MMM').format(monthStart)} - ${DateFormat('d MMM').format(monthEnd)}, Sum: $sum");
+        }
+        break;
+    }
+
+    AppLogger.info("The expense for the period is: $groupedExpenses");
+
+    return groupedExpenses;
   }
 }

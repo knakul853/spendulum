@@ -40,6 +40,43 @@ class StatsScreen extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Expense Trend',
+                          style: theme.textTheme.titleLarge!.copyWith(
+                              color: theme.textTheme.titleMedium
+                                  ?.color), // Updated to match MoreScreen style
+                        ),
+                        SizedBox(height: 16),
+                        EnhancedExpenseTrendChart(
+                          selectedAccountId: selectedAccount.id,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                      child: Column(
+                    children: [
+                      Text(
+                        'Expense By Categories',
+                        style: theme.textTheme.titleLarge!.copyWith(
+                            color: theme.textTheme.titleMedium
+                                ?.color), // Updated to match MoreScreen style
+                      ),
+                      CategoryExpenseChart(
+                        selectedAccount: selectedAccount,
+                      ),
+                    ],
+                  )),
+                ),
                 Center(
                   child: SizedBox(
                     width: 230,
@@ -64,34 +101,6 @@ class StatsScreen extends StatelessWidget {
                           size: 230,
                         ),
                       ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: CategoryExpenseChart(
-                      selectedAccount: selectedAccount,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Expense Trend',
-                          style: TextStyle(
-                              fontWeight: FontWeight
-                                  .bold), // Updated to match MoreScreen style
-                        ),
-                        SizedBox(height: 16),
-                        EnhancedExpenseTrendChart(
-                          selectedAccountId: selectedAccount.id,
-                        ),
-                      ],
                     ),
                   ),
                 ),
