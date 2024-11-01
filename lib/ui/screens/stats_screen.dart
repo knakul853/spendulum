@@ -77,33 +77,33 @@ class StatsScreen extends StatelessWidget {
                     ],
                   )),
                 ),
-                Center(
-                  child: SizedBox(
-                    width: 230,
-                    height: 230,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: theme.primaryColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.shadowColor.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: ExpenseSummaryCircle(
-                          selectedMonth: DateTime.now(),
-                          accountId: selectedAccount.id,
-                          currency: '\$',
-                          size: 230,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // Center(
+                //   child: SizedBox(
+                //     width: 230,
+                //     height: 230,
+                //     child: Container(
+                //       decoration: BoxDecoration(
+                //         shape: BoxShape.circle,
+                //         color: theme.primaryColor,
+                //         boxShadow: [
+                //           BoxShadow(
+                //             color: theme.shadowColor.withOpacity(0.1),
+                //             blurRadius: 8,
+                //             offset: const Offset(0, 4),
+                //           ),
+                //         ],
+                //       ),
+                //       child: Center(
+                //         child: ExpenseSummaryCircle(
+                //           selectedMonth: DateTime.now(),
+                //           accountId: selectedAccount.id,
+                //           currency: '\$',
+                //           size: 230,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
