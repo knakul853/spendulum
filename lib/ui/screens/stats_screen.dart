@@ -40,42 +40,6 @@ class StatsScreen extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 16),
-                Center(
-                  child: SizedBox(
-                    width: 230,
-                    height: 230,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: theme.primaryColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.shadowColor.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: ExpenseSummaryCircle(
-                          selectedMonth: DateTime.now(),
-                          accountId: selectedAccount.id,
-                          currency: '\$',
-                          size: 230,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: CategoryExpenseChart(
-                      selectedAccount: selectedAccount,
-                    ),
-                  ),
-                ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Center(
@@ -83,9 +47,9 @@ class StatsScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Expense Trend',
-                          style: TextStyle(
-                              fontWeight: FontWeight
-                                  .bold), // Updated to match MoreScreen style
+                          style: theme.textTheme.titleLarge!.copyWith(
+                              color: theme.textTheme.titleMedium
+                                  ?.color), // Updated to match MoreScreen style
                         ),
                         SizedBox(height: 16),
                         EnhancedExpenseTrendChart(
@@ -95,6 +59,51 @@ class StatsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                      child: Column(
+                    children: [
+                      Text(
+                        'Expense By Categories',
+                        style: theme.textTheme.titleLarge!.copyWith(
+                            color: theme.textTheme.titleMedium
+                                ?.color), // Updated to match MoreScreen style
+                      ),
+                      CategoryExpenseChart(
+                        selectedAccount: selectedAccount,
+                      ),
+                    ],
+                  )),
+                ),
+                // Center(
+                //   child: SizedBox(
+                //     width: 230,
+                //     height: 230,
+                //     child: Container(
+                //       decoration: BoxDecoration(
+                //         shape: BoxShape.circle,
+                //         color: theme.primaryColor,
+                //         boxShadow: [
+                //           BoxShadow(
+                //             color: theme.shadowColor.withOpacity(0.1),
+                //             blurRadius: 8,
+                //             offset: const Offset(0, 4),
+                //           ),
+                //         ],
+                //       ),
+                //       child: Center(
+                //         child: ExpenseSummaryCircle(
+                //           selectedMonth: DateTime.now(),
+                //           accountId: selectedAccount.id,
+                //           currency: '\$',
+                //           size: 230,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
