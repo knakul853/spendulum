@@ -11,14 +11,19 @@ import 'package:spendulum/services/database/tables/expense_table.dart';
 // and notifies listeners of any changes to the account data.
 
 class AccountProvider with ChangeNotifier {
-  List<Account> _accounts = []; // List of accounts
-  String? _selectedAccountId; // Currently selected account ID
+  List<Account> _accounts = [];
+  String? _selectedAccountId;
 
-  List<Account> get accounts => _accounts; // Getter for accounts
-  String? get selectedAccountId =>
-      _selectedAccountId; // Getter for selected account ID
+  List<Account> get accounts => _accounts;
+  String? get selectedAccountId => _selectedAccountId;
 
-  // Loads accounts from the database and updates the _accounts list
+  /// Loads all accounts from the database and updates the [_accounts] list.
+  ///
+  /// The selected account is set to the latest account (i.e., the account with the
+  /// most recent creation date) if the list of accounts is not empty.
+  ///
+  /// Listeners are notified of the change after the accounts are loaded.
+  ///
   Future<void> loadAccounts() async {
     AppLogger.info('Loading accounts from the database');
     try {
@@ -53,7 +58,15 @@ class AccountProvider with ChangeNotifier {
     }
   }
 
-  // Adds a new account to the database and updates the local list
+  /// Adds a new account to the database and updates the local list.
+  ///
+  /// The [name], [accountNumber], [accountType], [balance], [color], and
+  /// [currency] parameters specify the new account to be added.
+  ///
+  /// If the account is added successfully, the local list of accounts is updated
+  /// and listeners are notified of the change. If the account already exists with
+  /// the given [id], an error is logged. If the addition fails, an error is
+  /// logged.
   Future<void> addAccount(String name, String accountNumber, String accountType,
       double balance, Color color, String currency) async {
     AppLogger.info('Adding new account: $name');
@@ -94,6 +107,16 @@ class AccountProvider with ChangeNotifier {
   }
 
   // Updates an existing account in the database and local list
+  /// Updates an existing account in the database and local list.
+  ///
+  /// The [id] parameter is the unique ID of the account to be updated.
+  ///
+  /// The [name], [accountNumber], [accountType], [balance], [color], and
+  /// [currency] parameters specify the new values for the account.
+  ///
+  /// If the update is successful, the local list of accounts is updated and
+  /// listeners are notified of the change. If the update fails, an error is
+  /// logged.
   Future<void> updateAccount(String id, String name, String accountNumber,
       String accountType, double balance, Color color, String currency) async {
     AppLogger.info('Updating account: $name');
@@ -137,7 +160,17 @@ class AccountProvider with ChangeNotifier {
     }
   }
 
-  // Deletes an account and its associated expenses
+  /// Deletes an account and its associated expenses from the database and local list.
+  ///
+  /// The [id] parameter is the unique identifier of the account to be deleted.
+  /// The [accountNumber] parameter is used to verify the account before deletion.
+  ///
+  /// If the account with the provided [id] and [accountNumber] exists, it is removed
+  /// from the database and the local list of accounts. Associated expenses are also
+  /// deleted. Listeners are notified of the change. If the account number does not
+  /// match, a warning is logged and no deletion occurs.
+  ///
+  /// Logs an error if the deletion fails.
   Future<void> deleteAccount(String id, String accountNumber) async {
     final account = getAccountById(id);
     if (account != null && account.accountNumber == accountNumber) {
@@ -161,14 +194,23 @@ class AccountProvider with ChangeNotifier {
     }
   }
 
-  // Selects an account by ID
+  /// Selects an account by its unique ID and updates the selected account state.
+  ///
+  /// The [id] parameter is the unique identifier of the account to be selected.
+  /// This method updates the [_selectedAccountId] to the given [id], logs the
+  /// selection, and notifies listeners about the change.
   void selectAccount(String id) {
     _selectedAccountId = id; // Set selected account ID
     AppLogger.info('Selected account: $id');
     notifyListeners(); // Notify listeners of the change
   }
 
-  // Retrieves the currently selected account
+  /// Retrieves the currently selected account.
+  ///
+  /// If there is no selected account or the accounts list is empty, this
+  /// method returns null and logs a warning. If the selected account is not
+  /// found in the accounts list, this method resets the selection and returns
+  /// null. Otherwise, it returns the selected account.
   Account? getSelectedAccount() {
     if (_selectedAccountId == null || _accounts.isEmpty) {
       AppLogger.warn('No selected account or accounts are empty');
@@ -185,7 +227,16 @@ class AccountProvider with ChangeNotifier {
     }
   }
 
-  // Updates the balance of an account by a specified amount
+  /// Updates the balance of an account by a specified amount.
+  ///
+  /// The [id] parameter is the unique ID of the account to be updated.
+  ///
+  /// The [amount] parameter is the amount to be added to the account balance.
+  /// A positive amount increases the balance, a negative amount decreases it.
+  ///
+  /// If the account is found in the local list, this method updates the balance
+  /// and notifies listeners of the change. If the account is not found, this
+  /// method logs a warning and does not update the balance.
   void updateAccountBalance(String id, double amount) {
     final accountIndex = _accounts.indexWhere((account) => account.id == id);
     if (accountIndex != -1) {
@@ -198,7 +249,12 @@ class AccountProvider with ChangeNotifier {
     }
   }
 
-  // Retrieves an account by its ID
+  /// Retrieves an account by its unique ID.
+  ///
+  /// The [id] parameter is the unique identifier of the account to be retrieved.
+  ///
+  /// Returns the [Account] object if found, otherwise returns null.
+  /// Logs a warning if the account is not found.
   Account? getAccountById(String id) {
     try {
       return accounts.firstWhere((account) => account.id == id);
@@ -215,7 +271,11 @@ class AccountProvider with ChangeNotifier {
         'USD'; // Return the currency code of the account
   }
 
-  // Retrieves the latest account based on the updatedAt timestamp
+  /// Retrieves the latest account based on the updatedAt timestamp.
+  ///
+  /// Returns the [Account] object of the latest account, which is the account
+  /// with the most recent updatedAt timestamp. If the accounts list is empty,
+  /// this method returns null and logs a warning.
   Account getLatestAccount() {
     return _accounts.reduce((a, b) => a.updatedAt.isAfter(b.updatedAt) ? a : b);
   }

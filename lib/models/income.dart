@@ -1,5 +1,6 @@
 import 'package:spendulum/ui/widgets/logger.dart';
 
+/// Represents a single income record.
 class Income {
   final String id;
   final String source;

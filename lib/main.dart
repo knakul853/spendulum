@@ -12,6 +12,10 @@ void main() {
   runApp(const MyApp());
 }
 
+/// Main entry point for the application, built with Flutter and using the Provider package for state management.
+/// The app starts with a splash screen and then navigates to the main home screen with a bottom navigation bar.
+/// Key features include transaction tracking, budget management, account management, and customizable themes.
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 

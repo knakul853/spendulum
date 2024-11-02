@@ -1,8 +1,4 @@
-enum Period { daily, weekly, biweekly, monthly, quarterly, yearly, custom }
-
-// New enum for budget status
-enum BudgetStatus { active, paused, completed, exceeded }
-
+/// Represents a budget for a specific account and period.
 class Budget {
   final String id;
   final String name;
@@ -94,3 +90,7 @@ class Budget {
     }
   }
 }
+
+enum Period { daily, weekly, biweekly, monthly, quarterly, yearly, custom }
+
+enum BudgetStatus { active, paused, completed, exceeded }

@@ -1,3 +1,4 @@
+/// Represents a single expense record.
 class Expense {
   final String id;
   final String category;

@@ -1,3 +1,4 @@
+/// Represents a category for tracking expenses and incomes.
 class Category {
   final String id;
   final String name;
