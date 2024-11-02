@@ -8,10 +8,12 @@ import 'package:spendulum/ui/widgets/logger.dart';
 
 class BudgetCard extends StatelessWidget {
   final Budget budget;
+  final VoidCallback? onTap;
 
   const BudgetCard({
     Key? key,
     required this.budget,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -31,15 +33,46 @@ class BudgetCard extends StatelessWidget {
       elevation: 2,
       margin: EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildHeader(context, theme),
-            SizedBox(height: 16),
-            _buildProgressSection(
-                context, theme, progressColor, progress, isExceeded),
-          ],
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildHeader(context, theme),
+              if (budget.status == BudgetStatus.paused)
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.pause_circle,
+                        size: 16,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Paused',
+                        style: theme.textTheme.bodySmall!.copyWith(
+                          color: theme.colorScheme.secondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              SizedBox(height: 16),
+              _buildProgressSection(
+                  context, theme, progressColor, progress, isExceeded),
+            ],
+          ),
         ),
       ),
     );
