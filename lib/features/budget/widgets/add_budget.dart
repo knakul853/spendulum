@@ -158,13 +158,13 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
             children: categories.map((category) {
               return FilterChip(
                 label: Text(category.name),
-                selected: _selectedCategoryIds.contains(category.id),
+                selected: _selectedCategoryIds.contains(category.name),
                 onSelected: (selected) {
                   setState(() {
                     if (selected) {
-                      _selectedCategoryIds.add(category.id);
+                      _selectedCategoryIds.add(category.name);
                     } else {
-                      _selectedCategoryIds.remove(category.id);
+                      _selectedCategoryIds.remove(category.name);
                     }
                   });
                 },

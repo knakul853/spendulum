@@ -7,7 +7,7 @@ class Budget {
   final String id;
   final String name;
   final String accountId;
-  final List<String> categoryIds; // Changed to support multiple categories
+  final List<String> categories; // Changed to support multiple categories
   final double amount;
   final Period period;
   DateTime startDate;
@@ -24,7 +24,7 @@ class Budget {
     required this.id,
     required this.name,
     required this.accountId,
-    this.categoryIds = const [], // Default to empty list
+    this.categories = const [], // Default to empty list
     required this.amount,
     required this.period,
     required this.startDate,

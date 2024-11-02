@@ -26,7 +26,7 @@ class _EditBudgetDialogState extends State<EditBudgetDialog> {
   late TextEditingController _notesController;
 
   late String? _selectedAccountId;
-  late List<String> _selectedCategoryIds;
+  late List<String> _selectedCategories;
   late Period _selectedPeriod;
   late DateTime _startDate;
   DateTime? _endDate;
@@ -43,7 +43,7 @@ class _EditBudgetDialogState extends State<EditBudgetDialog> {
 
     // Initialize other fields
     _selectedAccountId = widget.budget.accountId;
-    _selectedCategoryIds = List.from(widget.budget.categoryIds);
+    _selectedCategories = List.from(widget.budget.categories);
     _selectedPeriod = widget.budget.period;
     _startDate = widget.budget.startDate;
     _endDate = widget.budget.endDate;
@@ -181,13 +181,13 @@ class _EditBudgetDialogState extends State<EditBudgetDialog> {
             children: categories.map((category) {
               return FilterChip(
                 label: Text(category.name),
-                selected: _selectedCategoryIds.contains(category.id),
+                selected: _selectedCategories.contains(category.name),
                 onSelected: (selected) {
                   setState(() {
                     if (selected) {
-                      _selectedCategoryIds.add(category.id);
+                      _selectedCategories.add(category.name);
                     } else {
-                      _selectedCategoryIds.remove(category.id);
+                      _selectedCategories.remove(category.name);
                     }
                   });
                 },
@@ -347,7 +347,7 @@ class _EditBudgetDialogState extends State<EditBudgetDialog> {
           id: widget.budget.id,
           name: _nameController.text,
           accountId: _selectedAccountId!,
-          categoryIds: _selectedCategoryIds,
+          categories: _selectedCategories,
           amount: amount,
           period: _selectedPeriod,
           startDate: _startDate,

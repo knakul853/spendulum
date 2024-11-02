@@ -19,27 +19,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // CategoryProvider
         ChangeNotifierProvider(
           create: (context) {
             final provider = CategoryProvider();
-            provider.loadCategories(); // Load categories on app initialization
+            provider.loadCategories();
             return provider;
           },
         ),
+
+        // AccountProvider
         ChangeNotifierProvider(create: (context) => AccountProvider()),
-        ChangeNotifierProxyProvider<AccountProvider, ExpenseProvider>(
-          create: (context) => ExpenseProvider(
-              Provider.of<AccountProvider>(context, listen: false)),
-          update: (context, accountProvider, previous) =>
-              ExpenseProvider(accountProvider)
-                ..addAll(previous?.expenses ?? []),
-        ),
-        ChangeNotifierProxyProvider<AccountProvider, IncomeProvider>(
-          create: (context) => IncomeProvider(
-              Provider.of<AccountProvider>(context, listen: false)),
-          update: (context, accountProvider, previous) =>
-              IncomeProvider(accountProvider)..addAll(previous?.incomes ?? []),
-        ),
+
+        // BudgetProvider
         ChangeNotifierProvider(
           create: (context) {
             final provider = BudgetProvider();
@@ -47,6 +39,40 @@ class MyApp extends StatelessWidget {
             return provider;
           },
         ),
+
+        // ExpenseProvider with both AccountProvider and BudgetProvider
+        ChangeNotifierProxyProvider2<AccountProvider, BudgetProvider,
+            ExpenseProvider>(
+          create: (context) => ExpenseProvider(
+            Provider.of<AccountProvider>(context, listen: false),
+            Provider.of<BudgetProvider>(context, listen: false),
+          ),
+          // Maintain the previous state when updating
+          update: (context, accountProvider, budgetProvider, previous) {
+            if (previous == null) {
+              return ExpenseProvider(accountProvider, budgetProvider);
+            }
+            // Return the previous instance instead of creating a new one
+            return previous..updateProviders(accountProvider, budgetProvider);
+          },
+          lazy: false,
+        ),
+
+        // IncomeProvider
+        ChangeNotifierProxyProvider<AccountProvider, IncomeProvider>(
+          create: (context) => IncomeProvider(
+            Provider.of<AccountProvider>(context, listen: false),
+          ),
+          update: (context, accountProvider, previous) {
+            if (previous == null) {
+              return IncomeProvider(accountProvider);
+            }
+            return previous..updateAccountProvider(accountProvider);
+          },
+          lazy: false,
+        ),
+
+        // ThemeProvider
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
       child: Consumer<ThemeProvider>(
