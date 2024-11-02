@@ -50,11 +50,17 @@ class AccountProvider with ChangeNotifier {
       if (_accounts.isNotEmpty) {
         _selectedAccountId = getOldestAccount().id;
         AppLogger.info('Selected latest account: ${_selectedAccountId}');
+      } else {
+        _selectedAccountId = null;
+        AppLogger.info('No accounts found in database');
       }
 
       notifyListeners(); // Notify listeners of the change
     } catch (e) {
       AppLogger.error('Error loading accounts', error: e);
+      _accounts = [];
+      _selectedAccountId = null;
+      notifyListeners();
     }
   }
 

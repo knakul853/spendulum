@@ -324,9 +324,9 @@ class WelcomeScreen extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          'To track expenses, you must create an account.',
+                          'The smarter way to keep your finances in check. Set budgets, track spending, and reach your goals with ease!',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             color: Colors.white.withOpacity(0.9),
                           ),
                           textAlign: TextAlign.center,

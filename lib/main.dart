@@ -12,10 +12,6 @@ void main() {
   runApp(const MyApp());
 }
 
-/// Main entry point for the application, built with Flutter and using the Provider package for state management.
-/// The app starts with a splash screen and then navigates to the main home screen with a bottom navigation bar.
-/// Key features include transaction tracking, budget management, account management, and customizable themes.
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -24,12 +20,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // CategoryProvider
-        ChangeNotifierProvider(
-          create: (context) {
-            final provider = CategoryProvider();
-            provider.loadCategories();
-            return provider;
-          },
+        ChangeNotifierProvider<CategoryProvider>(
+          lazy: false, // This ensures immediate creation
+          create: (context) => CategoryProvider(),
         ),
 
         // AccountProvider
@@ -37,11 +30,8 @@ class MyApp extends StatelessWidget {
 
         // BudgetProvider
         ChangeNotifierProvider(
-          create: (context) {
-            final provider = BudgetProvider();
-            provider.loadBudgets();
-            return provider;
-          },
+          create: (context) => BudgetProvider(),
+          lazy: false,
         ),
 
         // ExpenseProvider with both AccountProvider and BudgetProvider
@@ -51,12 +41,10 @@ class MyApp extends StatelessWidget {
             Provider.of<AccountProvider>(context, listen: false),
             Provider.of<BudgetProvider>(context, listen: false),
           ),
-          // Maintain the previous state when updating
           update: (context, accountProvider, budgetProvider, previous) {
             if (previous == null) {
               return ExpenseProvider(accountProvider, budgetProvider);
             }
-            // Return the previous instance instead of creating a new one
             return previous..updateProviders(accountProvider, budgetProvider);
           },
           lazy: false,
@@ -84,11 +72,45 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Expense Tracker',
             theme: themeProvider.currentTheme,
-            home: const SplashScreen(),
+            home: const InitializationWrapper(child: SplashScreen()),
             debugShowCheckedModeBanner: false,
           );
         },
       ),
     );
+  }
+}
+
+// New widget to handle initialization
+class InitializationWrapper extends StatefulWidget {
+  final Widget child;
+
+  const InitializationWrapper({Key? key, required this.child})
+      : super(key: key);
+
+  @override
+  State<InitializationWrapper> createState() => _InitializationWrapperState();
+}
+
+class _InitializationWrapperState extends State<InitializationWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeProviders();
+  }
+
+  Future<void> _initializeProviders() async {
+    // Get providers
+    final categoryProvider = context.read<CategoryProvider>();
+    final budgetProvider = context.read<BudgetProvider>();
+
+    // Initialize in sequence
+    await categoryProvider.loadCategories();
+    await budgetProvider.loadBudgets();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

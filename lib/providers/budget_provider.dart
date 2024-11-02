@@ -4,6 +4,7 @@ import 'package:spendulum/models/budget.dart';
 import 'package:spendulum/services/database/database_helper.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/services/database/tables/budget_table.dart';
+import 'package:spendulum/services/database/tables/accounts_table.dart';
 
 class BudgetProvider with ChangeNotifier {
   List<Budget> _budgets = [];
@@ -22,6 +23,17 @@ class BudgetProvider with ChangeNotifier {
     try {
       final budgetMaps =
           await DatabaseHelper.instance.queryAllRows(BudgetsTable.tableName);
+
+      // First check if there are any accounts
+      final accounts =
+          await DatabaseHelper.instance.queryAllRows(AccountsTable.tableName);
+
+      if (accounts.isEmpty) {
+        AppLogger.info('No accounts found, skipping budget loading');
+        _budgets = [];
+        notifyListeners();
+        return;
+      }
 
       _budgets = budgetMaps
           .map((map) => Budget(
@@ -44,6 +56,8 @@ class BudgetProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       AppLogger.error('Error loading budgets from the database', error: e);
+      _budgets = [];
+      notifyListeners();
     }
   }
 
