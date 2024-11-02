@@ -6,6 +6,7 @@ import 'providers/income_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/account_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/budget_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => CategoryProvider()),
+        ChangeNotifierProvider(
+          create: (context) {
+            final provider = CategoryProvider();
+            provider.loadCategories(); // Load categories on app initialization
+            return provider;
+          },
+        ),
         ChangeNotifierProvider(create: (context) => AccountProvider()),
         ChangeNotifierProxyProvider<AccountProvider, ExpenseProvider>(
           create: (context) => ExpenseProvider(
@@ -32,6 +39,13 @@ class MyApp extends StatelessWidget {
               Provider.of<AccountProvider>(context, listen: false)),
           update: (context, accountProvider, previous) =>
               IncomeProvider(accountProvider)..addAll(previous?.incomes ?? []),
+        ),
+        ChangeNotifierProvider(
+          create: (context) {
+            final provider = BudgetProvider();
+            provider.loadBudgets();
+            return provider;
+          },
         ),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],

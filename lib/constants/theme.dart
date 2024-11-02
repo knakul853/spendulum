@@ -14,6 +14,7 @@ class AppTheme {
     success: Colors.green[600]!,
     disabled: Colors.grey[300]!,
     hint: Colors.grey[500]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final darkTheme = _createTheme(
@@ -29,6 +30,7 @@ class AppTheme {
     text: Colors.white,
     disabled: Colors.grey[600]!,
     hint: Colors.grey[400]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final glassmorphismTheme = _createTheme(
@@ -44,6 +46,7 @@ class AppTheme {
     text: Colors.white,
     disabled: Colors.grey.withOpacity(0.5),
     hint: Colors.white70,
+    warning: Color(0xFFFF9800),
   );
 
   static final neumorphismTheme = _createTheme(
@@ -59,6 +62,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final materialTheme = _createTheme(
@@ -74,6 +78,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final gradientTheme = _createTheme(
@@ -89,6 +94,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final minimalTheme = _createTheme(
@@ -104,6 +110,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[300]!,
     hint: Colors.grey[500]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final pastelTheme = _createTheme(
@@ -119,6 +126,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Color(0xFFD3D3D3),
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final retroTheme = _createTheme(
@@ -134,6 +142,7 @@ class AppTheme {
     text: Colors.brown[800]!,
     disabled: Colors.brown[300]!,
     hint: Colors.brown[500]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final cyberpunkTheme = _createTheme(
@@ -149,6 +158,7 @@ class AppTheme {
     text: Color(0xFFE6E6FA),
     disabled: Colors.grey[600]!,
     hint: Colors.grey[400]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final greeneryTheme = _createTheme(
@@ -164,6 +174,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final woodenTheme = _createTheme(
@@ -179,6 +190,7 @@ class AppTheme {
     text: Colors.brown[800]!,
     disabled: Colors.brown[300]!,
     hint: Colors.brown[500]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final natureTheme = _createTheme(
@@ -194,6 +206,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final spaceTheme = _createTheme(
@@ -209,6 +222,7 @@ class AppTheme {
     text: Colors.white,
     disabled: Colors.grey[600]!,
     hint: Colors.grey[400]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final luxuryTheme = _createTheme(
@@ -224,6 +238,7 @@ class AppTheme {
     text: Color(0xFFE0E0E0),
     disabled: Colors.grey[600]!,
     hint: Colors.grey[400]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final abstractTheme = _createTheme(
@@ -239,6 +254,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final futuristicTheme = _createTheme(
@@ -254,6 +270,7 @@ class AppTheme {
     text: Colors.white,
     disabled: Colors.grey[600]!,
     hint: Colors.grey[400]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final vintageTheme = _createTheme(
@@ -269,6 +286,7 @@ class AppTheme {
     text: Colors.brown[800]!,
     disabled: Colors.brown[300]!,
     hint: Colors.brown[500]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final monochromeTheme = _createTheme(
@@ -284,6 +302,7 @@ class AppTheme {
     text: Colors.black87,
     disabled: Colors.grey[400]!,
     hint: Colors.grey[600]!,
+    warning: Color(0xFFFF9800),
   );
 
   static final amoledTheme = _createTheme(
@@ -299,6 +318,7 @@ class AppTheme {
     text: Colors.white,
     disabled: Colors.grey[600]!,
     hint: Colors.grey[400]!,
+    warning: Color(0xFFFF9800),
   );
 
   static ThemeData _createTheme({
@@ -314,6 +334,7 @@ class AppTheme {
     required Color text,
     required Color disabled,
     required Color hint,
+    required Color warning,
   }) {
     return ThemeData(
       brightness: brightness,
@@ -504,33 +525,33 @@ class AppTheme {
   }
 
   // Helper method to create a custom theme
-  static ThemeData createCustomTheme({
-    required String name,
-    required Brightness brightness,
-    required Color primary,
-    required Color secondary,
-    required Color background,
-    required Color surface,
-    required Color onSurface,
-    required Color error,
-    required Color success,
-    required Color text,
-    required Color disabled,
-    required Color hint,
-  }) {
+  static ThemeData createCustomTheme(
+      {required String name,
+      required Brightness brightness,
+      required Color primary,
+      required Color secondary,
+      required Color background,
+      required Color surface,
+      required Color onSurface,
+      required Color error,
+      required Color success,
+      required Color text,
+      required Color disabled,
+      required Color hint,
+      required Color warning}) {
     return _createTheme(
-      name: name,
-      brightness: brightness,
-      primary: primary,
-      secondary: secondary,
-      background: background,
-      surface: surface,
-      onSurface: onSurface,
-      error: error,
-      success: success,
-      text: text,
-      disabled: disabled,
-      hint: hint,
-    );
+        name: name,
+        brightness: brightness,
+        primary: primary,
+        secondary: secondary,
+        background: background,
+        surface: surface,
+        onSurface: onSurface,
+        error: error,
+        success: success,
+        text: text,
+        disabled: disabled,
+        hint: hint,
+        warning: warning);
   }
 }

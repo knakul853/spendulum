@@ -10,6 +10,13 @@ class BudgetProvider with ChangeNotifier {
 
   List<Budget> get budgets => _budgets;
 
+  /// Loads all budgets from the database.
+  ///
+  /// This method queries all rows from the [BudgetsTable] and maps the results
+  /// to a list of [Budget] objects. It then notifies all listeners of changes.
+  ///
+  /// If an error occurs during the database query, it is logged with an error
+  /// level.
   Future<void> loadBudgets() async {
     AppLogger.info('Loading budgets from the database');
     try {
@@ -21,7 +28,7 @@ class BudgetProvider with ChangeNotifier {
                 id: map[BudgetsTable.columnId] as String,
                 name: map[BudgetsTable.columnName] as String,
                 accountId: map[BudgetsTable.columnAccountId] as String,
-                categoryId: map[BudgetsTable.columnCategoryId] as String?,
+                categoryIds: map[BudgetsTable.columnCategoryId] as List<String>,
                 amount: map[BudgetsTable.columnAmount] as double,
                 period: Period.values[map[BudgetsTable.columnPeriod] as int],
                 startDate:
@@ -39,10 +46,18 @@ class BudgetProvider with ChangeNotifier {
     }
   }
 
+  /// Adds a new budget to the database and the list of budgets.
+  ///
+  /// This method creates a new [Budget] object with the given parameters and
+  /// adds it to the database using [_addBudgetToDatabase]. It then adds the new
+  /// budget to the list of budgets and notifies all listeners of changes.
+  ///
+  /// If an error occurs during the database query, it is logged with an error
+  /// level.
   Future<void> addBudget({
     required String name,
     required String accountId,
-    String? categoryId,
+    List<String> categoryIds = const [],
     required double amount,
     required Period period,
   }) async {
@@ -52,7 +67,7 @@ class BudgetProvider with ChangeNotifier {
         id: const Uuid().v4(),
         name: name,
         accountId: accountId,
-        categoryId: categoryId,
+        categoryIds: categoryIds,
         amount: amount,
         period: period,
         startDate: DateTime.now(),
@@ -67,13 +82,23 @@ class BudgetProvider with ChangeNotifier {
     }
   }
 
+  /// Adds the given [budget] to the database.
+  ///
+  /// This method inserts the budget's details into the [BudgetsTable].
+  /// It logs the action before and after the insertion to track the
+  /// addition of the budget to the database.
+  ///
+  /// The budget details include the ID, name, account ID, category ID,
+  /// amount, period, start date, end date, and spent amount.
+  ///
+  /// The dates are stored as ISO 8601 strings.
   Future<void> _addBudgetToDatabase(Budget budget) async {
     AppLogger.info('Adding budget to the database: ${budget.name}');
     await DatabaseHelper.instance.insert(BudgetsTable.tableName, {
       BudgetsTable.columnId: budget.id,
       BudgetsTable.columnName: budget.name,
       BudgetsTable.columnAccountId: budget.accountId,
-      BudgetsTable.columnCategoryId: budget.categoryId,
+      BudgetsTable.columnCategoryId: budget.categoryIds,
       BudgetsTable.columnAmount: budget.amount,
       BudgetsTable.columnPeriod: budget.period.index,
       BudgetsTable.columnStartDate: budget.startDate.toIso8601String(),
@@ -100,24 +125,31 @@ class BudgetProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateBudget({
-    required String id,
-    required String name,
-    required String accountId,
-    String? categoryId,
-    required double amount,
-    required Period period,
-  }) async {
+  Future<void> updateBudget(
+      {required String id,
+      required String name,
+      required String accountId,
+      List<String> categoryIds = const [],
+      required double amount,
+      required Period period,
+      required DateTime startDate,
+      required DateTime? endDate,
+      required bool rollover,
+      required String notes}) async {
     AppLogger.info('Updating budget with ID: $id');
     try {
       final updatedBudget = Budget(
         id: id,
         name: name,
         accountId: accountId,
-        categoryId: categoryId,
+        categoryIds: categoryIds,
         amount: amount,
         period: period,
-        startDate: DateTime.now(),
+        startDate: startDate,
+        endDate: endDate,
+        rollover: rollover,
+        notes: notes,
+        updatedAt: DateTime.now(),
       );
 
       await DatabaseHelper.instance.update(
@@ -125,7 +157,7 @@ class BudgetProvider with ChangeNotifier {
         {
           BudgetsTable.columnName: updatedBudget.name,
           BudgetsTable.columnAccountId: updatedBudget.accountId,
-          BudgetsTable.columnCategoryId: updatedBudget.categoryId,
+          BudgetsTable.columnCategoryId: updatedBudget.categoryIds,
           BudgetsTable.columnAmount: updatedBudget.amount,
           BudgetsTable.columnPeriod: updatedBudget.period.index,
           BudgetsTable.columnStartDate:
@@ -139,6 +171,9 @@ class BudgetProvider with ChangeNotifier {
 
       final index = _budgets.indexWhere((budget) => budget.id == id);
       if (index != -1) {
+        updatedBudget.status = _budgets[index].status;
+        updatedBudget.spent = _budgets[index].spent;
+        updatedBudget.createdAt = _budgets[index].createdAt;
         _budgets[index] = updatedBudget;
         notifyListeners();
       }
@@ -207,5 +242,67 @@ class BudgetProvider with ChangeNotifier {
       budget.id,
     );
     AppLogger.info('Budget updated in database: ${budget.id}');
+  }
+
+  Future<List<Budget>> getBudgetsByCategory(String categoryId) async {
+    return _budgets
+        .where((budget) => budget.categoryIds.contains(categoryId))
+        .toList();
+  }
+
+  Future<List<Budget>> getActiveBudgets() async {
+    return _budgets
+        .where((budget) => budget.status == BudgetStatus.active)
+        .toList();
+  }
+
+  Future<List<Budget>> getExceededBudgets() async {
+    return _budgets
+        .where((budget) => budget.status == BudgetStatus.exceeded)
+        .toList();
+  }
+
+  Future<void> pauseBudget(String id) async {
+    AppLogger.info('Pausing budget with ID: $id');
+    try {
+      final budget = getBudgetById(id);
+      if (budget != null) {
+        budget.status = BudgetStatus.paused;
+        budget.updatedAt = DateTime.now();
+        await _updateBudgetInDatabase(budget);
+        notifyListeners();
+        AppLogger.info('Budget paused successfully: $id');
+      }
+    } catch (e) {
+      AppLogger.error('Error pausing budget with ID: $id', error: e);
+    }
+  }
+
+  Future<void> resumeBudget(String id) async {
+    AppLogger.info('Resuming budget with ID: $id');
+    try {
+      final budget = getBudgetById(id);
+      if (budget != null) {
+        budget.status = BudgetStatus.active;
+        budget.updatedAt = DateTime.now();
+        await _updateBudgetInDatabase(budget);
+        notifyListeners();
+        AppLogger.info('Budget resumed successfully: $id');
+      }
+    } catch (e) {
+      AppLogger.error('Error resuming budget with ID: $id', error: e);
+    }
+  }
+
+  double getTotalBudgetedAmount() {
+    return _budgets
+        .where((budget) => budget.status == BudgetStatus.active)
+        .fold(0.0, (sum, budget) => sum + budget.amount);
+  }
+
+  double getTotalSpentAmount() {
+    return _budgets
+        .where((budget) => budget.status == BudgetStatus.active)
+        .fold(0.0, (sum, budget) => sum + budget.spent);
   }
 }
