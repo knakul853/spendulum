@@ -8,9 +8,13 @@ import 'package:spendulum/services/database/tables/incomes_table.dart';
 
 class IncomeProvider with ChangeNotifier {
   final List<Income> _incomes = [];
-  final AccountProvider _accountProvider;
+  AccountProvider _accountProvider;
 
   IncomeProvider(this._accountProvider);
+
+  void updateAccountProvider(AccountProvider accountProvider) {
+    _accountProvider = accountProvider;
+  }
 
   List<Income> get incomes => _incomes;
 

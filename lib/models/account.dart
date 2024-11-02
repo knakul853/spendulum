@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Represents a user's bank account.
 class Account {
   final String id;
   final String name;
@@ -9,7 +10,7 @@ class Account {
   final Color color;
   final String currency;
   final DateTime createdAt;
-  DateTime updatedAt; // New field
+  DateTime updatedAt;
 
   Account({
     required this.id,
@@ -20,6 +21,6 @@ class Account {
     required this.color,
     required this.currency,
     required this.createdAt,
-    required this.updatedAt, // New parameter
+    required this.updatedAt,
   });
 }

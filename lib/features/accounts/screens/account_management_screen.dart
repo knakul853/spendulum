@@ -546,14 +546,16 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             label: 'Account Name',
             onSaved: (value) => _name = value!,
             initialValue: _name,
-            textColor: theme.colorScheme.onSurface, // Use theme color
+            textColor: theme.colorScheme.onSurface,
+            hintText: "Account name (e.g., Savings, Checking)",
           ),
           SizedBox(height: 16),
           CustomTextField(
             label: 'Account Number',
             onSaved: (value) => _accountNumber = value!,
             initialValue: _accountNumber,
-            textColor: theme.colorScheme.onSurface, // Use theme color
+            textColor: theme.colorScheme.onSurface,
+            hintText: "Enter account number",
           ),
           SizedBox(height: 16),
           CustomDropdown(
@@ -561,7 +563,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _accountTypes,
             onChanged: (value) => _accountType = value!,
             initialValue: _accountType,
-            textColor: theme.colorScheme.onSurface, // Use theme color
+            textColor: theme.colorScheme.onSurface,
           ),
           SizedBox(height: 16),
           CustomTextField(
@@ -574,7 +576,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
                 _balance = 0;
               });
             },
-            textColor: theme.colorScheme.onSurface, // Use theme color
+            textColor: theme.colorScheme.onSurface,
+            hintText: "Enter account balance",
           ),
           SizedBox(height: 16),
           CustomDropdown(

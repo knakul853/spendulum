@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:spendulum/features/budget/screens/budget_screen.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/expense_logging_screen.dart';
 import 'package:spendulum/ui/screens/income_logging_screen.dart';
 import 'package:spendulum/ui/widgets/custom_button_tab.dart';
 import 'package:spendulum/features/transactions/screens/transactions_screen.dart';
 import 'package:spendulum/ui/screens/stats_screen.dart';
-import 'package:spendulum/ui/screens/more_screen.dart';
 import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
-import 'package:spendulum/ui/widgets/logger.dart'; // Import
+import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/ui/screens/more_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+
+  /// The main home screen of the application. It provides a bottom navigation
+  /// bar and a page view with five screens: transactions, stats, budget,
+  /// account management, and more.
+  ///
+  /// The transactions screen is responsible for displaying all the transactions
+  /// for the selected account. The stats screen displays charts and summaries of
+  /// the transactions. The budget screen allows the user to add, edit, and delete
+  /// budgets. The account management screen allows the user to add, edit, and
+  /// delete accounts. The more screen contains links to other features of the
+  /// application.
+  ///
+  /// The floating action button is used to add new transactions.
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     AppLogger.info(
@@ -47,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               TransactionsScreen(selectedAccount: selectedAccount),
               StatsScreen(selectedAccount: selectedAccount),
+              BudgetScreen(),
               AccountManagementScreen(
                 isInitialSetup: false,
               ), // Added Account Management Screen
@@ -73,6 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// A temporary screen that is displayed while the application is waiting for
+  /// the selected account to be loaded.
+  ///
+  /// The screen displays a centered [CircularProgressIndicator] with the text
+  /// "Loading account..." below it.
+  ///
+  /// This screen is only displayed when the selected account is not available.
   Widget _buildLoadingScreen() {
     return Scaffold(
       body: Center(

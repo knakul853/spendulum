@@ -29,7 +29,11 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
             accountId: widget.selectedAccount.id);
 
         if (categoryExpenses.isEmpty) {
-          return const Center(child: Text('No expenses found.'));
+          return const Center(
+              child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text('No expenses found.'),
+          ));
         }
 
         List<Color> colorList = [

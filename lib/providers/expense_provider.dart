@@ -5,6 +5,7 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/services/database/database_helper.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/services/database/tables/expense_table.dart';
+import 'package:spendulum/providers/budget_provider.dart';
 
 /// ExpenseProvider is a class that manages the state and operations related to
 /// expenses in the application. It extends ChangeNotifier to allow UI components
@@ -21,10 +22,18 @@ class ExpenseProvider with ChangeNotifier {
   // Monthly budget for tracking expenses
   double _monthlyBudget = 0.0;
   // Reference to the AccountProvider for account balance updates
-  final AccountProvider _accountProvider;
+  AccountProvider _accountProvider;
+
+  BudgetProvider _budgetProvider;
 
   // Constructor to initialize the ExpenseProvider with an AccountProvider
-  ExpenseProvider(this._accountProvider);
+  ExpenseProvider(this._accountProvider, this._budgetProvider);
+
+  void updateProviders(
+      AccountProvider accountProvider, BudgetProvider budgetProvider) {
+    _accountProvider = accountProvider;
+    _budgetProvider = budgetProvider;
+  }
 
   // Getter to retrieve the list of expenses
   List<Expense> get expenses => _expenses;
@@ -43,7 +52,6 @@ class ExpenseProvider with ChangeNotifier {
       _expenses.clear(); // Clear existing expenses
       // Map the database records to Expense objects
 
-      AppLogger.info("The expense map is: $expenseMaps");
       // Map the database records to Expense objects, filtering by accountId and month
       _expenses.addAll(expenseMaps.where((map) {
         final expenseDate =
@@ -103,10 +111,56 @@ class ExpenseProvider with ChangeNotifier {
       _expenses.add(newExpense); // Add the new expense to the list
       _accountProvider.updateAccountBalance(
           accountId, -amount); // Update account balance
+
+      await _updateAffectedBudgets(newExpense);
+
       notifyListeners(); // Notify listeners of changes
       AppLogger.info('Expense added successfully: ${newExpense.id}');
     } catch (e) {
       AppLogger.error('Error adding expense', error: e);
+    }
+  }
+
+  // New method to update affected budgets
+  Future<void> _updateAffectedBudgets(Expense expense) async {
+    AppLogger.info('Updating budgets for expense: ${expense.id}');
+    try {
+      // Get all active budgets
+      final activeBudgets = await _budgetProvider.getActiveBudgets();
+
+      // Filter budgets that match the expense criteria
+      final affectedBudgets = activeBudgets.where((budget) {
+        // Check if the expense falls within the budget's date range
+        final isWithinDateRange = expense.date.isAfter(budget.startDate) &&
+            expense.date.isBefore(budget.endDate);
+        // Check if the budget applies to this expense's category
+        final matchesCategory = budget.categories.contains(expense.category);
+
+        // Check if the budget applies to this expense's account
+        final matchesAccount = budget.accountId == expense.accountId;
+
+        return isWithinDateRange && matchesCategory && matchesAccount;
+      });
+
+      // Update each affected budget
+      for (final budget in affectedBudgets) {
+        AppLogger.info(
+            'Updating budget: ${budget.id} for expense: ${expense.id}');
+
+        // Update the budget's spent amount
+        await _budgetProvider.updateBudgetSpent(budget.id, expense.amount);
+
+        // If the budget is exceeded after this expense, log a warning
+        if (budget.isExceeded) {
+          AppLogger.warn(
+              'Budget ${budget.id} (${budget.name}) has exceeded its limit. '
+              'Budget: ${budget.amount}, Spent: ${budget.spent}');
+        }
+      }
+    } catch (e) {
+      AppLogger.error('Error updating budgets for expense: ${expense.id}',
+          error: e);
+      // Don't rethrow - we don't want budget updates to break expense creation
     }
   }
 

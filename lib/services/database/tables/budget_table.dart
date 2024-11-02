@@ -1,3 +1,5 @@
+import 'package:spendulum/services/database/tables/accounts_table.dart';
+
 class BudgetsTable {
   static const String tableName = 'budgets';
   static const String columnId = 'id';
@@ -20,9 +22,8 @@ class BudgetsTable {
       $columnPeriod INTEGER NOT NULL,
       $columnStartDate TEXT NOT NULL,
       $columnEndDate TEXT NOT NULL,
-      $columnSpent REAL NOT NULL,
-      FOREIGN KEY ($columnAccountId) REFERENCES accounts(id),
-      FOREIGN KEY ($columnCategoryId) REFERENCES categories(id)
+      $columnSpent REAL NOT NULL DEFAULT 0.0,
+      FOREIGN KEY ($columnAccountId) REFERENCES ${AccountsTable.tableName} (${AccountsTable.columnId})
     )
   ''';
 }

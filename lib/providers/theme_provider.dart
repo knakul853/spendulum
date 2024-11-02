@@ -22,7 +22,7 @@ class ThemeProvider with ChangeNotifier {
 
   Future<void> _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _currentThemeIndex = prefs.getInt('themeIndex') ?? 0;
+    _currentThemeIndex = prefs.getInt('themeIndex') ?? 1;
     _currentTheme = AppTheme.getThemeFromIndex(_currentThemeIndex);
     notifyListeners();
   }
