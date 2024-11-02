@@ -21,7 +21,7 @@ Spendulum: Expense and Income Tracker is a personal finance management applicati
 ## Features
 
 - **Expense Tracking**: Log and categorize your expenses effortlessly.
-- **Budget Management**: Set budgets for different categories and monitor your spending.
+- **Budget Management**: Set budgets for different categories and monitor your spending.  This includes creating, editing, pausing, and resuming budgets.  The app displays summary cards showing total budgeted and spent amounts.  Budgets can be filtered by status (active, paused, or all).
 - **Monthly Reports**: Visualize your spending habits with detailed monthly reports.
 - **Account Management**: Manage multiple accounts and track balances.
 - **User-Friendly Interface**: Simple and clean design for an enhanced user experience.
