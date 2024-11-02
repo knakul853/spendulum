@@ -30,7 +30,7 @@ class AnimatedBottomNav extends StatelessWidget {
                 _buildNavItem(Icons.account_balance, 'Budget', 2),
                 _buildNavItem(Icons.account_balance_wallet_outlined, 'Account',
                     3), // Added Account tab
-                // _buildNavItem(Icons.more_horiz, 'More', 4), //Updated index
+                _buildNavItem(Icons.more_horiz, 'More', 4), //Updated index
               ],
             ),
           ),
@@ -45,7 +45,7 @@ class AnimatedBottomNav extends StatelessWidget {
       child: AnimatedContainer(
         duration: Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 26),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         decoration: BoxDecoration(
           color: currentIndex == index
               ? Color.fromARGB(80, 238, 184, 237)

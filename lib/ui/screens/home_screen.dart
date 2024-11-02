@@ -9,6 +9,7 @@ import 'package:spendulum/features/transactions/screens/transactions_screen.dart
 import 'package:spendulum/ui/screens/stats_screen.dart';
 import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/ui/widgets/logger.dart'; // Import
+import 'package:spendulum/ui/screens/more_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               AccountManagementScreen(
                 isInitialSetup: false,
               ), // Added Account Management Screen
-              // MoreScreen(),
+              MoreScreen(),
             ],
           ),
           bottomNavigationBar: AnimatedBottomNav(
