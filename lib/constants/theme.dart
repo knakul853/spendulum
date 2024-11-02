@@ -21,7 +21,7 @@ class AppTheme {
     name: 'Dark',
     brightness: Brightness.dark,
     primary: Colors.blueGrey,
-    secondary: Colors.blueAccent,
+    secondary: Color(0xFF2E3B4E),
     background: Colors.grey[900]!,
     surface: Colors.grey[800]!,
     onSurface: Colors.white70,

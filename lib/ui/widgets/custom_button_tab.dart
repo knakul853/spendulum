@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:spendulum/models/account.dart';
 
 class AnimatedBottomNav extends StatelessWidget {
@@ -25,12 +26,12 @@ class AnimatedBottomNav extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(Icons.list, 'Transactions', 0),
-                _buildNavItem(Icons.bar_chart, 'Stats', 1),
-                _buildNavItem(Icons.account_balance, 'Budget', 2),
+                _buildNavItem(Icons.list, 'Transactions', 0, context),
+                _buildNavItem(Icons.bar_chart, 'Stats', 1, context),
+                _buildNavItem(Icons.account_balance, 'Budget', 2, context),
                 _buildNavItem(Icons.account_balance_wallet_outlined, 'Account',
-                    3), // Added Account tab
-                _buildNavItem(Icons.more_horiz, 'More', 4), //Updated index
+                    3, context),
+                _buildNavItem(Icons.more_horiz, 'More', 4, context),
               ],
             ),
           ),
@@ -39,22 +40,24 @@ class AnimatedBottomNav extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(
+      IconData icon, String label, int index, BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => onTap(index),
       child: AnimatedContainer(
         duration: Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
           color: currentIndex == index
-              ? Color.fromARGB(80, 238, 184, 237)
+              ? theme.colorScheme.primary.withOpacity(0.4)
               : Colors.transparent,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(15), // Adjust as needed
-            topRight: Radius.circular(15), // Adjust as needed
-            bottomLeft: Radius.circular(0), // No curve for bottom left
-            bottomRight: Radius.circular(0), // No curve for bottom right
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15),
+            bottomLeft: Radius.circular(0),
+            bottomRight: Radius.circular(0),
           ),
         ),
         child: Column(
@@ -68,14 +71,18 @@ class AnimatedBottomNav extends StatelessWidget {
                 ..translate(currentIndex == index ? 2.0 : 0.0),
               child: Icon(
                 icon,
-                color: currentIndex == index ? Colors.white : Colors.white70,
+                color: currentIndex == index
+                    ? theme.textTheme.bodyMedium?.color
+                    : theme.textTheme.bodySmall?.color,
               ),
             ),
             SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: currentIndex == index ? Colors.white : Colors.white70,
+                color: currentIndex == index
+                    ? theme.textTheme.bodyMedium?.color
+                    : theme.textTheme.bodySmall?.color,
                 fontSize: 12,
               ),
             ),
