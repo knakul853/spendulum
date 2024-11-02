@@ -41,6 +41,60 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     AppLogger.info('ExpenseIncomeList: Disposed TabController');
   }
 
+  String _getCurrencySymbol(String currency) {
+    switch (currency.toUpperCase()) {
+      case 'INR':
+        return '₹';
+      case 'USD':
+        return '\$';
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      default:
+        return '\$';
+    }
+  }
+
+  Widget _buildTotalCard(double total, String currency, String title) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Total $title',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+            ),
+          ),
+          Text(
+            '${_getCurrencySymbol(currency)}${NumberFormat('#,##0.00').format(total)}',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     AppLogger.info('ExpenseIncomeList: Building widget');
@@ -71,12 +125,26 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
         final accountCurrency =
             accountProvider.getCurrencyCode(widget.accountId);
 
-        return _buildList(
-          items: expenses,
-          itemBuilder: (expense) =>
-              ExpenseListItem(expense: expense, currency: accountCurrency),
-          emptyMessage: 'No Expenses Found',
-          title: '${DateFormat.MMMM().format(widget.selectedMonth)} Expenses',
+        // Calculate total expenses
+        final totalExpenses = expenses.fold<double>(
+          0,
+          (sum, expense) => sum + expense.amount,
+        );
+
+        return Column(
+          children: [
+            _buildTotalCard(totalExpenses, accountCurrency, 'Expenses'),
+            Expanded(
+              child: _buildList(
+                items: expenses,
+                itemBuilder: (expense) => ExpenseListItem(
+                    expense: expense, currency: accountCurrency),
+                emptyMessage: 'No Expenses Found',
+                title:
+                    '${DateFormat.MMMM().format(widget.selectedMonth)} Expenses',
+              ),
+            ),
+          ],
         );
       },
     );
@@ -92,12 +160,26 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
         final accountCurrency =
             accountProvider.getCurrencyCode(widget.accountId);
 
-        return _buildList(
-          items: incomes,
-          itemBuilder: (income) =>
-              IncomeListItem(income: income, currency: accountCurrency),
-          emptyMessage: 'No Income Found',
-          title: '${DateFormat.MMMM().format(widget.selectedMonth)} Income',
+        // Calculate total income
+        final totalIncome = incomes.fold<double>(
+          0,
+          (sum, income) => sum + income.amount,
+        );
+
+        return Column(
+          children: [
+            _buildTotalCard(totalIncome, accountCurrency, 'Income'),
+            Expanded(
+              child: _buildList(
+                items: incomes,
+                itemBuilder: (income) =>
+                    IncomeListItem(income: income, currency: accountCurrency),
+                emptyMessage: 'No Income Found',
+                title:
+                    '${DateFormat.MMMM().format(widget.selectedMonth)} Income',
+              ),
+            ),
+          ],
         );
       },
     );
