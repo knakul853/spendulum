@@ -6,6 +6,7 @@ import 'package:spendulum/models/budget.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/budget/widgets/add_budget.dart';
 import 'package:spendulum/features/budget/widgets/edit_budget.dart';
+import 'package:spendulum/features/budget/widgets/budget_card.dart';
 
 class BudgetScreen extends StatelessWidget {
   const BudgetScreen({Key? key}) : super(key: key);
@@ -28,7 +29,86 @@ class BudgetScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: _buildBody(context),
+      body: Consumer<BudgetProvider>(
+        builder: (context, budgetProvider, _) {
+          final budgets = budgetProvider.budgets;
+
+          if (budgets.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: _buildSummaryCards(context, budgetProvider),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your Budgets',
+                        style: theme.textTheme.titleMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      _buildBudgetFilters(context),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.all(16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => BudgetCard(budget: budgets[index]),
+                    childCount: budgets.length,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBudgetFilters(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          FilterChip(
+            label: Text('All'),
+            selected: true,
+            onSelected: (selected) {
+              // Implement filter logic
+            },
+          ),
+          SizedBox(width: 8),
+          FilterChip(
+            label: Text('Active'),
+            selected: false,
+            onSelected: (selected) {
+              // Implement filter logic
+            },
+          ),
+          SizedBox(width: 8),
+          FilterChip(
+            label: Text('Paused'),
+            selected: false,
+            onSelected: (selected) {
+              // Implement filter logic
+            },
+          ),
+        ],
+      ),
     );
   }
 

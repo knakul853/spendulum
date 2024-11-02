@@ -28,7 +28,8 @@ class BudgetProvider with ChangeNotifier {
                 id: map[BudgetsTable.columnId] as String,
                 name: map[BudgetsTable.columnName] as String,
                 accountId: map[BudgetsTable.columnAccountId] as String,
-                categoryIds: map[BudgetsTable.columnCategoryId] as List<String>,
+                categoryIds:
+                    (map[BudgetsTable.columnCategoryId] as String).split(","),
                 amount: map[BudgetsTable.columnAmount] as double,
                 period: Period.values[map[BudgetsTable.columnPeriod] as int],
                 startDate:
@@ -98,7 +99,8 @@ class BudgetProvider with ChangeNotifier {
       BudgetsTable.columnId: budget.id,
       BudgetsTable.columnName: budget.name,
       BudgetsTable.columnAccountId: budget.accountId,
-      BudgetsTable.columnCategoryId: budget.categoryIds,
+      BudgetsTable.columnCategoryId: budget.categoryIds
+          .join(','), //Storing multiple category ids as comma separated.
       BudgetsTable.columnAmount: budget.amount,
       BudgetsTable.columnPeriod: budget.period.index,
       BudgetsTable.columnStartDate: budget.startDate.toIso8601String(),
@@ -157,7 +159,7 @@ class BudgetProvider with ChangeNotifier {
         {
           BudgetsTable.columnName: updatedBudget.name,
           BudgetsTable.columnAccountId: updatedBudget.accountId,
-          BudgetsTable.columnCategoryId: updatedBudget.categoryIds,
+          BudgetsTable.columnCategoryId: updatedBudget.categoryIds.join(','),
           BudgetsTable.columnAmount: updatedBudget.amount,
           BudgetsTable.columnPeriod: updatedBudget.period.index,
           BudgetsTable.columnStartDate:

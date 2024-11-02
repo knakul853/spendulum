@@ -22,7 +22,6 @@ class BudgetsTable {
       $columnEndDate TEXT NOT NULL,
       $columnSpent REAL NOT NULL,
       FOREIGN KEY ($columnAccountId) REFERENCES accounts(id),
-      FOREIGN KEY ($columnCategoryId) REFERENCES categories(id)
     )
   ''';
 }
