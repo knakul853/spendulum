@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:spendulum/models/income.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/services/database/database_helper.dart';
+import 'package:spendulum/db/database_helper.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/services/database/tables/incomes_table.dart';
+import 'package:spendulum/db/tables/incomes_table.dart';
 
 class IncomeProvider with ChangeNotifier {
   final List<Income> _incomes = [];

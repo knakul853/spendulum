@@ -1,10 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:spendulum/services/database/tables/accounts_table.dart';
-import 'package:spendulum/services/database/tables/expense_table.dart';
-import 'package:spendulum/services/database/tables/category_table.dart';
-import 'package:spendulum/services/database/tables/budget_table.dart';
-import 'package:spendulum/services/database/tables/incomes_table.dart';
+import 'package:spendulum/db/tables/accounts_table.dart';
+import 'package:spendulum/db/tables/expense_table.dart';
+import 'package:spendulum/db/tables/category_table.dart';
+import 'package:spendulum/db/tables/budget_table.dart';
+import 'package:spendulum/db/tables/incomes_table.dart';
 
 /// A singleton class that manages the SQLite database for the Spendulum application.
 /// It provides methods to initialize the database, create tables, and perform

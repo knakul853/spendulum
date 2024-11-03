@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class AddAccountDialog extends StatefulWidget {
   final Function? onAccountAdded;
@@ -19,7 +18,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   String _accountNumber = '';
   String _accountType = 'General';
   double _balance = 0.0;
-  Color _color = AppColors.primary; // Use AppColors.primary
+  Color _color = Colors.blue;
   String _currency = 'USD';
 
   final List<String> _accountTypes = [
@@ -118,7 +117,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                     ElevatedButton(
                       child: Text('Add',
                           style: TextStyle(
-                              color: AppColors.text)), // Use AppColors.text
+                              color: theme.textTheme.bodySmall?.color)),
                       onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
                         padding:
@@ -126,7 +125,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
                         backgroundColor:
-                            AppColors.primary, // Use AppColors.primary
+                            theme.colorScheme.surface, // Use AppColors.primary
                       ),
                     ),
                   ],
@@ -203,7 +202,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.text)), // Use AppColors.text
+                color: Theme.of(context).textTheme.labelMedium?.color)),
         SizedBox(height: 8),
         GestureDetector(
           onTap: _showColorPalette,
@@ -232,7 +231,8 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Select Account Color',
-              style: TextStyle(color: AppColors.text)), // Use AppColors.text
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.labelMedium?.color)),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: _color,
@@ -245,8 +245,11 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
           actions: <Widget>[
             TextButton(
               child: Text('OK',
-                  style:
-                      TextStyle(color: AppColors.text)), // Use AppColors.text
+                  style: TextStyle(
+                      color: Theme.of(context)
+                          .textTheme
+                          .labelMedium
+                          ?.color)), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -585,7 +585,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             items: _currencies,
             onChanged: (value) => _currency = value!,
             initialValue: _currency,
-            textColor: theme.colorScheme.onSurface, // Use theme color
+            textColor: theme.colorScheme.onSurface,
           ),
           SizedBox(height: 16),
           CustomColorPicker(
@@ -607,8 +607,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
             style: theme.textTheme.bodyMedium),
         onPressed: _submitForm,
         style: ElevatedButton.styleFrom(
-          backgroundColor: theme.primaryColor, // Use theme color
-          foregroundColor: theme.colorScheme.onPrimary, // Use theme color
+          backgroundColor: theme.primaryColor,
+          foregroundColor: theme.colorScheme.onPrimary,
           padding: EdgeInsets.symmetric(vertical: 16),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

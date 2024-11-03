@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:spendulum/models/account.dart';
-import 'package:spendulum/services/database/database_helper.dart';
-import 'package:spendulum/services/database/tables/accounts_table.dart';
+import 'package:spendulum/db/database_helper.dart';
+import 'package:spendulum/db/tables/accounts_table.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/services/database/tables/expense_table.dart';
+import 'package:spendulum/db/tables/expense_table.dart';
 
 // AccountProvider class manages the accounts in the application.
 // It handles loading, adding, updating, and selecting accounts,

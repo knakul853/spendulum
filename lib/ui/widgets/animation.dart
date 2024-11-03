@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:animated_background/animated_background.dart' as anim_bg;
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class CustomAnimatedBackground extends StatefulWidget {
   final Widget child;
@@ -59,6 +58,7 @@ class _GradientAnimatedBackgroundState extends State<GradientAnimatedBackground>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -68,9 +68,13 @@ class _GradientAnimatedBackgroundState extends State<GradientAnimatedBackground>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color.lerp(AppColors.primary, AppColors.secondary,
+                Color.lerp(
+                    theme.colorScheme.primary,
+                    theme.colorScheme.secondary,
                     _animation.value)!, // Use AppColors
-                Color.lerp(AppColors.secondary, AppColors.primary,
+                Color.lerp(
+                    theme.colorScheme.primary,
+                    theme.colorScheme.secondary,
                     _animation.value)!, // Use AppColors
               ],
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:spendulum/constants/app_colors.dart'; // Import AppColors
 
 class AnimatedCardShape extends StatefulWidget {
   @override
@@ -32,7 +31,8 @@ class _AnimatedCardShapeState extends State<AnimatedCardShape>
       animation: _controller,
       builder: (_, __) {
         return CustomPaint(
-          painter: ShapePainter(_controller.value, AppColors.primary), // Use AppColors.primary
+          painter: ShapePainter(_controller.value,
+              Theme.of(context).colorScheme.primary), // Use AppColors.primary
         );
       },
     );

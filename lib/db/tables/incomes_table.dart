@@ -1,4 +1,4 @@
-import 'package:spendulum/services/database/tables/accounts_table.dart';
+import 'package:spendulum/db/tables/accounts_table.dart';
 
 class IncomesTable {
   static const String tableName = 'incomes';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:spendulum/models/category.dart';
-import 'package:spendulum/services/database/database_helper.dart';
+import 'package:spendulum/db/database_helper.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/utils/category_utils.dart';
-import 'package:spendulum/services/database/tables/category_table.dart';
+import 'package:spendulum/db/tables/category_table.dart';
 
 /// A provider class that manages the state and operations related to
 /// categories in the application. It handles loading, adding, updating,

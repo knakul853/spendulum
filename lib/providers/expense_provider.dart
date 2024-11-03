@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:spendulum/models/expense.dart';
 import 'package:spendulum/providers/account_provider.dart';
-import 'package:spendulum/services/database/database_helper.dart';
+import 'package:spendulum/db/database_helper.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/services/database/tables/expense_table.dart';
+import 'package:spendulum/db/tables/expense_table.dart';
 import 'package:spendulum/providers/budget_provider.dart';
 
 /// ExpenseProvider is a class that manages the state and operations related to

@@ -70,10 +70,12 @@ class _CustomColorPickerState extends State<CustomColorPicker> {
             child: ColorPicker(
               pickerColor: _currentColor,
               onColorChanged: (color) {
-                setState(() {
-                  _currentColor = color;
-                });
-                widget.onColorChanged(color);
+                if (mounted) {
+                  setState(() {
+                    _currentColor = color;
+                  });
+                  widget.onColorChanged(color);
+                }
               },
               pickerAreaHeightPercent: 0.8,
             ),
