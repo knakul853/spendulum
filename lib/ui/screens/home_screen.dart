@@ -87,22 +87,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// A temporary screen that is displayed while the application is waiting for
-  /// the selected account to be loaded.
-  ///
-  /// The screen displays a centered [CircularProgressIndicator] with the text
-  /// "Loading account..." below it.
-  ///
-  /// This screen is only displayed when the selected account is not available.
   Widget _buildLoadingScreen() {
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
+            Text(
+              'Please create an account to continue using the app',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
             SizedBox(height: 20),
-            Text('Loading account...'),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AccountManagementScreen(
+                      isInitialSetup: false,
+                    ),
+                  ),
+                );
+              },
+              child: Text('Add Account'),
+            ),
           ],
         ),
       ),
