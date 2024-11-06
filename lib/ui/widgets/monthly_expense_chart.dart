@@ -6,13 +6,15 @@ import 'package:spendulum/models/expense.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/expenses/widgets/expense_bar_chart.dart';
+import 'package:spendulum/models/account.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class EnhancedExpenseTrendChart extends StatefulWidget {
-  final String selectedAccountId;
+  final Account selectedAccount;
 
   const EnhancedExpenseTrendChart({
     Key? key,
-    required this.selectedAccountId,
+    required this.selectedAccount,
   }) : super(key: key);
 
   @override
@@ -95,13 +97,13 @@ class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
         padding: const EdgeInsets.only(right: 16, left: 6, top: 16, bottom: 6),
         child: showLineChart
             ? _ExpenseTrendChart(
-                selectedAccountId: widget.selectedAccountId,
+                selectedAccount: widget.selectedAccount,
                 startDate: startDate,
                 endDate: endDate,
                 period: selectedPeriod,
               )
             : ExpenseBarChart(
-                selectedAccountId: widget.selectedAccountId,
+                selectedAccountId: widget.selectedAccount.id,
                 startDate: startDate,
                 endDate: endDate,
                 period: selectedPeriod,
@@ -153,13 +155,13 @@ class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
 }
 
 class _ExpenseTrendChart extends StatefulWidget {
-  final String selectedAccountId;
+  final Account selectedAccount;
   final DateTime startDate;
   final DateTime endDate;
   final String period;
 
   const _ExpenseTrendChart({
-    required this.selectedAccountId,
+    required this.selectedAccount,
     required this.startDate,
     required this.endDate,
     required this.period,
@@ -179,7 +181,7 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
       builder: (context, expenseProvider, child) {
         return FutureBuilder<List<Expense>>(
           future: expenseProvider.getExpensesForAccountAndDateRange(
-            widget.selectedAccountId,
+            widget.selectedAccount.id,
             widget.startDate,
             widget.endDate,
           ),
@@ -263,7 +265,8 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
             }
 
             return LineChart(
-              _createChartData(groupedExpenses, context),
+              _createChartData(groupedExpenses,
+                  getCurrencySymbol(widget.selectedAccount.currency), context),
               duration: const Duration(milliseconds: 250),
             );
           },
@@ -272,8 +275,8 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
     );
   }
 
-  LineChartData _createChartData(
-      Map<String, double> groupedExpenses, BuildContext context) {
+  LineChartData _createChartData(Map<String, double> groupedExpenses,
+      String currency, BuildContext context) {
     final spots = groupedExpenses.entries
         .map((e) => FlSpot(
               groupedExpenses.keys.toList().indexOf(e.key).toDouble(),
@@ -312,7 +315,8 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
             showTitles: true,
             reservedSize: 40,
             interval: maxY / 5, // Adjust interval based on max value
-            getTitlesWidget: (value, meta) => _leftTitleWidgets(value, context),
+            getTitlesWidget: (value, meta) =>
+                _leftTitleWidgets(value, currency, context),
           ),
         ),
         topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -365,8 +369,9 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
           getTooltipItems: (touchedSpots) {
             return touchedSpots.map((LineBarSpot touchedSpot) {
               final date = groupedExpenses.keys.toList()[touchedSpot.x.toInt()];
+
               return LineTooltipItem(
-                '${date}: \$${touchedSpot.y.toStringAsFixed(2)}',
+                '$date: $currency${touchedSpot.y.toStringAsFixed(2)}',
                 TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
               );
             }).toList();
@@ -406,9 +411,11 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
   /// The style of the title is determined by [Theme.of(context).textTheme.bodySmall].
   ///
   /// The title is right-aligned.
-  Widget _leftTitleWidgets(double value, BuildContext context) {
+  Widget _leftTitleWidgets(
+      double value, String currency, BuildContext context) {
     final style = Theme.of(context).textTheme.bodySmall;
-    return Text('\$${value.toInt()}', style: style, textAlign: TextAlign.right);
+    return Text('$currency${value.toInt()}',
+        style: style, textAlign: TextAlign.right);
   }
 
   /// Groups expenses by period.
