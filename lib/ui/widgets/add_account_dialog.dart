@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class AddAccountDialog extends StatefulWidget {
   final Function? onAccountAdded;
@@ -36,7 +37,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     'Other'
   ];
 
-  final List<String> _currencies = ['USD', 'EUR', 'GBP', 'JPY', 'INR', 'Other'];
+  final List<String> _currencies = getCurrencyCodes();
 
   @override
   Widget build(BuildContext context) {

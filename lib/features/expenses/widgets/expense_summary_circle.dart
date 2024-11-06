@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/expense_provider.dart';
+import 'package:spendulum/utils/currency.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 import 'package:spendulum/providers/account_provider.dart';
 
@@ -92,7 +93,7 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
                       ),
                       SizedBox(height: widget.size * 0.02),
                       Text(
-                        '${_getCurrencySymbol(widget.currency)}${(totalExpenses * _animation.value).toStringAsFixed(0)}', // Use currency symbol
+                        '${getCurrencySymbol(widget.currency)}${(totalExpenses * _animation.value).toStringAsFixed(0)}', // Use currency symbol
                         style: TextStyle(
                           fontSize: widget.size * 0.1,
                           fontWeight: FontWeight.bold,
@@ -100,7 +101,7 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
                       ),
                       SizedBox(height: widget.size * 0.02),
                       Text(
-                        'available ${_getCurrencySymbol(widget.currency)}${balance.toStringAsFixed(0)}', // Use currency symbol
+                        'available ${getCurrencySymbol(widget.currency)}${balance.toStringAsFixed(0)}', // Use currency symbol
                         style: TextStyle(fontSize: widget.size * 0.05),
                       ),
                     ],
@@ -128,21 +129,6 @@ class _ExpenseSummaryCircleState extends State<ExpenseSummaryCircle>
       return Colors.yellow;
     } else {
       return Theme.of(context).primaryColor;
-    }
-  }
-
-  String _getCurrencySymbol(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'INR':
-        return '₹';
-      case 'USD':
-        return '\$';
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      default:
-        return '\$'; // Default to USD
     }
   }
 }

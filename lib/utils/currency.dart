@@ -1,4 +1,5 @@
-// currency.dart
+import 'package:flutter/material.dart';
+
 Map<String, String> _currencySymbols = {
   'USD': '\$',
   'EUR': '€',
@@ -110,4 +111,127 @@ Map<String, String> _currencySymbols = {
 
 String getCurrencySymbol(String currencyCode) {
   return _currencySymbols[currencyCode] ?? currencyCode;
+}
+
+List<String> getCurrencyCodes() {
+  return _currencySymbols.keys.toList();
+}
+
+IconData getCurrencyIcon(String currency) {
+  switch (currency.toUpperCase()) {
+    case 'USD':
+    case 'JPY':
+    case 'AUD':
+    case 'CAD':
+    case 'CHF':
+    case 'CNY':
+    case 'HKD':
+    case 'NZD':
+    case 'SEK':
+    case 'KRW':
+    case 'BRL':
+    case 'RUB':
+    case 'MXN':
+    case 'ZAR':
+    case 'TRY':
+    case 'PLN':
+    case 'NOK':
+    case 'DKK':
+    case 'THB':
+    case 'MYR':
+    case 'PHP':
+    case 'IDR':
+    case 'VND':
+    case 'AED':
+    case 'SAR':
+    case 'HRK':
+    case 'CZK':
+    case 'HUF':
+    case 'ARS':
+    case 'CLP':
+    case 'COP':
+    case 'PEN':
+    case 'UYU':
+    case 'DOP':
+    case 'CRC':
+    case 'PYG':
+    case 'BOB':
+    case 'GTQ':
+    case 'NIO':
+    case 'HNL':
+    case 'SVC':
+    case 'MMK':
+    case 'KHR':
+    case 'LAK':
+    case 'BND':
+    case 'SGD':
+    case 'BWP':
+    case 'NAD':
+    case 'ZMW':
+    case 'TZS':
+    case 'UGX':
+    case 'KES':
+    case 'ETB':
+    case 'GHS':
+    case 'ZWL':
+    case 'MWK':
+    case 'MZN':
+    case 'AOA':
+    case 'CDF':
+    case 'SDG':
+    case 'SLL':
+    case 'SZL':
+    case 'LSL':
+    case 'RWF':
+    case 'BIF':
+    case 'GNF':
+    case 'XAF':
+    case 'XOF':
+    case 'XPF':
+    case 'DJF':
+    case 'ERN':
+    case 'GMD':
+    case 'CVE':
+    case 'MRO':
+    case 'STD':
+    case 'KMF':
+    case 'SOS':
+    case 'TDC':
+    case 'XCD':
+    case 'TMT':
+    case 'AFN':
+    case 'AMD':
+    case 'AZN':
+    case 'ALL':
+    case 'BAM':
+    case 'BGN':
+    case 'BYN':
+    case 'GEL':
+    case 'ISK':
+    case 'MKD':
+    case 'MDL':
+    case 'RON':
+    case 'RSD':
+    case 'TJS':
+    case 'UAH':
+    case 'UZS':
+    case 'XDR':
+      return Icons.attach_money;
+
+    case 'EUR':
+      return Icons.euro;
+    case 'GBP':
+    case 'SHP':
+      return Icons.currency_pound;
+    case 'INR':
+    case 'NPR':
+    case 'PKR':
+    case 'BDT':
+    case 'LKR':
+    case 'SCR':
+      return Icons.currency_rupee;
+
+    default:
+      return Icons.monetization_on;
+  }
 }

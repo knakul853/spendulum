@@ -5,6 +5,7 @@ import 'package:spendulum/providers/category_provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class IncomeLoggingScreen extends StatefulWidget {
   final String? initialAccountId;
@@ -190,7 +191,7 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
         final selectedAccount =
             accountProvider.getAccountById(_accountId ?? '');
         final currencyIcon =
-            _getCurrencyIcon(selectedAccount?.currency ?? 'USD');
+            getCurrencyIcon(selectedAccount?.currency ?? 'USD');
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -298,20 +299,5 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
       filled: true,
       fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
     );
-  }
-
-  IconData _getCurrencyIcon(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'INR':
-        return Icons.currency_rupee;
-      case 'USD':
-        return Icons.attach_money;
-      case 'EUR':
-        return Icons.euro;
-      case 'GBP':
-        return Icons.currency_pound;
-      default:
-        return Icons.monetization_on;
-    }
   }
 }

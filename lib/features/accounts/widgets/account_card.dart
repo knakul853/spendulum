@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/ui/widgets/animated_card_shape.dart';
 import 'package:intl/intl.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class AccountCard extends StatelessWidget {
   final Account account;
@@ -16,21 +17,6 @@ class AccountCard extends StatelessWidget {
     required this.onTap,
     this.trailing, // Add this line to the constructor
   }) : super(key: key);
-
-  String _getCurrencySymbol(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'INR':
-        return '₹';
-      case 'USD':
-        return '\$';
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      default:
-        return '\$'; // Default to USD
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +108,7 @@ class AccountCard extends StatelessWidget {
                             ),
                             isSelected
                                 ? Text(
-                                    '${_getCurrencySymbol(account.currency)}${NumberFormat('#,##0').format(account.balance)}', // Use currency symbol
+                                    '${getCurrencySymbol(account.currency)}${NumberFormat('#,##0').format(account.balance)}',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
