@@ -57,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: theme.scaffoldBackgroundColor,
           body: PageView(
             controller: _pageController,
+            physics: NeverScrollableScrollPhysics(),
             onPageChanged: (index) => setState(() => _currentIndex = index),
             children: [
               TransactionsScreen(selectedAccount: selectedAccount),
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
               BudgetScreen(),
               AccountManagementScreen(
                 isInitialSetup: false,
-              ), // Added Account Management Screen
+              ),
               MoreScreen(),
             ],
           ),
@@ -72,10 +73,8 @@ class _HomeScreenState extends State<HomeScreen> {
             currentIndex: _currentIndex,
             onTap: (index) {
               setState(() => _currentIndex = index);
-              _pageController.animateToPage(
+              _pageController.jumpToPage(
                 index,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
               );
             },
             selectedAccount: selectedAccount,
