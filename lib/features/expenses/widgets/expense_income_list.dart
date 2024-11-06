@@ -26,19 +26,146 @@ class ExpenseIncomeList extends StatefulWidget {
 class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _selectedFilter = 'all'; // 'all', 'category', 'date', 'amount'
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _searchController.addListener(_onSearchChanged);
     AppLogger.info('ExpenseIncomeList: Initialized with TabController');
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
     AppLogger.info('ExpenseIncomeList: Disposed TabController');
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text.toLowerCase();
+    });
+  }
+
+  bool _matchesSearch(dynamic item) {
+    if (_searchQuery.isEmpty) return true;
+
+    switch (_selectedFilter) {
+      case 'category':
+        return item.category.toLowerCase().contains(_searchQuery);
+      case 'date':
+        return DateFormat('MMM dd, yyyy')
+            .format(item.date)
+            .toLowerCase()
+            .contains(_searchQuery);
+      case 'amount':
+        return item.amount.toString().contains(_searchQuery);
+      default:
+        return item.category.toLowerCase().contains(_searchQuery) ||
+            item.description.toLowerCase().contains(_searchQuery) ||
+            DateFormat('MMM dd, yyyy')
+                .format(item.date)
+                .toLowerCase()
+                .contains(_searchQuery) ||
+            item.amount.toString().contains(_searchQuery);
+    }
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search transactions...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                      },
+                    )
+                  : null,
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                _buildFilterChip('All', 'all'),
+                _buildFilterChip('Category', 'category'),
+                _buildFilterChip('Date', 'date'),
+                _buildFilterChip('Amount', 'amount'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: FilterChip(
+        label: Text(label),
+        selected: _selectedFilter == value,
+        onSelected: (bool selected) {
+          setState(() {
+            _selectedFilter = selected ? value : 'all';
+          });
+        },
+        backgroundColor: Theme.of(context).cardColor,
+        selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+        checkmarkColor: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.receipt_long_outlined,
+            size: 64,
+            color: Theme.of(context).disabledColor,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).disabledColor,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
   String _getCurrencySymbol(String currency) {
@@ -103,9 +230,9 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.info('ExpenseIncomeList: Building widget');
     return Column(
       children: [
+        _buildSearchBar(),
         StyledTabBar(controller: _tabController),
         Expanded(
           child: TabBarView(
@@ -197,22 +324,27 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     required String emptyMessage,
     required String title,
   }) {
-    return Container(
-      child: items.isEmpty
-          ? Center(
-              child: Text(
-                emptyMessage,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 1.5,
-                    ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) => itemBuilder(items[index]),
-            ),
+    // Filter items based on search query
+    final filteredItems = items.where(_matchesSearch).toList();
+
+    if (items.isEmpty) {
+      return _buildEmptyState('No transactions found for $title');
+    }
+
+    if (filteredItems.isEmpty) {
+      return _buildEmptyState('No results found for "$_searchQuery"');
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 16),
+      itemCount: filteredItems.length,
+      itemBuilder: (context, index) {
+        final item = filteredItems[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: itemBuilder(item),
+        );
+      },
     );
   }
 }
