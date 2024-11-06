@@ -30,8 +30,6 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
   String _searchQuery = '';
   String _selectedFilter = 'all'; // 'all', 'category', 'date', 'amount'
   bool _isSearchExpanded = false;
-  String get _categoryOrSourceLabel =>
-      _tabController.index == 0 ? 'Category' : 'Source';
 
   @override
   void initState() {
@@ -126,6 +124,7 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
         builder: (context, constraints) {
           return AnimatedContainer(
             duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
             margin: EdgeInsets.symmetric(
               horizontal: _isSearchExpanded ? 16 : 8,
               vertical: 8,
@@ -153,65 +152,106 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: Icon(_isSearchExpanded
-                              ? Icons.arrow_back
-                              : Icons.search),
-                          onPressed: () {
-                            setState(() {
-                              _isSearchExpanded = !_isSearchExpanded;
-                              if (!_isSearchExpanded) {
-                                _searchController.clear();
-                                _selectedFilter = 'all';
-                              }
-                            });
-                          },
+                        // Animate search/back icon
+                        AnimatedRotation(
+                          duration: const Duration(milliseconds: 300),
+                          turns: _isSearchExpanded ? -0.25 : 0,
+                          child: IconButton(
+                            icon: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                return RotationTransition(
+                                  turns: animation,
+                                  child: ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: Icon(
+                                _isSearchExpanded
+                                    ? Icons.arrow_back
+                                    : Icons.search,
+                                key: ValueKey<bool>(_isSearchExpanded),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isSearchExpanded = !_isSearchExpanded;
+                                if (!_isSearchExpanded) {
+                                  _searchController.clear();
+                                  _selectedFilter = 'all';
+                                }
+                              });
+                            },
+                          ),
                         ),
                         if (_isSearchExpanded) ...[
+                          // Animate TextField appearance
                           Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: const InputDecoration(
-                                hintText: 'Search transactions...',
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 200),
+                              opacity: _isSearchExpanded ? 1.0 : 0.0,
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                  hintText:
+                                      'Search ${_tabController.index == 0 ? 'Expenses' : 'Income'}...',
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                           if (_searchQuery.isNotEmpty)
-                            IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                              },
+                            // Animate clear button
+                            AnimatedOpacity(
+                              duration: const Duration(milliseconds: 200),
+                              opacity: _searchQuery.isNotEmpty ? 1.0 : 0.0,
+                              child: IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _searchController.clear();
+                                },
+                              ),
                             ),
                         ],
                       ],
                     ),
                   ),
-                  if (_isSearchExpanded)
-                    Container(
-                      height: 44,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildFilterChip('All', 'all'),
-                            _buildFilterChip(
-                              _categoryOrSourceLabel, // Use the getter here
-                              'category',
-                            ),
-                            _buildFilterChip('Date', 'date'),
-                            _buildFilterChip('Amount', 'amount'),
-                          ],
+                  // Animate filter chips
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: SizedBox(
+                      height: _isSearchExpanded ? 44 : 0,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: _isSearchExpanded ? 1.0 : 0.0,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildAnimatedFilterChip('All', 'all'),
+                              _buildAnimatedFilterChip(
+                                  _tabController.index == 0
+                                      ? 'Category'
+                                      : "Source",
+                                  'category'),
+                              _buildAnimatedFilterChip('Date', 'date'),
+                              _buildAnimatedFilterChip('Amount', 'amount'),
+                            ],
+                          ),
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -221,25 +261,35 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     );
   }
 
-  Widget _buildFilterChip(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FilterChip(
-        label: Text(
-          label,
-          style: TextStyle(fontSize: 12),
+  Widget _buildAnimatedFilterChip(String label, String value) {
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 200),
+      scale: _isSearchExpanded ? 1.0 : 0.0,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: _isSearchExpanded ? 1.0 : 0.0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: FilterChip(
+            label: Text(
+              label,
+              style: TextStyle(fontSize: 12),
+            ),
+            selected: _selectedFilter == value,
+            onSelected: (bool selected) {
+              setState(() {
+                _selectedFilter = selected ? value : 'all';
+              });
+            },
+            backgroundColor: Theme.of(context).cardColor,
+            selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+            checkmarkColor: Theme.of(context).primaryColor,
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            elevation: 0,
+            pressElevation: 0,
+          ),
         ),
-        selected: _selectedFilter == value,
-        onSelected: (bool selected) {
-          setState(() {
-            _selectedFilter = selected ? value : 'all';
-          });
-        },
-        backgroundColor: Theme.of(context).cardColor,
-        selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
-        checkmarkColor: Theme.of(context).primaryColor,
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }
