@@ -28,6 +28,7 @@ class _EnhancedCategoryExpenseChartState
   String selectedPeriod = 'Monthly';
   DateTime startDate = DateTime.now().subtract(const Duration(days: 7));
   DateTime endDate = DateTime.now();
+  List<Expense>? cachedExpenses;
 
   static const List<Color> chartColors = [
     Colors.blue,
@@ -75,7 +76,8 @@ class _EnhancedCategoryExpenseChartState
             endDate,
           ),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                cachedExpenses == null) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -86,11 +88,17 @@ class _EnhancedCategoryExpenseChartState
               );
             }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            final expenses = snapshot.data ?? cachedExpenses;
+            if (expenses == null || expenses.isEmpty) {
               return const ChartEmptyWidget();
             }
 
-            return _buildChartContent(snapshot.data!);
+            // Update cache with new data when available
+            if (snapshot.hasData) {
+              cachedExpenses = expenses;
+            }
+
+            return _buildChartContent(expenses);
           },
         );
       },
@@ -167,21 +175,24 @@ class _EnhancedCategoryExpenseChartState
 
   void _handleChartTouch(
       FlTouchEvent event, PieTouchResponse? pieTouchResponse) {
-    // setState(() {
-    //   if (!event.isInterestedForInteractions ||
-    //       pieTouchResponse == null ||
-    //       pieTouchResponse.touchedSection == null) {
-    //     touchedIndex = -1;
-    //     return;
-    //   }
-    //   touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-    // });
+    setState(() {
+      if (!event.isInterestedForInteractions ||
+          pieTouchResponse == null ||
+          pieTouchResponse.touchedSection == null) {
+        touchedIndex = -1;
+        return;
+      }
+      touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+    });
   }
 
   Widget _buildPieChart(Map<String, ExpenseCategoryData> categoryData) {
     return PieChart(
       PieChartData(
-        pieTouchData: PieTouchData(touchCallback: _handleChartTouch),
+        pieTouchData: PieTouchData(
+          touchCallback: _handleChartTouch,
+          enabled: true,
+        ),
         borderData: FlBorderData(show: false),
         sectionsSpace: 0,
         centerSpaceRadius: 0,
@@ -270,7 +281,7 @@ class _EnhancedCategoryExpenseChartState
       Map<String, ExpenseCategoryData> categoryData) {
     return categoryData.entries.map((entry) {
       final formattedAmount = entry.value.amount.toStringAsFixed(2);
-      final percentage = entry.value.percentage.toStringAsFixed(1);
+      //final percentage = entry.value.percentage.toStringAsFixed(1);
 
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -281,7 +292,7 @@ class _EnhancedCategoryExpenseChartState
             color: entry.value.color,
             category: entry.key,
             details:
-                ' (${getCurrencySymbol(widget.selectedAccount.currency)}$formattedAmount - $percentage%)',
+                ' (${getCurrencySymbol(widget.selectedAccount.currency)}$formattedAmount)',
           ),
         ),
       );
