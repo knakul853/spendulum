@@ -8,6 +8,7 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/ui/widgets/tabBar.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class ExpenseIncomeList extends StatefulWidget {
   final String accountId;
@@ -317,21 +318,6 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     );
   }
 
-  String _getCurrencySymbol(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'INR':
-        return '₹';
-      case 'USD':
-        return '\$';
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      default:
-        return '\$';
-    }
-  }
-
   Widget _buildTotalCard(double total, String currency, String title) {
     return Align(
       alignment: Alignment.centerRight,
@@ -364,7 +350,7 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
             ),
             SizedBox(height: 4),
             Text(
-              '${_getCurrencySymbol(currency)}${NumberFormat('#,##0.00').format(total)}',
+              '${getCurrencySymbol(currency)}${NumberFormat('#,##0.00').format(total)}',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

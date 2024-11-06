@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/providers/expense_provider.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class CategoryExpenseChart extends StatefulWidget {
   final Account selectedAccount;
@@ -55,7 +56,7 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
             children: <Widget>[
               const SizedBox(height: 10),
               Expanded(
-                flex: 3, // Increased flex for the chart
+                flex: 3,
                 child: PieChart(
                   PieChartData(
                     pieTouchData: PieTouchData(
@@ -79,9 +80,9 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20), // Spacing between chart and legend
+              const SizedBox(height: 20),
               Expanded(
-                flex: 1, // Reduced flex for the legend
+                flex: 1,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -107,13 +108,11 @@ class _CategoryExpenseChartState extends State<CategoryExpenseChart> {
 
       final entries = categoryExpenses.entries.toList();
       final value = entries[i].value;
-      final totalExpenses = categoryExpenses.values.reduce((a, b) => a + b);
-      final percentage = (value / totalExpenses * 100).toStringAsFixed(1);
 
       return PieChartSectionData(
         color: colorList[i % colorList.length],
         value: value,
-        title: '$percentage%',
+        title: '${getCurrencySymbol(widget.selectedAccount.currency)} $value',
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,

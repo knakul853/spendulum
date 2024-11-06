@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:spendulum/models/account.dart';
 
 class AnimatedBottomNav extends StatelessWidget {

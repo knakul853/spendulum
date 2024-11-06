@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spendulum/models/expense.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/constants/app_constants.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class ExpenseListItem extends StatefulWidget {
   final Expense expense;
@@ -19,21 +20,6 @@ class _ExpenseListItemState extends State<ExpenseListItem>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-
-  String _getCurrencySymbol(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'INR':
-        return '₹';
-      case 'USD':
-        return '\$';
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      default:
-        return '\$'; // Default to USD
-    }
-  }
 
   @override
   void initState() {
@@ -124,7 +110,7 @@ class _ExpenseListItemState extends State<ExpenseListItem>
                 children: [
                   SizedBox(width: 4),
                   Text(
-                    '${_getCurrencySymbol(widget.currency)}${NumberFormat('#,##0.00').format(widget.expense.amount)}', // Format amount
+                    '${getCurrencySymbol(widget.currency)}${NumberFormat('#,##0.00').format(widget.expense.amount)}', // Format amount
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spendulum/models/income.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class IncomeListItem extends StatefulWidget {
   final Income income;
@@ -99,7 +100,7 @@ class _IncomeListItemState extends State<IncomeListItem>
                 ],
               ),
               trailing: Text(
-                '${_getCurrencySymbol(widget.currency)}${NumberFormat('#,##0.00').format(widget.income.amount)}',
+                '${getCurrencySymbol(widget.currency)}${NumberFormat('#,##0.00').format(widget.income.amount)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -130,20 +131,5 @@ class _IncomeListItemState extends State<IncomeListItem>
         ),
       ),
     );
-  }
-
-  String _getCurrencySymbol(String currency) {
-    switch (currency.toUpperCase()) {
-      case 'INR':
-        return '₹';
-      case 'USD':
-        return '\$';
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      default:
-        return '\$';
-    }
   }
 }

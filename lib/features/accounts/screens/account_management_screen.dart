@@ -9,6 +9,7 @@ import 'package:spendulum/ui/widgets/custom_text_field.dart';
 import 'package:spendulum/ui/widgets/custom_dropdown.dart';
 import 'package:flutter/services.dart';
 import "package:spendulum/features/accounts/widgets/account_card.dart";
+import 'package:spendulum/utils/currency.dart';
 
 //Added for error handling
 import 'dart:developer' as developer;
@@ -56,7 +57,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen>
     'Other'
   ];
 
-  final List<String> _currencies = ['USD', 'EUR', 'GBP', 'JPY', 'INR', 'Other'];
+  final List<String> _currencies = getCurrencyCodes();
 
   @override
   Widget build(BuildContext context) {

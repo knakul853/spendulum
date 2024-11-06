@@ -18,9 +18,8 @@ class StatsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Statistics',
-          style: theme.textTheme.titleLarge!.copyWith(
-              color: theme
-                  .colorScheme.onPrimary), // Updated to match MoreScreen style
+          style: theme.textTheme.titleLarge!
+              .copyWith(color: theme.colorScheme.onPrimary),
         ),
         elevation: 4,
       ),
@@ -49,11 +48,11 @@ class StatsScreen extends StatelessWidget {
                           'Expense Trend',
                           style: theme.textTheme.titleLarge!.copyWith(
                               color: theme.textTheme.titleMedium
-                                  ?.color), // Updated to match MoreScreen style
+                                  ?.color),
                         ),
                         SizedBox(height: 16),
                         EnhancedExpenseTrendChart(
-                          selectedAccountId: selectedAccount.id,
+                          selectedAccount: selectedAccount,
                         ),
                       ],
                     ),
@@ -69,7 +68,7 @@ class StatsScreen extends StatelessWidget {
                         'Expense By Categories',
                         style: theme.textTheme.titleLarge!.copyWith(
                             color: theme.textTheme.titleMedium
-                                ?.color), // Updated to match MoreScreen style
+                                ?.color), 
                       ),
                       CategoryExpenseChart(
                         selectedAccount: selectedAccount,
