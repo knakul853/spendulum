@@ -25,7 +25,7 @@ class EnhancedExpenseTrendChart extends StatefulWidget {
 class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
   DateTime startDate = DateTime.now().subtract(const Duration(days: 365));
   DateTime endDate = DateTime.now();
-  String selectedPeriod = 'Weekly';
+  String selectedPeriod = 'Monthly';
   bool showLineChart = true;
 
   @override
@@ -39,10 +39,6 @@ class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
     return Column(
       children: [
         _buildPeriodSelector(),
-        //TODO: implement the complexity of selecting dynamic date range later on.
-        //_buildDateRangeDisplay(),
-        //  _buildChartTypeSelector(),
-
         _buildChart(),
       ],
     );
@@ -404,13 +400,6 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
     return const SizedBox.shrink();
   }
 
-  /// Generates left title widgets for the line chart.
-  ///
-  /// The title is the integer value of [value] prefixed with a dollar sign.
-  ///
-  /// The style of the title is determined by [Theme.of(context).textTheme.bodySmall].
-  ///
-  /// The title is right-aligned.
   Widget _leftTitleWidgets(
       double value, String currency, BuildContext context) {
     final style = Theme.of(context).textTheme.bodySmall;
@@ -418,18 +407,6 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
         style: style, textAlign: TextAlign.right);
   }
 
-  /// Groups expenses by period.
-  ///
-  /// The period is determined by the `period` argument.
-  ///
-  /// For 'Weekly', the expenses are grouped by day of week.
-  ///
-  /// For 'Monthly', the expenses are grouped by week of month.
-  ///
-  /// For 'Yearly', the expenses are grouped by month of year.
-  ///
-  /// The returned map has the period as the key and the sum of the expenses
-  /// for that period as the value.
   Map<String, double> _groupExpenses(List<Expense> expenses) {
     final groupedExpenses = <String, double>{};
     //Added log for debugging

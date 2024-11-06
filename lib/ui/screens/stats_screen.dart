@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/ui/widgets/monthly_expense_chart.dart';
-import 'package:spendulum/features/expenses/widgets/expense_summary_circle.dart';
 import 'package:spendulum/features/expenses/widgets/category_expense_chart.dart';
 
 class StatsScreen extends StatelessWidget {
@@ -47,8 +46,7 @@ class StatsScreen extends StatelessWidget {
                         Text(
                           'Expense Trend',
                           style: theme.textTheme.titleLarge!.copyWith(
-                              color: theme.textTheme.titleMedium
-                                  ?.color),
+                              color: theme.textTheme.titleMedium?.color),
                         ),
                         SizedBox(height: 16),
                         EnhancedExpenseTrendChart(
@@ -67,42 +65,14 @@ class StatsScreen extends StatelessWidget {
                       Text(
                         'Expense By Categories',
                         style: theme.textTheme.titleLarge!.copyWith(
-                            color: theme.textTheme.titleMedium
-                                ?.color), 
+                            color: theme.textTheme.titleMedium?.color),
                       ),
-                      CategoryExpenseChart(
+                      EnhancedCategoryExpenseChart(
                         selectedAccount: selectedAccount,
                       ),
                     ],
                   )),
                 ),
-                // Center(
-                //   child: SizedBox(
-                //     width: 230,
-                //     height: 230,
-                //     child: Container(
-                //       decoration: BoxDecoration(
-                //         shape: BoxShape.circle,
-                //         color: theme.primaryColor,
-                //         boxShadow: [
-                //           BoxShadow(
-                //             color: theme.shadowColor.withOpacity(0.1),
-                //             blurRadius: 8,
-                //             offset: const Offset(0, 4),
-                //           ),
-                //         ],
-                //       ),
-                //       child: Center(
-                //         child: ExpenseSummaryCircle(
-                //           selectedMonth: DateTime.now(),
-                //           accountId: selectedAccount.id,
-                //           currency: '\$',
-                //           size: 230,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
