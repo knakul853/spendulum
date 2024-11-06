@@ -8,6 +8,7 @@ import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/expenses/widgets/expense_bar_chart.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/utils/currency.dart';
+import 'package:spendulum/ui/widgets/common/empty_chart.dart';
 
 class EnhancedExpenseTrendChart extends StatefulWidget {
   final Account selectedAccount;
@@ -232,23 +233,7 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
 
             // Handle empty data state
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.analytics_outlined,
-                      size: 48,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No expenses found for this period',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
-                ),
-              );
+              return const ChartEmptyWidget();
             }
 
             final expenses = snapshot.data!;

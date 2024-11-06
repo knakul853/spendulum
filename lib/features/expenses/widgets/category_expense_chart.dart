@@ -6,6 +6,8 @@ import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/utils/currency.dart';
 import 'package:spendulum/models/expense.dart';
 import 'package:spendulum/ui/widgets/common/period_selector.dart';
+import 'package:spendulum/ui/widgets/common/empty_chart.dart';
+import 'package:spendulum/ui/widgets/common/error_chart.dart';
 
 class EnhancedCategoryExpenseChart extends StatefulWidget {
   final Account selectedAccount;
@@ -351,75 +353,6 @@ class CategoryIndicator extends StatelessWidget {
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
-    );
-  }
-}
-
-// Shared widgets to be placed in separate files
-class ChartErrorWidget extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
-
-  const ChartErrorWidget({
-    Key? key,
-    required this.error,
-    required this.onRetry,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 48,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Error loading expenses',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: Theme.of(context).textTheme.bodySmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: onRetry,
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ChartEmptyWidget extends StatelessWidget {
-  const ChartEmptyWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.analytics_outlined,
-            size: 48,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No expenses found for this period',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ],
-      ),
     );
   }
 }
