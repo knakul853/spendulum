@@ -29,13 +29,40 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedFilter = 'all'; // 'all', 'category', 'date', 'amount'
+  bool _isSearchExpanded = false;
+  String get _categoryOrSourceLabel =>
+      _tabController.index == 0 ? 'Category' : 'Source';
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _searchController.addListener(_onSearchChanged);
+    _tabController.addListener(() {
+      // Only trigger when the tab actually changes
+      if (_tabController.indexIsChanging) {
+        AppLogger.info(
+            'ExpenseIncomeList: Tab changed to index ${_tabController.index}');
+        _handleTabChange();
+      }
+    });
+
     AppLogger.info('ExpenseIncomeList: Initialized with TabController');
+  }
+
+  void _handleTabChange() {
+    AppLogger.info('ExpenseIncomeList: Handling tab change');
+    setState(() {
+      if (_searchQuery.isNotEmpty) {
+        _searchQuery = '';
+        _searchController.clear();
+        AppLogger.info('ExpenseIncomeList: Cleared search query');
+      }
+      _selectedFilter = 'all';
+      AppLogger.info('ExpenseIncomeList: Reset filter to all');
+      // Don't collapse search when switching tabs if it's expanded
+      // _isSearchExpanded = false;
+    });
   }
 
   @override
@@ -52,12 +79,28 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     });
   }
 
+  void _onTabChanged() {
+    AppLogger.info('ExpenseIncomeList: Tab changed');
+    setState(() {
+      if (_searchQuery.isNotEmpty) {
+        _searchQuery = '';
+        _searchController.clear();
+      }
+      _selectedFilter = 'all';
+      // Don't collapse search when switching tabs if it's expanded
+      // _isSearchExpanded = false;
+    });
+  }
+
   bool _matchesSearch(dynamic item) {
     if (_searchQuery.isEmpty) return true;
 
+    final isExpenseTab = _tabController.index == 0;
+    final categoryOrSource = isExpenseTab ? item.category : item.source;
+
     switch (_selectedFilter) {
       case 'category':
-        return item.category.toLowerCase().contains(_searchQuery);
+        return categoryOrSource.toLowerCase().contains(_searchQuery);
       case 'date':
         return DateFormat('MMM dd, yyyy')
             .format(item.date)
@@ -66,7 +109,7 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
       case 'amount':
         return item.amount.toString().contains(_searchQuery);
       default:
-        return item.category.toLowerCase().contains(_searchQuery) ||
+        return categoryOrSource.toLowerCase().contains(_searchQuery) ||
             item.description.toLowerCase().contains(_searchQuery) ||
             DateFormat('MMM dd, yyyy')
                 .format(item.date)
@@ -77,52 +120,103 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
   }
 
   Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search transactions...',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchQuery.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                      },
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Align(
+      alignment: _isSearchExpanded ? Alignment.center : Alignment.centerRight,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            margin: EdgeInsets.symmetric(
+              horizontal: _isSearchExpanded ? 16 : 8,
+              vertical: 8,
             ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                _buildFilterChip('All', 'all'),
-                _buildFilterChip('Category', 'category'),
-                _buildFilterChip('Date', 'date'),
-                _buildFilterChip('Amount', 'amount'),
+            height: _isSearchExpanded ? 100 : 48,
+            width: _isSearchExpanded ? constraints.maxWidth - 32 : 48,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
               ],
             ),
-          ),
-        ],
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(_isSearchExpanded
+                              ? Icons.arrow_back
+                              : Icons.search),
+                          onPressed: () {
+                            setState(() {
+                              _isSearchExpanded = !_isSearchExpanded;
+                              if (!_isSearchExpanded) {
+                                _searchController.clear();
+                                _selectedFilter = 'all';
+                              }
+                            });
+                          },
+                        ),
+                        if (_isSearchExpanded) ...[
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: const InputDecoration(
+                                hintText: 'Search transactions...',
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_searchQuery.isNotEmpty)
+                            IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                              },
+                            ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (_isSearchExpanded)
+                    Container(
+                      height: 44,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildFilterChip('All', 'all'),
+                            _buildFilterChip(
+                              _categoryOrSourceLabel, // Use the getter here
+                              'category',
+                            ),
+                            _buildFilterChip('Date', 'date'),
+                            _buildFilterChip('Amount', 'amount'),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -131,7 +225,10 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: FilterChip(
-        label: Text(label),
+        label: Text(
+          label,
+          style: TextStyle(fontSize: 12),
+        ),
         selected: _selectedFilter == value,
         onSelected: (bool selected) {
           setState(() {
@@ -141,6 +238,8 @@ class _ExpenseIncomeListState extends State<ExpenseIncomeList>
         backgroundColor: Theme.of(context).cardColor,
         selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
         checkmarkColor: Theme.of(context).primaryColor,
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }
