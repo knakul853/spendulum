@@ -1,7 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 class ReminderService {
   static final ReminderService _instance = ReminderService._internal();
@@ -15,12 +17,19 @@ class ReminderService {
 
   Future<void> initialize() async {
     if (_initialized) return;
-    tz.initializeTimeZones();
+    print('Initializing ReminderService...');
 
     // Initialize timezone
-    tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('America/New_York'));
-
+    try {
+      tz.initializeTimeZones();
+      final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+      AppLogger.info('Current Timezone: $currentTimeZone');
+      tz.setLocalLocation(tz.getLocation(currentTimeZone));
+      print('Timezone initialized successfully');
+    } catch (e) {
+      print('Error initializing timezone: $e');
+      rethrow;
+    }
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iOSSettings = DarwinInitializationSettings(
@@ -36,9 +45,8 @@ class ReminderService {
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // Handle notification tap
-      },
+      onDidReceiveNotificationResponse:
+          (NotificationResponse response) async {},
     );
 
     await flutterLocalNotificationsPlugin
@@ -49,6 +57,8 @@ class ReminderService {
           badge: true,
           sound: true,
         );
+
+    AppLogger.info('ReminderService initialized successfully');
 
     _initialized = true;
   }
@@ -65,6 +75,7 @@ class ReminderService {
     );
 
     while (scheduledDate.isBefore(now) || scheduledDate.weekday != dayOfWeek) {
+      print('Adjusting scheduled date to $scheduledDate');
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
@@ -84,20 +95,23 @@ class ReminderService {
       await cancelReminder(id);
 
       for (final day in selectedDays) {
+        AppLogger.info(
+            'Scheduling reminder for day: ${tz.TZDateTime.now(tz.local)}');
         final scheduledDate = _nextInstanceOfTime(time, day);
+        print('Scheduling reminder with ID $id on $scheduledDate');
 
-        await flutterLocalNotificationsPlugin.zonedSchedule(
+        await flutterLocalNotificationsPlugin
+            .zonedSchedule(
           androidScheduleMode: AndroidScheduleMode.exact,
           id + day,
           'Expense Reminder',
           'Don\'t forget to add your expenses for today!',
-          scheduledDate,
+          tz.TZDateTime.now(tz.local),
           NotificationDetails(
             android: AndroidNotificationDetails(
-              'expense_reminders_$id', // channel id
-              'Expense Reminders', // channel name
-              channelDescription:
-                  'Reminders for adding expenses', // channel description
+              'expense_reminders_$id',
+              'Expense Reminders',
+              channelDescription: 'Reminders for adding expenses',
               importance: Importance.high,
               priority: Priority.high,
               icon: '@mipmap/ic_launcher',
@@ -111,8 +125,15 @@ class ReminderService {
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
           matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-        );
+        )
+            .then((_) {
+          print('Reminder with ID $id scheduled successfully');
+        }).catchError((error) {
+          print('Error scheduling reminder with ID $id: $error');
+        });
       }
+
+      print('Scheduled reminders for days: $selectedDays');
     } catch (e) {
       print('Error scheduling reminder: $e');
       throw Exception('Failed to schedule reminder: $e');
@@ -139,41 +160,32 @@ class ReminderService {
       throw Exception('Failed to cancel all reminders: $e');
     }
   }
-}
 
-// reminder_model.dart
-class ReminderModel {
-  final int id;
-  final TimeOfDay time;
-  final List<int> selectedDays;
-  final bool isActive;
+  // Test method to schedule an immediate notification
+  Future<void> scheduleTestNotification() async {
+    print('Scheduling test notification...');
 
-  ReminderModel({
-    required this.id,
-    required this.time,
-    required this.selectedDays,
-    this.isActive = true,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'time': '${time.hour}:${time.minute}',
-      'selectedDays': selectedDays,
-      'isActive': isActive,
-    };
-  }
-
-  factory ReminderModel.fromMap(Map<String, dynamic> map) {
-    final timeParts = map['time'].split(':');
-    return ReminderModel(
-      id: map['id'],
-      time: TimeOfDay(
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-      ),
-      selectedDays: List<int>.from(map['selectedDays']),
-      isActive: map['isActive'],
-    );
+    try {
+      await flutterLocalNotificationsPlugin.show(
+        0,
+        'Test Notification',
+        'This is a test notification',
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'expense_reminders',
+            'Expense Reminders',
+            channelDescription: 'Notifications for expense reminders',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+      );
+      print('Test notification scheduled successfully');
+    } catch (e) {
+      print('Error scheduling test notification: $e');
+      rethrow;
+    }
   }
 }

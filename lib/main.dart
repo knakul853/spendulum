@@ -119,7 +119,7 @@ class _InitializationWrapperState extends State<InitializationWrapper> {
       await Future.wait([
         categoryProvider.loadCategories(),
         budgetProvider.loadBudgets(),
-        reminderProvider.initialize(), // Add this line
+        reminderProvider.initialize(),
       ]);
     } catch (e) {
       print('Error during initialization: $e');
