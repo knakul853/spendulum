@@ -7,8 +7,12 @@ import 'providers/category_provider.dart';
 import 'providers/account_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/budget_provider.dart';
+import 'providers/reminder_provider.dart';
 
 void main() {
+  // This is required for platform channels
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -19,6 +23,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<ReminderProvider>(
+          create: (context) => ReminderProvider(),
+          lazy: false,
+        ),
+
         // CategoryProvider
         ChangeNotifierProvider<CategoryProvider>(
           lazy: false, // This ensures immediate creation
@@ -103,10 +112,18 @@ class _InitializationWrapperState extends State<InitializationWrapper> {
     // Get providers
     final categoryProvider = context.read<CategoryProvider>();
     final budgetProvider = context.read<BudgetProvider>();
+    final reminderProvider = context.read<ReminderProvider>();
 
     // Initialize in sequence
-    await categoryProvider.loadCategories();
-    await budgetProvider.loadBudgets();
+    try {
+      await Future.wait([
+        categoryProvider.loadCategories(),
+        budgetProvider.loadBudgets(),
+        reminderProvider.initialize(),
+      ]);
+    } catch (e) {
+      print('Error during initialization: $e');
+    }
   }
 
   @override

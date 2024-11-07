@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spendulum/ui/screens/theme_selection_screen.dart';
+import 'package:spendulum/ui/screens/export_screen.dart';
+import 'package:spendulum/ui/screens/reminder_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({Key? key}) : super(key: key);
@@ -52,9 +54,10 @@ class MoreScreen extends StatelessWidget {
             icon: Icons.notifications,
             title: 'Reminders',
             subtitle: 'Set up expense reminders',
-            onTap: () {
-              // TODO: Navigate to Reminders setup screen
-            },
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ReminderScreen()),
+            ),
           ),
           _buildListItem(
             context,
@@ -67,11 +70,23 @@ class MoreScreen extends StatelessWidget {
           ),
           _buildListItem(
             context,
-            icon: Icons.cloud_upload,
+            icon: Icons.sync,
             title: 'Backup & Sync',
             subtitle: 'Manage data backup and synchronization',
             onTap: () {
               // TODO: Navigate to Backup & Sync screen
+            },
+          ),
+          _buildListItem(
+            context,
+            icon: Icons.cloud_upload,
+            title: 'Export',
+            subtitle: 'Export Expense or Income data',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ExportScreen()),
+              );
             },
           ),
           _buildListItem(

@@ -8,6 +8,7 @@ import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/features/expenses/widgets/expense_bar_chart.dart';
 import 'package:spendulum/models/account.dart';
 import 'package:spendulum/utils/currency.dart';
+import 'package:spendulum/ui/widgets/common/empty_chart.dart';
 
 class EnhancedExpenseTrendChart extends StatefulWidget {
   final Account selectedAccount;
@@ -25,7 +26,7 @@ class EnhancedExpenseTrendChart extends StatefulWidget {
 class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
   DateTime startDate = DateTime.now().subtract(const Duration(days: 365));
   DateTime endDate = DateTime.now();
-  String selectedPeriod = 'Weekly';
+  String selectedPeriod = 'Monthly';
   bool showLineChart = true;
 
   @override
@@ -39,10 +40,6 @@ class _EnhancedExpenseTrendChartState extends State<EnhancedExpenseTrendChart> {
     return Column(
       children: [
         _buildPeriodSelector(),
-        //TODO: implement the complexity of selecting dynamic date range later on.
-        //_buildDateRangeDisplay(),
-        //  _buildChartTypeSelector(),
-
         _buildChart(),
       ],
     );
@@ -236,23 +233,7 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
 
             // Handle empty data state
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.analytics_outlined,
-                      size: 48,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No expenses found for this period',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
-                ),
-              );
+              return const ChartEmptyWidget();
             }
 
             final expenses = snapshot.data!;
@@ -404,13 +385,6 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
     return const SizedBox.shrink();
   }
 
-  /// Generates left title widgets for the line chart.
-  ///
-  /// The title is the integer value of [value] prefixed with a dollar sign.
-  ///
-  /// The style of the title is determined by [Theme.of(context).textTheme.bodySmall].
-  ///
-  /// The title is right-aligned.
   Widget _leftTitleWidgets(
       double value, String currency, BuildContext context) {
     final style = Theme.of(context).textTheme.bodySmall;
@@ -418,18 +392,6 @@ class _ExpenseTrendChartState extends State<_ExpenseTrendChart> {
         style: style, textAlign: TextAlign.right);
   }
 
-  /// Groups expenses by period.
-  ///
-  /// The period is determined by the `period` argument.
-  ///
-  /// For 'Weekly', the expenses are grouped by day of week.
-  ///
-  /// For 'Monthly', the expenses are grouped by week of month.
-  ///
-  /// For 'Yearly', the expenses are grouped by month of year.
-  ///
-  /// The returned map has the period as the key and the sum of the expenses
-  /// for that period as the value.
   Map<String, double> _groupExpenses(List<Expense> expenses) {
     final groupedExpenses = <String, double>{};
     //Added log for debugging

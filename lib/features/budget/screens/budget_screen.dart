@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:spendulum/providers/budget_provider.dart';
 import 'package:spendulum/models/budget.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
