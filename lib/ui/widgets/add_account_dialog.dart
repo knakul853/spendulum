@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/utils/currency.dart';
 
 class AddAccountDialog extends StatefulWidget {
   final Function? onAccountAdded;
@@ -36,10 +37,11 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     'Other'
   ];
 
-  final List<String> _currencies = ['USD', 'EUR', 'GBP', 'JPY', 'INR', 'Other'];
+  final List<String> _currencies = getCurrencyCodes();
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -53,24 +55,43 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Add New Account',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: theme.textTheme.bodyMedium
+                            ?.color)), // Use AppColors.text
                 SizedBox(height: 24),
-                _buildTextField('Account Name', (value) => _name = value!),
+                _buildTextField(
+                  'Account Name',
+                  (value) => _name = value!,
+                  TextInputType.text,
+                ), // Corrected to use TextInputType
                 SizedBox(height: 16),
                 _buildTextField(
-                    'Account Number', (value) => _accountNumber = value!),
+                  'Account Number',
+                  (value) => _accountNumber = value!,
+                  TextInputType.text, // Corrected to use TextInputType
+                ), // Use AppColors.text
                 SizedBox(height: 16),
-                _buildDropdownField('Account Type', _accountTypes, _accountType,
-                    (value) => setState(() => _accountType = value!)),
+                _buildDropdownField(
+                    'Account Type',
+                    _accountTypes,
+                    _accountType,
+                    (value) => setState(
+                        () => _accountType = value!)), // Use AppColors.text
                 SizedBox(height: 16),
                 _buildTextField(
-                    'Balance',
-                    (value) => _balance = double.parse(value!),
-                    TextInputType.number),
+                  'Balance',
+                  (value) => _balance = double.parse(value!),
+                  TextInputType.number,
+                ), // Use AppColors.text
                 SizedBox(height: 16),
-                _buildDropdownField('Currency', _currencies, _currency,
-                    (value) => setState(() => _currency = value!)),
+                _buildDropdownField(
+                  'Currency',
+                  _currencies,
+                  _currency,
+                  (value) => setState(() => _currency = value!),
+                ), // Use AppColors.text
                 SizedBox(height: 16),
                 _buildColorPicker(),
                 SizedBox(height: 24),
@@ -78,18 +99,34 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      child: Text('Cancel'),
+                      child: Text('Cancel',
+                          style: TextStyle(
+                              color: theme.textTheme.bodySmall
+                                  ?.color)), // Use AppColors.text
                       onPressed: () => Navigator.of(context).pop(),
+                      style: TextButton.styleFrom(
+                        backgroundColor:
+                            theme.colorScheme.error, // Use AppColors.error
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                     ),
                     SizedBox(width: 16),
                     ElevatedButton(
-                      child: Text('Add'),
+                      child: Text('Add',
+                          style: TextStyle(
+                              color: theme.textTheme.bodySmall?.color)),
                       onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
                         padding:
                             EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
+                        backgroundColor:
+                            theme.colorScheme.surface, // Use AppColors.primary
                       ),
                     ),
                   ],
@@ -107,11 +144,29 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        labelStyle:
+            Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide:
+              BorderSide(color: Theme.of(context).primaryColor, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+              color: Theme.of(context).primaryColor.withOpacity(0.5), width: 1),
+        ),
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
       ),
       keyboardType: keyboardType,
       validator: (value) => value!.isEmpty ? 'Please enter $label' : null,
       onSaved: onSaved,
+      style: TextStyle(
+          color: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.color), // Use AppColors.text if textColor is null
     );
   }
 
@@ -126,10 +181,17 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       items: items.map((String item) {
         return DropdownMenuItem<String>(
           value: item,
-          child: Text(item),
+          child: Text(item,
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color)), // Use textColor
         );
       }).toList(),
       onChanged: onChanged,
+      style: TextStyle(
+          color: Theme.of(context).textTheme.bodySmall?.color), // Use textColor
     );
   }
 
@@ -138,7 +200,10 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Account Color',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.labelMedium?.color)),
         SizedBox(height: 8),
         GestureDetector(
           onTap: _showColorPalette,
@@ -166,7 +231,9 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Account Color'),
+          title: Text('Select Account Color',
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.labelMedium?.color)),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: _color,
@@ -178,7 +245,12 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: Text('OK',
+                  style: TextStyle(
+                      color: Theme.of(context)
+                          .textTheme
+                          .labelMedium
+                          ?.color)), // Use AppColors.text
               onPressed: () {
                 Navigator.of(context).pop();
               },

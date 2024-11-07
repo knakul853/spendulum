@@ -17,7 +17,7 @@ class _CustomAnimatedBackgroundState extends State<CustomAnimatedBackground>
   @override
   Widget build(BuildContext context) {
     return anim_bg.AnimatedBackground(
-      behaviour: anim_bg.BubblesBehaviour(),
+      behaviour: anim_bg.BubblesBehaviour(), // Use bubbleColor
       vsync: this,
       child: widget.child,
     );
@@ -58,6 +58,7 @@ class _GradientAnimatedBackgroundState extends State<GradientAnimatedBackground>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -68,9 +69,13 @@ class _GradientAnimatedBackgroundState extends State<GradientAnimatedBackground>
               end: Alignment.bottomRight,
               colors: [
                 Color.lerp(
-                    Colors.blue[100], Colors.purple[100], _animation.value)!,
+                    theme.colorScheme.primary,
+                    theme.colorScheme.secondary,
+                    _animation.value)!, // Use AppColors
                 Color.lerp(
-                    Colors.purple[100], Colors.blue[100], _animation.value)!,
+                    theme.colorScheme.primary,
+                    theme.colorScheme.secondary,
+                    _animation.value)!, // Use AppColors
               ],
             ),
           ),

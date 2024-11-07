@@ -1,285 +1,189 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:spendulum/features/budget/screens/budget_screen.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/expense_logging_screen.dart';
-import 'package:spendulum/ui/screens/account_management_screen.dart';
-import 'package:spendulum/ui/widgets/account_cards/account_cards_list.dart';
-import 'package:spendulum/ui/widgets/expenses/expense_list.dart';
-import 'package:spendulum/ui/widgets/animated_background.dart';
-import 'package:spendulum/ui/widgets/month_selector.dart';
-import 'package:spendulum/ui/widgets/expenses/expense_summary_circle.dart';
+import 'package:spendulum/ui/screens/income_logging_screen.dart';
+import 'package:spendulum/ui/widgets/custom_button_tab.dart';
+import 'package:spendulum/features/transactions/screens/transactions_screen.dart';
+import 'package:spendulum/ui/screens/stats_screen.dart';
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
-import 'package:spendulum/providers/expense_provider.dart';
-import 'package:spendulum/models/account.dart';
+import 'package:spendulum/ui/screens/more_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key}); // Changed to use 'super.key'
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month,
-      1); // Set to the first day of the current month
-  Account? selectedAccount; // Declare selectedAccount as a member variable
+  int _currentIndex = 0;
+  final PageController _pageController = PageController();
 
   @override
-  void initState() {
-    super.initState();
-    AppLogger.info("HomeScreen: initState called");
-    // Check if there's a selected account, if not, navigate to AccountManagementScreen
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   final accountProvider =
-    //       Provider.of<AccountProvider>(context, listen: false);
-    //   if (accountProvider.getSelectedAccount() == null) {
-    //     Navigator.of(context).pushReplacement(
-    //       MaterialPageRoute(
-    //         builder: (context) =>
-    //             AccountManagementScreen(isInitialSetup: false),
-    //       ),
-    //     );
-    //   }
-    // });
-    final accountProvider =
-        Provider.of<AccountProvider>(context, listen: false);
-    selectedAccount = accountProvider.getSelectedAccount();
-
-    if (selectedAccount != null) {
-      final expenseProvider =
-          Provider.of<ExpenseProvider>(context, listen: false);
-      expenseProvider.loadExpenses(selectedAccount!.id,
-          _selectedMonth); // Load expenses for the selected account and month
-    }
-  }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-
-  //   // final accountProvider = Provider.of<AccountProvider>(context, listen: true);
-  //   // selectedAccount = accountProvider.getSelectedAccount();
-
-  //   if (selectedAccount != null) {
-  //     AppLogger.info("Selected account was ${selectedAccount?.accountNumber}");
-  //     final expenseProvider =
-  //         Provider.of<ExpenseProvider>(context, listen: false);
-  //     expenseProvider.loadExpenses(selectedAccount!.id,
-  //         _selectedMonth); // Load expenses for the selected account and month
-  //   }
-  // }
-
-  void _onMonthChanged(DateTime newMonth) {
-    setState(() {
-      _selectedMonth = newMonth;
-    });
-    loadExpenses();
-    // Here you would typically update your data based on the new month
-  }
-
-  void loadExpenses() {
-    if (selectedAccount != null) {
-      AppLogger.info("Selected account was ${selectedAccount?.accountNumber}");
-      final expenseProvider =
-          Provider.of<ExpenseProvider>(context, listen: false);
-      expenseProvider.loadExpenses(selectedAccount!.id,
-          _selectedMonth); // Load expenses for the selected account and month
-    }
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
+
+  /// The main home screen of the application. It provides a bottom navigation
+  /// bar and a page view with five screens: transactions, stats, budget,
+  /// account management, and more.
+  ///
+  /// The transactions screen is responsible for displaying all the transactions
+  /// for the selected account. The stats screen displays charts and summaries of
+  /// the transactions. The budget screen allows the user to add, edit, and delete
+  /// budgets. The account management screen allows the user to add, edit, and
+  /// delete accounts. The more screen contains links to other features of the
+  /// application.
+  ///
+  /// The floating action button is used to add new transactions.
   Widget build(BuildContext context) {
-    AppLogger.info("HomeScreen: build method called");
-
+    final theme = Theme.of(context);
+    AppLogger.info(
+        "The scaffold background color is: ${theme.scaffoldBackgroundColor}");
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, _) {
-        selectedAccount = accountProvider.getSelectedAccount();
-        AppLogger.info(
-            "The selected account is: ${selectedAccount?.accountNumber}");
-
-        loadExpenses();
-
+        final selectedAccount = accountProvider.getSelectedAccount();
         if (selectedAccount == null) {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading account...'),
-                ],
-              ),
-            ),
-          );
+          return _buildLoadingScreen();
         }
 
-        return Stack(
-          children: [
-            AnimatedBackground(color: Theme.of(context).primaryColor),
-            Scaffold(
-              backgroundColor: Colors.transparent,
-              body: CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: 160.0,
-                    floating: false,
-                    pinned: true,
-                    automaticallyImplyLeading: false,
-                    backgroundColor: Colors.transparent,
-                    actions: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.settings,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const AccountManagementScreen(
-                                isInitialSetup: false,
-                              ),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                const begin =
-                                    Offset(1.0, 0.0); // Start from the right
-                                const end =
-                                    Offset.zero; // End at the original position
-                                const curve = Curves.easeInOut;
-
-                                var tween = Tween(begin: begin, end: end)
-                                    .chain(CurveTween(curve: curve));
-                                var offsetAnimation = animation.drive(tween);
-
-                                return SlideTransition(
-                                  position: offsetAnimation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                    flexibleSpace: const FlexibleSpaceBar(
-                      background: Padding(
-                        padding: EdgeInsets.only(top: 60.0),
-                        child: AccountCardsList(),
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      child: MonthSelector(
-                        selectedMonth: _selectedMonth,
-                        onMonthChanged: _onMonthChanged,
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      child: Center(
-                        child: Container(
-                          width: 230, // Size of the circular background
-                          height: 230, // Size of the circular background
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const RadialGradient(
-                              colors: [
-                                Color(
-                                    0xFFF5F5F5), // Lighter color at the center
-                                Color(0xFFE0E0E0), // Darker color at the edges
-                              ],
-                              stops: [0.5, 1.0], // Define the gradient spread
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4), // Shadow position
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: ExpenseSummaryCircle(
-                              selectedMonth: _selectedMonth,
-                              accountId: selectedAccount!.id,
-                              currency: selectedAccount!.currency,
-                              size:
-                                  230, // Size of the ExpenseSummaryCircle, adjust as needed
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // SliverToBoxAdapter(
-                  //   child: MonthlyExpenseChart(
-                  //     accountId: selectedAccount.id,
-                  //     selectedMonth: _selectedMonth,
-                  //   ),
-                  // ),
-                  // SliverToBoxAdapter(
-                  //   child: CategoryPieChart(
-                  //     accountId: selectedAccount.id,
-                  //     selectedMonth: _selectedMonth,
-                  //   ),
-                  // ),
-                  // SliverToBoxAdapter(
-                  //   child: WeeklyBarChart(
-                  //     accountId: selectedAccount.id,
-                  //     selectedMonth: _selectedMonth,
-                  //   ),
-                  // ),
-                  ExpenseList(
-                    accountId: selectedAccount!.id,
-                    selectedMonth: _selectedMonth,
-                  ),
-                ],
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          body: PageView(
+            controller: _pageController,
+            physics: NeverScrollableScrollPhysics(),
+            onPageChanged: (index) => setState(() => _currentIndex = index),
+            children: [
+              TransactionsScreen(selectedAccount: selectedAccount),
+              StatsScreen(selectedAccount: selectedAccount),
+              BudgetScreen(),
+              AccountManagementScreen(
+                isInitialSetup: false,
               ),
-              floatingActionButton:
-                  _buildAddExpenseButton(context, selectedAccount!.id),
-            ),
-          ],
+              MoreScreen(),
+            ],
+          ),
+          bottomNavigationBar: AnimatedBottomNav(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() => _currentIndex = index);
+              _pageController.jumpToPage(
+                index,
+              );
+            },
+            selectedAccount: selectedAccount,
+          ),
+          floatingActionButton: _currentIndex == 0
+              ? _buildAddButton(context, selectedAccount.id)
+              : null,
         );
       },
     );
   }
 
-  Widget _buildAddExpenseButton(BuildContext context, String accountId) {
-    return FloatingActionButton.extended(
+  Widget _buildLoadingScreen() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Please create an account to continue using the app',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AccountManagementScreen(
+                      isInitialSetup: false,
+                    ),
+                  ),
+                );
+              },
+              child: Text('Add Account'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddButton(BuildContext context, String accountId) {
+    return FloatingActionButton(
       onPressed: () {
-        Navigator.of(context).push(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                ExpenseLoggingScreen(initialAccountId: accountId),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 1.0); // Start from the bottom
-              const end = Offset.zero; // End at the original position
-              const curve = Curves.easeInOut;
-
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              var offsetAnimation = animation.drive(tween);
-
-              return SlideTransition(
-                position: offsetAnimation,
-                child: child,
-              );
-            },
-          ),
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              height: 120,
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                    leading: Icon(Icons.remove_circle_outline),
+                    title: Text('Add Expense'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation,
+                                  secondaryAnimation) =>
+                              ExpenseLoggingScreen(initialAccountId: accountId),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(0.0, 1.0);
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOut;
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+                            return SlideTransition(
+                                position: offsetAnimation, child: child);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.add_circle_outline),
+                    title: Text('Add Income'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation,
+                                  secondaryAnimation) =>
+                              IncomeLoggingScreen(initialAccountId: accountId),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(0.0, 1.0);
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOut;
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+                            return SlideTransition(
+                                position: offsetAnimation, child: child);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
-      icon: const Icon(Icons.add),
-      label: const Text('Add Expense'),
+      child: Icon(Icons.add),
     );
   }
 }

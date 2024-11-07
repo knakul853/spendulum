@@ -1,4 +1,4 @@
-package com.example.budget_buddy
+package com.spendulam.budgettracker
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-
+/// Represents a category for tracking expenses and incomes.
 class Category {
   final String id;
   final String name;
   final String color;
-  final IconData icon; // New icon field
+  final String icon; // New icon field
 
   Category({
     required this.id,

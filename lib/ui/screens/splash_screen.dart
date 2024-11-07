@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spendulum/providers/account_provider.dart';
 import 'package:spendulum/ui/screens/home_screen.dart';
-import 'package:spendulum/ui/screens/account_management_screen.dart';
+import 'package:spendulum/features/accounts/screens/account_management_screen.dart';
 import 'package:spendulum/ui/widgets/add_account_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -100,7 +100,8 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigateToAccountManagement() {
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
+      // Changed to push
       MaterialPageRoute(
         builder: (context) => AccountManagementScreen(
           onBackPressed: _showExitConfirmationDialog,
@@ -323,9 +324,9 @@ class WelcomeScreen extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          'To track expenses, you must create an account.',
+                          'The smarter way to keep your finances in check. Set budgets, track spending, and reach your goals with ease!',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             color: Colors.white.withOpacity(0.9),
                           ),
                           textAlign: TextAlign.center,

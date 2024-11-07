@@ -1,8 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:spendulum/services/database/tables/accounts_table.dart';
-import 'package:spendulum/services/database/tables/expense_table.dart';
-import 'package:spendulum/services/database/tables/category_table.dart';
+import 'package:spendulum/db/tables/accounts_table.dart';
+import 'package:spendulum/db/tables/expense_table.dart';
+import 'package:spendulum/db/tables/category_table.dart';
+import 'package:spendulum/db/tables/budget_table.dart';
+import 'package:spendulum/db/tables/incomes_table.dart';
+import 'package:spendulum/db/tables/export_jobs_table.dart';
 
 /// A singleton class that manages the SQLite database for the Spendulum application.
 /// It provides methods to initialize the database, create tables, and perform
@@ -43,6 +46,9 @@ class DatabaseHelper {
     await db.execute(AccountsTable.createTableQuery);
     await db.execute(ExpensesTable.createTableQuery);
     await db.execute(CategoriesTable.createTable);
+    await db.execute(BudgetsTable.createTable);
+    await db.execute(IncomesTable.createTableQuery);
+    await db.execute(ExportJobsTable.createTable);
 
     // Add other table creation queries here as needed
   }
@@ -68,6 +74,36 @@ class DatabaseHelper {
     return await db.query(table); // Query all rows and return the result
   }
 
+  /// Executes a raw SQL query on the database.
+  ///
+  /// [sql] - The SQL query string to execute.
+  /// [arguments] - Optional list of arguments for the SQL query.
+  ///
+  /// Returns a list of maps, where each map represents a row in the result set.
+
+  Future<List<Map<String, dynamic>>> rawQuery(String sql,
+      [List<dynamic>? arguments]) async {
+    final db = await instance.database;
+    return await db.rawQuery(sql, arguments);
+  }
+
+  /// Queries rows from the specified table with optional filtering.
+  ///
+  /// [table] - The name of the table to query.
+  /// [where] - The optional SQL WHERE clause to filter the results.
+  /// [whereArgs] - Arguments for the WHERE clause.
+  ///
+  /// Returns a list of maps, where each map represents a row in the table.
+  Future<List<Map<String, dynamic>>> queryRows(String table,
+      {String? where, List<dynamic>? whereArgs}) async {
+    final db = await instance.database;
+    return await db.query(
+      table,
+      where: where,
+      whereArgs: whereArgs,
+    );
+  }
+
   /// Updates a specific row in the specified table.
   ///
   /// [table] - The name of the table where the row will be updated.
@@ -80,6 +116,37 @@ class DatabaseHelper {
     return await db.update(table, row,
         where: '$columnId = ?',
         whereArgs: [value]); // Update the row and return the result
+  }
+
+  /// Updates specific rows in the specified table based on custom `where` clause.
+  ///
+  /// [table] - The name of the table where the row will be updated.
+  /// [row] - A map containing the updated column names and their corresponding values.
+  /// [where] - A SQL WHERE clause to filter the rows to update (optional).
+  /// [whereArgs] - Arguments for the `where` clause to avoid SQL injection (optional).
+  Future<int> updateRows(String table, Map<String, dynamic> row,
+      {String? where, List<dynamic>? whereArgs}) async {
+    final db = await instance.database; // Get the database instance
+    return await db.update(
+      table,
+      row,
+      where: where,
+      whereArgs: whereArgs,
+    ); // Update the row(s) and return the result
+  }
+
+  /// Executes a batch of database operations.
+  ///
+  /// [actions] - A function that takes a Batch object and defines the operations to be performed.
+  ///
+  /// This method creates a new batch, passes it to the provided function for operation definition,
+  /// and then commits the batch without returning results.
+
+  Future<void> batch(Function(Batch) actions) async {
+    final db = await instance.database;
+    final batch = db.batch();
+    actions(batch);
+    await batch.commit(noResult: true);
   }
 
   /// Deletes a specific row from the specified table.

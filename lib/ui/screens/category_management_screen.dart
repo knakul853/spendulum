@@ -16,7 +16,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final _formKey = GlobalKey<FormState>();
   String _categoryName = '';
   Color _categoryColor = Colors.blue; // Default color
-  IconData _icon = Icons.category;
+  String _icon = "category";
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) {

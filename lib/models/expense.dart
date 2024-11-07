@@ -1,10 +1,11 @@
+/// Represents a single expense record.
 class Expense {
   final String id;
   final String category;
   final double amount;
   final DateTime date;
   final String description;
-  final String accountId; // New field to reference the account
+  final String accountId;
 
   Expense({
     required this.id,
@@ -12,6 +13,6 @@ class Expense {
     required this.amount,
     required this.date,
     required this.description,
-    required this.accountId, // New required field
+    required this.accountId,
   });
 }

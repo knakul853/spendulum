@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
-class CustomColorPicker extends StatelessWidget {
+class CustomColorPicker extends StatefulWidget {
   final Color initialColor;
   final Function(Color) onColorChanged;
 
@@ -10,6 +10,29 @@ class CustomColorPicker extends StatelessWidget {
     required this.initialColor,
     required this.onColorChanged,
   }) : super(key: key);
+
+  @override
+  _CustomColorPickerState createState() => _CustomColorPickerState();
+}
+
+class _CustomColorPickerState extends State<CustomColorPicker> {
+  late Color _currentColor;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentColor = widget.initialColor;
+  }
+
+  @override
+  void didUpdateWidget(CustomColorPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialColor != oldWidget.initialColor) {
+      setState(() {
+        _currentColor = widget.initialColor;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +50,7 @@ class CustomColorPicker extends StatelessWidget {
           child: Container(
             height: 50,
             decoration: BoxDecoration(
-              color: initialColor,
+              color: _currentColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey[300]!),
             ),
@@ -45,8 +68,15 @@ class CustomColorPicker extends StatelessWidget {
           title: Text('Select Account Color'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: initialColor,
-              onColorChanged: onColorChanged,
+              pickerColor: _currentColor,
+              onColorChanged: (color) {
+                if (mounted) {
+                  setState(() {
+                    _currentColor = color;
+                  });
+                  widget.onColorChanged(color);
+                }
+              },
               pickerAreaHeightPercent: 0.8,
             ),
           ),

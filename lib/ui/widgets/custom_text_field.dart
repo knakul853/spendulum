@@ -5,7 +5,9 @@ class CustomTextField extends StatelessWidget {
   final Function(String?) onSaved;
   final String? initialValue;
   final TextInputType? keyboardType;
-  final VoidCallback? onTap; // Add optional onTap callback
+  final VoidCallback? onTap;
+  final Color? textColor;
+  final String? hintText;
 
   const CustomTextField({
     Key? key,
@@ -13,7 +15,9 @@ class CustomTextField extends StatelessWidget {
     required this.onSaved,
     this.initialValue,
     this.keyboardType,
-    this.onTap, // Include onTap in the constructor
+    this.onTap,
+    this.textColor,
+    this.hintText,
   }) : super(key: key);
 
   @override
@@ -24,9 +28,22 @@ class CustomTextField extends StatelessWidget {
       child: TextFormField(
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          hintText: hintText,
+          labelStyle:
+              Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 18),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:
+                BorderSide(color: Theme.of(context).primaryColor, width: 2),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+                color: Theme.of(context).primaryColor.withOpacity(0.5),
+                width: 1),
+          ),
           filled: true,
-          fillColor: Colors.grey[100],
+          fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
         ),
         initialValue: initialValue,
         keyboardType: keyboardType,

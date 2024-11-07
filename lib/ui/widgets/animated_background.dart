@@ -3,10 +3,8 @@ import 'dart:math' as math;
 
 class AnimatedBackground extends StatefulWidget {
   final Widget? child;
-  final Color color;
 
-  const AnimatedBackground({Key? key, this.child, required this.color})
-      : super(key: key);
+  const AnimatedBackground({Key? key, this.child}) : super(key: key);
 
   @override
   _AnimatedBackgroundState createState() => _AnimatedBackgroundState();
@@ -39,7 +37,8 @@ class _AnimatedBackgroundState extends State<AnimatedBackground>
           animation: _controller,
           builder: (_, __) {
             return CustomPaint(
-              painter: BackgroundPainter(_controller.value, widget.color),
+              painter: BackgroundPainter(
+                  _controller.value, Theme.of(context).colorScheme.primary),
               child: Container(),
             );
           },
@@ -59,7 +58,7 @@ class BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withOpacity(1.0)
       ..style = PaintingStyle.fill;
 
     final path = Path();

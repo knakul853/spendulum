@@ -1,11 +1,12 @@
 # Spendulum: Expense and Income Tracker
 
-![Spendulum: Expense and Income Tracker](assets/images/app_icon.png) <!-- Replace with your logo path -->
+![Spendulum: Expense and Income Tracker](assets/images/app_icon.png)
 
 ## Table of Contents
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [Architecture](#architecture)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -20,29 +21,36 @@ Spendulum: Expense and Income Tracker is a personal finance management applicati
 ## Features
 
 - **Expense Tracking**: Log and categorize your expenses effortlessly.
-- **Budget Management**: Set budgets for different categories and monitor your spending.
+- **Budget Management**: Set budgets for different categories and monitor your spending.  This includes creating, editing, pausing, and resuming budgets.  The app displays summary cards showing total budgeted and spent amounts.  Budgets can be filtered by status (active, paused, or all).
 - **Monthly Reports**: Visualize your spending habits with detailed monthly reports.
 - **Account Management**: Manage multiple accounts and track balances.
 - **User-Friendly Interface**: Simple and clean design for an enhanced user experience.
-- **Data Synchronization**: Sync your data across devices for seamless access.
+- **Data Synchronization**: (Add details about data synchronization if applicable)
+
+## Architecture
+
+The application uses a layered architecture:
+
+- **Presentation Layer (UI):** Flutter widgets handle user interaction and display data.
+- **Business Logic Layer (Providers):** Provider manages the application state and business logic.
+- **Data Access Layer (Database):** A local SQLite database stores application data.
 
 ## Technologies Used
 
 - **Flutter**: For building the cross-platform mobile application.
 - **Dart**: The programming language used for development.
 - **Provider**: State management solution for managing app state.
-- **Firebase**: For backend services, including authentication and database storage.
-- **Chart.js**: For visualizing financial data in reports.
+- **SQLite:** Local database for persistent data storage.
 
 ## Installation
 
 To get started with Spendulum: Expense and Income Tracker, follow these steps:
 
-1. **Clone the repository**:
+1. **Clone the repository**: (If applicable, replace with actual repo URL)
 
    ```bash
-   git clone https://github.com/yourusername/budget_buddy.git
-   cd budget_buddy
+   #git clone <repository_url>
+   #cd spendulum
    ```
 
 2. **Install dependencies**:

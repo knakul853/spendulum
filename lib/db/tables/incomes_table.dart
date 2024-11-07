@@ -1,21 +1,21 @@
-import 'package:spendulum/services/database/tables/accounts_table.dart';
+import 'package:spendulum/db/tables/accounts_table.dart';
 
-class ExpensesTable {
-  static const String tableName = 'expenses';
+class IncomesTable {
+  static const String tableName = 'incomes';
   static const String columnId = 'id';
-  static const String columnCategory = 'category';
+  static const String columnSource = 'source';
   static const String columnAmount = 'amount';
   static const String columnDate = 'date';
   static const String columnDescription = 'description';
-  static const String columnAccountId = 'accountId';
+  static const String columnAccountId = 'account_id';
 
   static const String createTableQuery = '''
-    CREATE TABLE $tableName(
+    CREATE TABLE $tableName (
       $columnId TEXT PRIMARY KEY,
-      $columnCategory TEXT NOT NULL,
+      $columnSource TEXT NOT NULL,
       $columnAmount REAL NOT NULL,
       $columnDate TEXT NOT NULL,
-      $columnDescription TEXT NOT NULL,
+      $columnDescription TEXT,
       $columnAccountId TEXT NOT NULL,
       FOREIGN KEY ($columnAccountId) REFERENCES ${AccountsTable.tableName} (${AccountsTable.columnId})
     )
