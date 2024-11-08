@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spendulum/ui/screens/theme_selection_screen.dart';
 import 'package:spendulum/ui/screens/export_screen.dart';
 import 'package:spendulum/ui/screens/reminder_screen.dart';
+import 'package:spendulum/ui/screens/help_support_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({Key? key}) : super(key: key);
@@ -94,9 +95,11 @@ class MoreScreen extends StatelessWidget {
             icon: Icons.help_outline,
             title: 'Help & Support',
             subtitle: 'Get assistance and view FAQs',
-            onTap: () {
-              // TODO: Navigate to Help & Support screen
-            },
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const HelpSupportScreen()),
+            ),
           ),
         ],
       ),
