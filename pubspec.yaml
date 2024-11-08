@@ -34,6 +34,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   encrypt: ^5.0.3
   url_launcher: ^6.1.14
+  package_info_plus: ^4.0.0
 
 dev_dependencies:
   flutter_test:

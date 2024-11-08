@@ -41,15 +41,7 @@ class MoreScreen extends StatelessWidget {
               // TODO: Navigate to Categories management screen
             },
           ),
-          _buildListItem(
-            context,
-            icon: Icons.bar_chart,
-            title: 'Reports',
-            subtitle: 'View detailed expense reports',
-            onTap: () {
-              // TODO: Navigate to Reports screen
-            },
-          ),
+
           _buildListItem(
             context,
             icon: Icons.notifications,
@@ -60,24 +52,27 @@ class MoreScreen extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const ReminderScreen()),
             ),
           ),
-          _buildListItem(
-            context,
-            icon: Icons.security,
-            title: 'Security',
-            subtitle: 'Manage app security settings',
-            onTap: () {
-              // TODO: Navigate to Security settings screen
-            },
-          ),
-          _buildListItem(
-            context,
-            icon: Icons.sync,
-            title: 'Backup & Sync',
-            subtitle: 'Manage data backup and synchronization',
-            onTap: () {
-              // TODO: Navigate to Backup & Sync screen
-            },
-          ),
+          //TODO: most probably will be removed
+          // _buildListItem(
+          //   context,
+          //   icon: Icons.security,
+          //   title: 'Security',
+          //   subtitle: 'Manage app security settings',
+          //   onTap: () {
+          //     // TODO: Navigate to Security settings screen
+          //   },
+          // ),
+
+          //TDOD: add cloud sync and backup feature
+          // _buildListItem(
+          //   context,
+          //   icon: Icons.sync,
+          //   title: 'Backup & Sync',
+          //   subtitle: 'Manage data backup and synchronization',
+          //   onTap: () {
+          //     // TODO: Navigate to Backup & Sync screen
+          //   },
+          // ),
           _buildListItem(
             context,
             icon: Icons.cloud_upload,

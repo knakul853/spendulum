@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:spendulum/config/env_config.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:spendulum/utils/email.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({Key? key}) : super(key: key);
@@ -25,27 +29,27 @@ class HelpSupportScreen extends StatelessWidget {
             subtitle: 'Find answers to common questions',
             onTap: () => _showFAQScreen(context),
           ),
-          _buildSection(
-            context,
-            icon: Icons.menu_book,
-            title: 'User Guide',
-            subtitle: 'Learn how to use the app effectively',
-            onTap: () => _showUserGuideScreen(context),
-          ),
-          _buildSection(
-            context,
-            icon: Icons.contact_support,
-            title: 'Contact Support',
-            subtitle: 'Get in touch with our support team',
-            onTap: () => _showContactSupport(context),
-          ),
-          _buildSection(
-            context,
-            icon: Icons.bug_report,
-            title: 'Report a Problem',
-            subtitle: 'Let us know if something isn\'t working',
-            onTap: () => _showReportProblem(context),
-          ),
+          // _buildSection(
+          //   context,
+          //   icon: Icons.menu_book,
+          //   title: 'User Guide',
+          //   subtitle: 'Learn how to use the app effectively',
+          //   onTap: () => _showUserGuideScreen(context),
+          // ),
+          // _buildSection(
+          //   context,
+          //   icon: Icons.contact_support,
+          //   title: 'Contact Support',
+          //   subtitle: 'Get in touch with our support team',
+          //   onTap: () => _showContactSupport(context),
+          // ),
+          // _buildSection(
+          //   context,
+          //   icon: Icons.bug_report,
+          //   title: 'Report a Problem',
+          //   subtitle: 'Let us know if something isn\'t working',
+          //   onTap: () => _showReportProblem(context),
+          // ),
           _buildSection(
             context,
             icon: Icons.star_outline,
@@ -171,35 +175,47 @@ class HelpSupportScreen extends StatelessWidget {
   Future<void> _launchPrivacyPolicy() async {
     const url =
         'https://docs.google.com/document/d/1e-r5vZ1n84z_BTyTbkfVsNUFTvNZU6yPaUckYUP1gH8/edit?usp=sharing';
-    if (await canLaunch(url)) {
-      await launch(url);
+    try {
+      if (!await launchUrl(Uri.parse(url),
+          mode: LaunchMode.externalApplication)) {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+      // Handle error appropriately
     }
   }
 
-  void _showVersionInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Version Information'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text('App Version: 1.0.0'),
-            SizedBox(height: 8),
-            Text('Build Number: 100'),
-            SizedBox(height: 16),
-            Text('Last Updated: November 8, 2024'),
+  void _showVersionInfo(BuildContext context) async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Version Information'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('App Version: ${packageInfo.version}'),
+              const SizedBox(height: 8),
+              Text('Build Number: ${packageInfo.buildNumber}'),
+              const SizedBox(height: 16),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
+      );
+    } catch (e) {
+      print('Error getting package info: $e');
+      // Handle error appropriately
+    }
   }
 
   Future<void> _launchEmail(String email) async {
@@ -304,6 +320,8 @@ class _UserGuideScreen extends StatelessWidget {
 
 class _ProblemReportScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -342,9 +360,12 @@ class _ProblemReportScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState?.validate() ?? false) {
-                  // Submit problem report
+                  final title = _titleController.text;
+                  final description = _descriptionController.text;
+                  await _sendEmail(
+                      'Problem Report: $title', 'Description:\n$description');
                   Navigator.pop(context);
                 }
               },
@@ -355,10 +376,39 @@ class _ProblemReportScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _sendEmail(String subject, String body) async {
+    try {
+      final smtpEmail = await SecureConfig.getSecureValue('SMTP_EMAIL');
+      final Uri emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: smtpEmail,
+        queryParameters: {
+          'subject': subject,
+          'body': body,
+        },
+      );
+
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrlString(emailLaunchUri.toString());
+      } else {
+        throw 'Could not launch email client';
+      }
+    } catch (e) {
+      print('Error sending email: $e');
+    }
+  }
 }
 
-class _FeedbackScreen extends StatelessWidget {
+class _FeedbackScreen extends StatefulWidget {
+  @override
+  _FeedbackScreenState createState() => _FeedbackScreenState();
+}
+
+class _FeedbackScreenState extends State<_FeedbackScreen> {
   final _formKey = GlobalKey<FormState>();
+  int _rating = 0;
+  final TextEditingController _feedbackController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -379,9 +429,14 @@ class _FeedbackScreen extends StatelessWidget {
               children: List.generate(
                 5,
                 (index) => IconButton(
-                  icon: Icon(Icons.star_border),
+                  icon: Icon(
+                    index < _rating ? Icons.star : Icons.star_border,
+                    color: index < _rating ? Colors.amber : null,
+                  ),
                   onPressed: () {
-                    // Handle rating
+                    setState(() {
+                      _rating = index + 1;
+                    });
                   },
                 ),
               ),
@@ -402,9 +457,17 @@ class _FeedbackScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState?.validate() ?? false) {
-                  // Submit feedback
+                  final smtpEmail =
+                      await SecureConfig.getSecureValue('SMTP_EMAIL');
+                  await EmailUtils.sendEmail(
+                    to: smtpEmail.toString(),
+                    subject: 'App Feedback',
+                    body:
+                        'Rating: $_rating/5\n\nFeedback:\n${_feedbackController.text}',
+                    context: context,
+                  );
                   Navigator.pop(context);
                 }
               },
