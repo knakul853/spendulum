@@ -11,7 +11,6 @@ import 'providers/reminder_provider.dart';
 import 'services/export_service.dart';
 import 'db/database_helper.dart';
 import 'config/env_config.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
 void main() {
   // This is required for platform channels
