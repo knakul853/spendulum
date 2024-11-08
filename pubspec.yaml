@@ -2,7 +2,7 @@ name: spendulum
 description: "Spendulum: Expense and Income Tracker"
 publish_to: "none"
 
-version: 0.1.0-alpha+1
+version: 0.1.0-alpha+2
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
@@ -24,12 +24,15 @@ dependencies:
   percent_indicator: ^4.0.1
   csv: ^5.0.1
   excel: ^2.0.1
-  mailer: ^6.0.1
+  mailer: ^6.2.0
   workmanager: ^0.5.1
   path_provider: ^2.0.15
   flutter_local_notifications: ^18.0.0
   timezone: ^0.9.0
   flutter_timezone: ^3.0.1
+  flutter_dotenv: ^5.1.0
+  flutter_secure_storage: ^9.0.0
+  encrypt: ^5.0.3
 
 dev_dependencies:
   flutter_test:
@@ -46,4 +49,5 @@ flutter_launcher_icons:
 flutter:
   assets:
     - assets/images/app_icon.png
+    - .env
   uses-material-design: true

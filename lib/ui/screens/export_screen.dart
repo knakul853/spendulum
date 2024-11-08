@@ -17,6 +17,14 @@ class _ExportScreenState extends State<ExportScreen> {
   ExportType _exportType = ExportType.csv;
   bool _isLoading = false;
 
+  DateTime _setEndOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+  }
+
+  DateTime _setStartOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 0, 0, 0, 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +93,10 @@ class _ExportScreenState extends State<ExportScreen> {
                   if (_endDate == null) {
                     return 'Please select end date';
                   }
-                  if (_startDate != null && _endDate!.isBefore(_startDate!)) {
+
+                  DateTime endOfDay = _setEndOfDay(_endDate!);
+
+                  if (_startDate != null && endOfDay.isBefore(_startDate!)) {
                     return 'End date must be after start date';
                   }
                   if (_startDate != null &&
@@ -172,7 +183,7 @@ class _ExportScreenState extends State<ExportScreen> {
     if (picked != null) {
       setState(() {
         if (isStartDate) {
-          _startDate = picked;
+          _startDate = _setStartOfDay(picked);
         } else {
           _endDate = picked;
         }
@@ -192,7 +203,7 @@ class _ExportScreenState extends State<ExportScreen> {
     try {
       final exportJob = ExportJob(
         startDate: _startDate!,
-        endDate: _endDate!,
+        endDate: _setEndOfDay(_endDate!),
         email: _email,
         exportType: _exportType,
       );
