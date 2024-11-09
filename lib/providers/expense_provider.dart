@@ -290,18 +290,31 @@ class ExpenseProvider with ChangeNotifier {
     AppLogger.info(
         'Fetching expenses for account $accountId from $startDate to $endDate');
     try {
-      // Construct the SQL query
-      final String query = '''
-        SELECT * FROM ${ExpensesTable.tableName}
-        WHERE ${ExpensesTable.columnAccountId} = ? 
-        AND ${ExpensesTable.columnDate} BETWEEN ? AND ?
-      ''';
+      String query;
+      List<dynamic> args;
 
-      // Execute the raw query
-      final expenseMaps = await DatabaseHelper.instance.rawQuery(
-        query,
-        [accountId, startDate.toIso8601String(), endDate.toIso8601String()],
-      );
+      if (accountId.toLowerCase() == 'all') {
+        // Query for all accounts
+        query = '''
+          SELECT * FROM ${ExpensesTable.tableName}
+          WHERE ${ExpensesTable.columnDate} BETWEEN ? AND ?
+        ''';
+        args = [startDate.toIso8601String(), endDate.toIso8601String()];
+      } else {
+        // Query for specific account
+        query = '''
+          SELECT * FROM ${ExpensesTable.tableName}
+          WHERE ${ExpensesTable.columnAccountId} = ? 
+          AND ${ExpensesTable.columnDate} BETWEEN ? AND ?
+        ''';
+        args = [
+          accountId,
+          startDate.toIso8601String(),
+          endDate.toIso8601String()
+        ];
+      }
+
+      final expenseMaps = await DatabaseHelper.instance.rawQuery(query, args);
 
       return expenseMaps
           .map((map) => Expense(
@@ -313,10 +326,35 @@ class ExpenseProvider with ChangeNotifier {
                 accountId: map[ExpensesTable.columnAccountId] as String,
               ))
           .toList()
-        ..sort((a, b) => a.date.compareTo(b.date)); // Sort by date ascending
+        ..sort((a, b) => a.date.compareTo(b.date));
     } catch (e) {
       AppLogger.error('Error fetching expenses for date range', error: e);
       return [];
+    }
+  }
+
+  Future<Map<String, List<Expense>>> getExpensesGroupedByAccount(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final allExpenses =
+          await getExpensesForAccountAndDateRange('all', startDate, endDate);
+
+      // Group expenses by account ID
+      final groupedExpenses = <String, List<Expense>>{};
+
+      for (var expense in allExpenses) {
+        if (!groupedExpenses.containsKey(expense.accountId)) {
+          groupedExpenses[expense.accountId] = [];
+        }
+        groupedExpenses[expense.accountId]!.add(expense);
+      }
+
+      return groupedExpenses;
+    } catch (e) {
+      AppLogger.error('Error grouping expenses by account', error: e);
+      return {};
     }
   }
 }

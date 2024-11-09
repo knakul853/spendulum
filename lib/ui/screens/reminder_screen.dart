@@ -64,7 +64,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
       body: Column(
         children: [
           //test notification
-          _buildTestNotificationButton(),
+          // _buildTestNotificationButton(),
           Expanded(
             child: Consumer<ReminderProvider>(
               builder: (context, provider, child) {
@@ -269,4 +269,3 @@ class _ReminderScreenState extends State<ReminderScreen> {
     }
   }
 }
- 

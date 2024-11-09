@@ -8,6 +8,9 @@ import 'providers/account_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/budget_provider.dart';
 import 'providers/reminder_provider.dart';
+import 'services/export_service.dart';
+import 'db/database_helper.dart';
+import 'config/env_config.dart';
 
 void main() {
   // This is required for platform channels
@@ -23,6 +26,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Add DatabaseHelper Provider
+        Provider<DatabaseHelper>(
+          create: (_) => DatabaseHelper.instance,
+          lazy: false,
+        ),
+
         ChangeNotifierProvider<ReminderProvider>(
           create: (context) => ReminderProvider(),
           lazy: false,
@@ -30,7 +39,7 @@ class MyApp extends StatelessWidget {
 
         // CategoryProvider
         ChangeNotifierProvider<CategoryProvider>(
-          lazy: false, // This ensures immediate creation
+          lazy: false,
           create: (context) => CategoryProvider(),
         ),
 
@@ -56,6 +65,16 @@ class MyApp extends StatelessWidget {
             }
             return previous..updateProviders(accountProvider, budgetProvider);
           },
+          lazy: false,
+        ),
+
+        // Add ExportService Provider
+        Provider<ExportService>(
+          create: (context) => ExportService(
+            Provider.of<DatabaseHelper>(context, listen: false),
+            Provider.of<ExpenseProvider>(context, listen: false),
+            Provider.of<AccountProvider>(context, listen: false),
+          ),
           lazy: false,
         ),
 
@@ -90,7 +109,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// New widget to handle initialization
 class InitializationWrapper extends StatefulWidget {
   final Widget child;
 
@@ -113,6 +131,13 @@ class _InitializationWrapperState extends State<InitializationWrapper> {
     final categoryProvider = context.read<CategoryProvider>();
     final budgetProvider = context.read<BudgetProvider>();
     final reminderProvider = context.read<ReminderProvider>();
+    final exportService = context.read<ExportService>();
+
+    try {
+      SecureConfig.initialize();
+    } catch (e) {
+      print('Error loading .env: $e');
+    }
 
     // Initialize in sequence
     try {
@@ -121,6 +146,9 @@ class _InitializationWrapperState extends State<InitializationWrapper> {
         budgetProvider.loadBudgets(),
         reminderProvider.initialize(),
       ]);
+
+      // Check for failed export jobs
+      await exportService.retryFailedJobs();
     } catch (e) {
       print('Error during initialization: $e');
     }
