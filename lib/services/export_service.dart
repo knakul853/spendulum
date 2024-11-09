@@ -11,14 +11,29 @@ import 'package:spendulum/db/tables/export_jobs_table.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/models/expense.dart';
+import 'package:mailer/smtp_server/gmail.dart';
+import 'package:spendulum/providers/account_provider.dart';
+import 'package:spendulum/config/env_config.dart';
 
 class ExportService {
   final DatabaseHelper _db;
   final ExpenseProvider _expenseProvider;
+  final AccountProvider _accountProvider;
+
   static const int maxRetries = 3;
   static const Duration retryDelay = Duration(minutes: 15);
 
-  ExportService(this._db, this._expenseProvider);
+  ExportService(this._db, this._expenseProvider, this._accountProvider);
+
+  String _getAccountNumber(String accountId) {
+    final account = _accountProvider.getAccountById(accountId);
+    return account?.accountNumber ?? 'Unknown Account';
+  }
+
+  String _getAccountName(String accountId) {
+    final account = _accountProvider.getAccountById(accountId);
+    return account?.name ?? 'Unknown Account';
+  }
 
   Future<void> createExportJob(ExportJob job) async {
     try {
@@ -32,6 +47,23 @@ class ExportService {
     }
   }
 
+  Future<List<Expense>> _getExpensesForExport(
+      String accountId, DateTime startDate, DateTime endDate) async {
+    if (accountId.toLowerCase() == 'all') {
+      return await _expenseProvider.getExpensesForAccountAndDateRange(
+        'all',
+        startDate,
+        endDate,
+      );
+    }
+
+    return await _expenseProvider.getExpensesForAccountAndDateRange(
+      accountId,
+      startDate,
+      endDate,
+    );
+  }
+
   Future<void> processJob(ExportJob job) async {
     try {
       // Update job status to in progress
@@ -39,8 +71,10 @@ class ExportService {
       await _updateJobStatus(job);
 
       // Get expenses for the date range
-      final expenses = await _expenseProvider.getExpensesForAccountAndDateRange(
-        'all', // You might want to add account selection in the export
+      // Get expenses for the date range
+      final expenses = await _getExpensesForExport(
+        //job.accountId, : TODO: Support account filtering
+        'all',
         job.startDate,
         job.endDate,
       );
@@ -48,7 +82,6 @@ class ExportService {
       // Generate the export file
       final file = await _generateExportFile(expenses, job.exportType);
 
-      // Send email with the file
       await _sendExportEmail(job.email, file);
 
       // Update job status to completed
@@ -80,7 +113,14 @@ class ExportService {
 
   Future<File> _generateCsvFile(List<Expense> expenses, File file) async {
     final List<List<dynamic>> rows = [
-      ['Date', 'Category', 'Amount', 'Description', 'Account ID']
+      [
+        'Date',
+        'Category',
+        'Amount',
+        'Description',
+        'Account Name',
+        'Account Number'
+      ]
     ];
 
     for (var expense in expenses) {
@@ -89,7 +129,8 @@ class ExportService {
         expense.category,
         expense.amount,
         expense.description,
-        expense.accountId,
+        _getAccountName(expense.accountId),
+        _getAccountNumber(expense.accountId),
       ]);
     }
 
@@ -100,7 +141,6 @@ class ExportService {
 
   Future<File> _generateExcelFile(List<Expense> expenses, File file) async {
     final workbook = excel.Excel.createExcel();
-    // Get the default sheet, or create a new sheet if it's null
     final sheet = workbook.sheets[workbook.getDefaultSheet()] ??
         workbook.sheets['Sheet1'];
 
@@ -108,8 +148,15 @@ class ExportService {
       throw Exception("Unable to create or access default sheet in workbook");
     }
 
-    // Add headers
-    final headers = ['Date', 'Category', 'Amount', 'Description', 'Account ID'];
+    // Add headers with account information
+    final headers = [
+      'Date',
+      'Category',
+      'Amount',
+      'Description',
+      'Account Name',
+      'Account Number'
+    ];
     for (var i = 0; i < headers.length; i++) {
       sheet.cell(excel.CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0))
         ..value = headers[i]
@@ -119,7 +166,7 @@ class ExportService {
         );
     }
 
-    // Add data
+    // Add data with account information
     for (var i = 0; i < expenses.length; i++) {
       final expense = expenses[i];
       final row = i + 1;
@@ -138,7 +185,10 @@ class ExportService {
         ..value = expense.description;
       sheet
           .cell(excel.CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
-        ..value = expense.accountId;
+        ..value = _getAccountName(expense.accountId);
+      sheet
+          .cell(excel.CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
+        ..value = _getAccountNumber(expense.accountId);
     }
 
     await file.writeAsBytes(workbook.encode()!);
@@ -146,11 +196,22 @@ class ExportService {
   }
 
   Future<void> _sendExportEmail(String email, File file) async {
-    final smtpServer =
-        gmail('your-email@gmail.com', 'your-app-specific-password');
+    final smtpEmail = await SecureConfig.getSecureValue('SMTP_EMAIL');
+    final smtpPassword = await SecureConfig.getSecureValue('SMTP_PASSWORD');
+
+    print("The SMTP email is $smtpEmail");
+    print("The SMTP password is $smtpPassword");
+
+    if (smtpEmail == null || smtpPassword == null) {
+      throw Exception('SMTP credentials not configured');
+    }
+
+    final smtpServer = gmail(smtpEmail, smtpPassword);
+
+    AppLogger.info('Sending export email to $email');
 
     final message = Message()
-      ..from = Address('your-email@gmail.com', 'Expense Tracker')
+      ..from = Address(smtpEmail, 'Expense Tracker')
       ..recipients.add(email)
       ..subject = 'Your Expense Export'
       ..text = 'Please find your requested expense export attached.'
@@ -161,10 +222,22 @@ class ExportService {
       ];
 
     try {
-      await send(message, smtpServer);
+      // Add timeout
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
+
+      AppLogger.info('Export email sent successfully to $email');
     } catch (e) {
-      AppLogger.error('Error sending export email', error: e);
-      throw Exception('Failed to send export email');
+      if (e is SocketException) {
+        AppLogger.error('Network error while sending email: ${e.message}');
+        throw Exception('Network error: Please check your internet connection');
+      } else if (e is TimeoutException) {
+        AppLogger.error('Email sending timed out');
+        throw Exception('Email sending timed out: Please try again');
+      } else {
+        AppLogger.error('Error sending export email', error: e);
+        throw Exception('Failed to send export email: ${e.toString()}');
+      }
     }
   }
 

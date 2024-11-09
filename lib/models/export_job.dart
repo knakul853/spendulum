@@ -32,33 +32,33 @@ class ExportJob {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'start_date': startDate.toIso8601String(),
+      'end_date': endDate.toIso8601String(),
       'email': email,
-      'exportType': exportType.toString(),
+      'export_type': exportType.toString(),
       'status': status.toString(),
-      'retryCount': retryCount,
-      'lastRetryAt': lastRetryAt?.toIso8601String(),
-      'errorMessage': errorMessage,
-      'createdAt': createdAt.toIso8601String(),
+      'retry_count': retryCount,
+      'last_retry_at': lastRetryAt?.toIso8601String(),
+      'error_message': errorMessage,
+      'created_at': createdAt.toIso8601String(),
     };
   }
 
   factory ExportJob.fromMap(Map<String, dynamic> map) {
     return ExportJob(
       id: map['id'],
-      startDate: DateTime.parse(map['startDate']),
-      endDate: DateTime.parse(map['endDate']),
+      startDate: DateTime.parse(map['start_date']),
+      endDate: DateTime.parse(map['end_date']),
       email: map['email'],
       exportType: ExportType.values
-          .firstWhere((e) => e.toString() == map['exportType']),
+          .firstWhere((e) => e.toString() == map['export_type']),
       status:
           ExportStatus.values.firstWhere((e) => e.toString() == map['status']),
-      retryCount: map['retryCount'],
-      lastRetryAt: map['lastRetryAt'] != null
-          ? DateTime.parse(map['lastRetryAt'])
+      retryCount: map['retry_count'],
+      lastRetryAt: map['last_retry_at'] != null
+          ? DateTime.parse(map['last_retry_at'])
           : null,
-      errorMessage: map['errorMessage'],
+      errorMessage: map['error_message'],
     );
   }
 }

@@ -4,66 +4,162 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ReminderService {
+  // Singleton setup
   static final ReminderService _instance = ReminderService._internal();
   factory ReminderService() => _instance;
   ReminderService._internal();
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  // Constants
+  static const String _scheduledChannelId = 'scheduled_notifications';
+  static const String _scheduledChannelName = 'Scheduled Notifications';
+  static const String _scheduledChannelDesc =
+      'Channel for scheduled notifications';
 
+  // Instance variables
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
+  // Notification configurations
+  static const _androidNotificationDetails = AndroidNotificationDetails(
+    _scheduledChannelId,
+    _scheduledChannelName,
+    channelDescription: _scheduledChannelDesc,
+    importance: Importance.max,
+    priority: Priority.max,
+    enableLights: true,
+    enableVibration: true,
+    playSound: true,
+    category: AndroidNotificationCategory.alarm,
+    fullScreenIntent: true,
+    visibility: NotificationVisibility.public,
+    ticker: 'Scheduled notification',
+    icon: "notification",
+    autoCancel: true,
+    sound: const RawResourceAndroidNotificationSound(
+        'notification'), // Make sure this matches your file name
+  );
+
+  static const _iosNotificationDetails = DarwinNotificationDetails(
+    presentAlert: true,
+    presentBadge: true,
+    presentSound: true,
+    sound: 'default',
+    badgeNumber: 1,
+    interruptionLevel: InterruptionLevel.timeSensitive,
+  );
+
+  static const notificationDetails = NotificationDetails(
+    android: _androidNotificationDetails,
+    iOS: _iosNotificationDetails,
+  );
+
+  // Initialization
   Future<void> initialize() async {
     if (_initialized) return;
-    print('Initializing ReminderService...');
 
-    // Initialize timezone
     try {
-      tz.initializeTimeZones();
-      final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
-      AppLogger.info('Current Timezone: $currentTimeZone');
-      tz.setLocalLocation(tz.getLocation(currentTimeZone));
-      print('Timezone initialized successfully');
+      await _initializeTimeZone();
+      await _requestPermissions();
+      await _setupNotificationChannel();
+      await _initializeNotifications();
+
+      _initialized = true;
+      AppLogger.info('ReminderService initialized successfully');
     } catch (e) {
-      print('Error initializing timezone: $e');
+      AppLogger.error('Failed to initialize ReminderService: $e');
       rethrow;
     }
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iOSSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    const initializationSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iOSSettings,
-    );
-
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse:
-          (NotificationResponse response) async {},
-    );
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-
-    AppLogger.info('ReminderService initialized successfully');
-
-    _initialized = true;
   }
 
-  tz.TZDateTime _nextInstanceOfTime(TimeOfDay time, int dayOfWeek) {
+  // Private initialization methods
+  Future<void> _initializeTimeZone() async {
+    tz.initializeTimeZones();
+    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(currentTimeZone));
+    AppLogger.info('Timezone initialized: $currentTimeZone');
+  }
+
+  Future<void> _requestPermissions() async {
+    // Android permissions
+    if (await Permission.notification.isDenied) {
+      final status = await Permission.notification.request();
+      if (status.isDenied) {
+        throw Exception('Notification permissions are required');
+      }
+    }
+
+    // iOS permissions
+    await _notifications
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+  }
+
+  Future<void> _setupNotificationChannel() async {
+    final AndroidNotificationChannel channel = AndroidNotificationChannel(
+      _scheduledChannelId,
+      _scheduledChannelName,
+      description: _scheduledChannelDesc,
+      importance: Importance.max,
+      playSound: true,
+      enableVibration: true,
+      enableLights: true,
+      showBadge: true,
+      sound: const RawResourceAndroidNotificationSound(
+          'notification'), // Make sure this matches your file name
+    );
+
+    await _notifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+
+  Future<void> _initializeNotifications() async {
+    const initializationSettings = InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      ),
+    );
+
+    await _notifications.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: _handleNotificationResponse,
+    );
+  }
+
+  void _handleNotificationResponse(NotificationResponse response) {
+    AppLogger.info('Notification clicked: ${response.payload}');
+  }
+
+  Future<void> scheduleReminder({
+    required int id,
+    required TimeOfDay time,
+    required List<int> selectedDays,
+  }) async {
+    try {
+      await initialize();
+      await cancelReminder(id);
+
+      for (final day in selectedDays) {
+        final scheduledDate = _getNextInstanceOfTime(time, day);
+        await _scheduleReminderForDate(id + day, scheduledDate);
+      }
+    } catch (e) {
+      AppLogger.error('Failed to schedule reminder: $e');
+      rethrow;
+    }
+  }
+
+  // Helper methods
+  tz.TZDateTime _getNextInstanceOfTime(TimeOfDay time, int dayOfWeek) {
     final now = tz.TZDateTime.now(tz.local);
     var scheduledDate = tz.TZDateTime(
       tz.local,
@@ -74,117 +170,59 @@ class ReminderService {
       time.minute,
     );
 
-    while (scheduledDate.isBefore(now) || scheduledDate.weekday != dayOfWeek) {
-      print('Adjusting scheduled date to $scheduledDate');
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    while (scheduledDate.weekday != dayOfWeek) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
     return scheduledDate;
   }
 
-  Future<void> scheduleReminder({
-    required int id,
-    required TimeOfDay time,
-    required List<int> selectedDays,
-  }) async {
-    try {
-      // Ensure initialization
-      await initialize();
+  Future<void> _scheduleReminderForDate(
+      int id, tz.TZDateTime scheduledDate) async {
+    await _notifications.zonedSchedule(
+      id,
+      'Expense Reminder',
+      'Don\'t forget to add your expenses for today!',
+      scheduledDate,
+      notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+    );
+    AppLogger.info('Reminder scheduled for: ${scheduledDate.toLocal()}');
+  }
 
-      // Cancel existing reminders with the same ID
-      await cancelReminder(id);
-
-      for (final day in selectedDays) {
-        AppLogger.info(
-            'Scheduling reminder for day: ${tz.TZDateTime.now(tz.local)}');
-        final scheduledDate = _nextInstanceOfTime(time, day);
-        print('Scheduling reminder with ID $id on $scheduledDate');
-
-        await flutterLocalNotificationsPlugin
-            .zonedSchedule(
-          androidScheduleMode: AndroidScheduleMode.exact,
-          id + day,
-          'Expense Reminder',
-          'Don\'t forget to add your expenses for today!',
-          tz.TZDateTime.now(tz.local),
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              'expense_reminders_$id',
-              'Expense Reminders',
-              channelDescription: 'Reminders for adding expenses',
-              importance: Importance.high,
-              priority: Priority.high,
-              icon: '@mipmap/ic_launcher',
-            ),
-            iOS: const DarwinNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-            ),
-          ),
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-        )
-            .then((_) {
-          print('Reminder with ID $id scheduled successfully');
-        }).catchError((error) {
-          print('Error scheduling reminder with ID $id: $error');
-        });
-      }
-
-      print('Scheduled reminders for days: $selectedDays');
-    } catch (e) {
-      print('Error scheduling reminder: $e');
-      throw Exception('Failed to schedule reminder: $e');
+  // Utility methods
+  Future<void> checkActiveNotifications() async {
+    final pendingNotifications =
+        await _notifications.pendingNotificationRequests();
+    AppLogger.info('Pending notifications: ${pendingNotifications.length}');
+    for (var notification in pendingNotifications) {
+      AppLogger.info('ID: ${notification.id}, Title: ${notification.title}');
     }
   }
 
   Future<void> cancelReminder(int id) async {
     try {
-      // Cancel reminders for all days (id + 1 through id + 7)
       for (int i = 1; i <= 7; i++) {
-        await flutterLocalNotificationsPlugin.cancel(id + i);
+        await _notifications.cancel(id + i);
       }
     } catch (e) {
-      print('Error canceling reminder: $e');
-      throw Exception('Failed to cancel reminder: $e');
+      AppLogger.error('Failed to cancel reminder: $e');
+      rethrow;
     }
   }
 
   Future<void> cancelAllReminders() async {
     try {
-      await flutterLocalNotificationsPlugin.cancelAll();
+      await _notifications.cancelAll();
     } catch (e) {
-      print('Error canceling all reminders: $e');
-      throw Exception('Failed to cancel all reminders: $e');
-    }
-  }
-
-  // Test method to schedule an immediate notification
-  Future<void> scheduleTestNotification() async {
-    print('Scheduling test notification...');
-
-    try {
-      await flutterLocalNotificationsPlugin.show(
-        0,
-        'Test Notification',
-        'This is a test notification',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'expense_reminders',
-            'Expense Reminders',
-            channelDescription: 'Notifications for expense reminders',
-            importance: Importance.high,
-            priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
-      );
-      print('Test notification scheduled successfully');
-    } catch (e) {
-      print('Error scheduling test notification: $e');
+      AppLogger.error('Failed to cancel all reminders: $e');
       rethrow;
     }
   }

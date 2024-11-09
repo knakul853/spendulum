@@ -55,6 +55,13 @@ class ReminderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> removeAllReminders() async {
+    await _reminderService.cancelAllReminders();
+    _reminders.clear();
+    await saveReminders();
+    notifyListeners();
+  }
+
   Future<void> toggleReminder(int id) async {
     final index = _reminders.indexWhere((reminder) => reminder.id == id);
     if (index != -1) {
