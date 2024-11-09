@@ -3,6 +3,9 @@ import 'package:spendulum/services/reminder_service.dart';
 import 'package:spendulum/models/reminder.dart';
 import 'package:spendulum/providers/reminder_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter/foundation.dart';
 
 class ReminderScreen extends StatefulWidget {
   const ReminderScreen({Key? key}) : super(key: key);
@@ -25,36 +28,6 @@ class _ReminderScreenState extends State<ReminderScreen> {
     'Sunday',
   ];
 
-  Widget _buildTestNotificationButton() {
-    return ElevatedButton(
-      onPressed: () async {
-        try {
-          final reminderProvider = context.read<ReminderProvider>();
-          await reminderProvider.reminderService.scheduleTestNotification();
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Test notification sent!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: ${e.toString()}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      },
-      child: const Text('Send Test Notification'),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,8 +36,39 @@ class _ReminderScreenState extends State<ReminderScreen> {
       ),
       body: Column(
         children: [
-          //test notification
-          // _buildTestNotificationButton(),
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTimeSelector(),
+                const SizedBox(height: 16),
+                _buildDaySelector(),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _selectedDays.isEmpty ? null : _saveReminder,
+                    child: const Text('Add Reminder'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Scheduled Reminders'),
+                TextButton(
+                  onPressed: _showStopAllRemindersDialog,
+                  child: const Text('Stop All'),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: Consumer<ReminderProvider>(
               builder: (context, provider, child) {
@@ -117,39 +121,18 @@ class _ReminderScreenState extends State<ReminderScreen> {
               },
             ),
           ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: _buildNewReminderSection(),
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildNewReminderSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTimeSelector(),
-        const SizedBox(height: 16),
-        _buildDaySelector(),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _selectedDays.isEmpty ? null : _saveReminder,
-            child: const Text('Add Reminder'),
-          ),
-        ),
-      ],
     );
   }
 
   Widget _buildTimeSelector() {
     return Card(
       child: ListTile(
-        leading: const Icon(Icons.access_time),
+        leading: Icon(
+          Icons.access_time,
+          color: Theme.of(context).primaryColor,
+        ),
         title: const Text('Reminder Time'),
         subtitle: Text(_selectedTime.format(context)),
         onTap: _selectTime,
@@ -192,23 +175,38 @@ class _ReminderScreenState extends State<ReminderScreen> {
     );
   }
 
-  Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: _selectedDays.isEmpty ? null : _saveReminder,
-            child: const Text('Save Reminder'),
-          ),
+  Future<void> _showStopAllRemindersDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Stop All Reminders'),
+        content: const Text(
+          'Are you sure you want to stop all reminders?',
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => _reminderService.cancelAllReminders(),
-            child: const Text('Stop All Reminders'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCEL'),
           ),
-        ),
-      ],
+          TextButton(
+            onPressed: () async {
+              // First cancel all notifications
+              await _reminderService.cancelAllReminders();
+              // Then clear all reminders from provider (which should also clear preferences)
+              if (mounted) {
+                await context.read<ReminderProvider>().removeAllReminders();
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('All reminders have been stopped'),
+                  ),
+                );
+              }
+            },
+            child: const Text('STOP ALL'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -220,6 +218,11 @@ class _ReminderScreenState extends State<ReminderScreen> {
     if (picked != null) {
       setState(() {
         _selectedTime = picked;
+        // Auto-select today's day when time is picked
+        final today = DateTime.now().weekday;
+        if (!_selectedDays.contains(today)) {
+          _selectedDays.add(today);
+        }
       });
     }
   }
@@ -229,7 +232,6 @@ class _ReminderScreenState extends State<ReminderScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select at least one day'),
-          backgroundColor: Colors.orange,
         ),
       );
       return;
@@ -253,7 +255,6 @@ class _ReminderScreenState extends State<ReminderScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Reminder set successfully!'),
-            backgroundColor: Colors.green,
           ),
         );
       }
@@ -262,7 +263,6 @@ class _ReminderScreenState extends State<ReminderScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to set reminder: ${e.toString()}'),
-            backgroundColor: Colors.red,
           ),
         );
       }
