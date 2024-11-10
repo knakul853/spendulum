@@ -6,6 +6,8 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/utils/currency.dart';
+import 'package:spendulum/models/recurring_transaction.dart';
+import 'package:spendulum/ui/widgets/recurring_settings_modal.dart';
 
 class IncomeLoggingScreen extends StatefulWidget {
   final String? initialAccountId;
@@ -25,6 +27,9 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
   double _amount = 0.0;
   DateTime _selectedDate = DateTime.now();
   String _description = '';
+
+  bool _isRecurring = false;
+  RecurringTransaction? _recurringSettings;
 
   late AnimationController _submitButtonController;
 
@@ -121,6 +126,8 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
                   _buildDatePicker(),
                   const SizedBox(height: 16),
                   _buildDescriptionField(),
+                  const SizedBox(height: 16),
+                  _buildRecurringSwitch(),
                   const SizedBox(height: 24),
                   _buildSubmitButton(),
                 ],
@@ -271,6 +278,60 @@ class _IncomeLoggingScreenState extends State<IncomeLoggingScreen>
                 child: const Text('Add Income'),
               ),
             );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecurringSwitch() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Switch(
+            value: _isRecurring,
+            onChanged: (value) {
+              setState(() {
+                _isRecurring = value;
+                if (value) {
+                  _showRecurringSettingsModal();
+                } else {
+                  _recurringSettings = null;
+                }
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Make Recurring',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          if (_isRecurring && _recurringSettings != null)
+            TextButton(
+              onPressed: _showRecurringSettingsModal,
+              child: const Text('Edit Settings'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showRecurringSettingsModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: RecurringSettingsModal(
+          isExpense: false,
+          existingTransaction: _recurringSettings,
+          onSave: (transaction) {
+            setState(() {
+              _recurringSettings = transaction;
+            });
           },
         ),
       ),

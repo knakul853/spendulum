@@ -162,21 +162,4 @@ class DatabaseHelper {
         where: '$columnId = ?',
         whereArgs: [value]); // Delete the row and return the result
   }
-
-  Future<Map<String, dynamic>?> getRecord(
-      String table, String idColumn, dynamic id) async {
-    try {
-      Database db = await instance.database;
-      List<Map<String, dynamic>> results = await db.query(
-        table,
-        where: '$idColumn = ?',
-        whereArgs: [id],
-        limit: 1,
-      );
-      return results.isNotEmpty ? results.first : null;
-    } catch (e) {
-      // AppLogger.error('Error getting record from $table', error: e);
-      rethrow;
-    }
-  }
 }

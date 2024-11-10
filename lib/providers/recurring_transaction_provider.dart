@@ -5,6 +5,7 @@ import 'package:spendulum/db/tables/recurring_transactions_table.dart';
 import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/income_provider.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
+import 'package:flutter/material.dart';
 
 class RecurringTransactionProvider with ChangeNotifier {
   List<RecurringTransaction> _recurringTransactions = [];
@@ -102,7 +103,7 @@ class RecurringTransactionProvider with ChangeNotifier {
 
     for (var transaction in _recurringTransactions) {
       try {
-        if (!_shouldProcessTransaction(transaction, now)) continue;
+        if (!await _shouldProcessTransaction(transaction, now)) continue;
 
         await _createTransaction(transaction);
 
@@ -124,13 +125,13 @@ class RecurringTransactionProvider with ChangeNotifier {
     }
   }
 
-  bool _shouldProcessTransaction(
-      RecurringTransaction transaction, DateTime now) {
+  Future<bool> _shouldProcessTransaction(
+      RecurringTransaction transaction, DateTime now) async {
     if (!transaction.isActive) return false;
     if (transaction.endDate != null && transaction.endDate!.isBefore(now))
       return false;
 
-    final lastProcessed = _getLastProcessedDate(transaction);
+    final lastProcessed = await _getLastProcessedDate(transaction);
     if (lastProcessed == null) return true;
 
     switch (transaction.frequency) {
@@ -153,18 +154,25 @@ class RecurringTransactionProvider with ChangeNotifier {
     }
   }
 
-  DateTime? _getLastProcessedDate(RecurringTransaction transaction) {
-    final map = DatabaseHelper.instance.getRecord(
-      RecurringTransactionsTable.tableName,
-      RecurringTransactionsTable.columnId,
-      transaction.id,
-    ) as Map<String, dynamic>?;
+  Future<DateTime?> _getLastProcessedDate(
+      RecurringTransaction transaction) async {
+    try {
+      final results = await DatabaseHelper.instance.queryRows(
+        RecurringTransactionsTable.tableName,
+        where: '${RecurringTransactionsTable.columnId} = ?',
+        whereArgs: [transaction.id],
+      );
 
-    if (map == null) return null;
+      if (results.isEmpty) return null;
 
-    final lastProcessedStr =
-        map[RecurringTransactionsTable.columnLastProcessed];
-    return lastProcessedStr != null ? DateTime.parse(lastProcessedStr) : null;
+      final lastProcessedStr =
+          results.first[RecurringTransactionsTable.columnLastProcessed];
+
+      return lastProcessedStr != null ? DateTime.parse(lastProcessedStr) : null;
+    } catch (e) {
+      AppLogger.error('Error getting last processed date', error: e);
+      return null;
+    }
   }
 
   Future<void> _createTransaction(RecurringTransaction transaction) async {

@@ -7,15 +7,6 @@ import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/db/tables/expense_table.dart';
 import 'package:spendulum/providers/budget_provider.dart';
 
-/// ExpenseProvider is a class that manages the state and operations related to
-/// expenses in the application. It extends ChangeNotifier to allow UI components
-/// to listen for changes in the expense data. This class handles loading expenses
-/// from a database, adding new expenses, calculating totals, and managing the
-/// monthly budget. It also provides methods to retrieve expenses filtered by
-/// various criteria such as account ID, date range, and category. The class
-/// interacts with the AccountProvider to update account balances when expenses
-/// are added. Logging is implemented throughout the class to track operations
-/// and errors for better debugging and monitoring.
 class ExpenseProvider with ChangeNotifier {
   // List to hold all expenses
   final List<Expense> _expenses = [];

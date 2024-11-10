@@ -4,7 +4,6 @@ import 'package:spendulum/providers/expense_provider.dart';
 import 'package:spendulum/providers/income_provider.dart';
 import 'package:spendulum/providers/recurring_transaction_provider.dart';
 import 'package:spendulum/providers/budget_provider.dart';
-import 'package:spendulum/providers/account_provider.dart';
 
 final GetIt getIt = GetIt.instance;
 
