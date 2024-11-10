@@ -6,6 +6,7 @@ import 'package:spendulum/db/tables/category_table.dart';
 import 'package:spendulum/db/tables/budget_table.dart';
 import 'package:spendulum/db/tables/incomes_table.dart';
 import 'package:spendulum/db/tables/export_jobs_table.dart';
+import 'package:spendulum/db/tables/recurring_transactions_table.dart';
 
 /// A singleton class that manages the SQLite database for the Spendulum application.
 /// It provides methods to initialize the database, create tables, and perform
@@ -49,6 +50,7 @@ class DatabaseHelper {
     await db.execute(BudgetsTable.createTable);
     await db.execute(IncomesTable.createTableQuery);
     await db.execute(ExportJobsTable.createTable);
+    await db.execute(RecurringTransactionsTable.createTableQuery);
 
     // Add other table creation queries here as needed
   }
@@ -159,5 +161,22 @@ class DatabaseHelper {
     return await db.delete(table,
         where: '$columnId = ?',
         whereArgs: [value]); // Delete the row and return the result
+  }
+
+  Future<Map<String, dynamic>?> getRecord(
+      String table, String idColumn, dynamic id) async {
+    try {
+      Database db = await instance.database;
+      List<Map<String, dynamic>> results = await db.query(
+        table,
+        where: '$idColumn = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      return results.isNotEmpty ? results.first : null;
+    } catch (e) {
+      // AppLogger.error('Error getting record from $table', error: e);
+      rethrow;
+    }
   }
 }

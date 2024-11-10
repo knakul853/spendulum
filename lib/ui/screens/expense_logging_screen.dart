@@ -7,6 +7,9 @@ import 'package:spendulum/providers/account_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:spendulum/ui/widgets/logger.dart';
 import 'package:spendulum/utils/currency.dart';
+import 'package:spendulum/models/recurring_transaction.dart';
+import 'package:spendulum/ui/widgets/recurring_settings_modal.dart';
+import 'package:spendulum/providers/recurring_transaction_provider.dart';
 
 class ExpenseLoggingScreen extends StatefulWidget {
   final String? initialAccountId;
@@ -26,6 +29,9 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
   double _amount = 0.0;
   DateTime _selectedDate = DateTime.now();
   String _description = '';
+
+  bool _isRecurring = false;
+  RecurringTransaction? _recurringSettings;
 
   late AnimationController _submitButtonController = AnimationController(
     duration: const Duration(milliseconds: 300),
@@ -82,6 +88,26 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
       return;
     }
 
+    if (_isRecurring && _recurringSettings != null) {
+      final recurringTransaction = RecurringTransaction(
+        id: _recurringSettings!.id,
+        title: _description.isEmpty ? _category! : _description,
+        amount: _amount,
+        accountId: _accountId!,
+        categoryOrSource: _category!,
+        description: _description,
+        frequency: _recurringSettings!.frequency,
+        startDate: _selectedDate,
+        endDate: _recurringSettings!.endDate,
+        reminderTime: _recurringSettings!.reminderTime,
+        isExpense: true,
+        customDays: _recurringSettings!.customDays,
+      );
+
+      Provider.of<RecurringTransactionProvider>(context, listen: false)
+          .addRecurringTransaction(recurringTransaction);
+    }
+
     Provider.of<ExpenseProvider>(context, listen: false).addExpense(
       _category!,
       _amount,
@@ -94,8 +120,61 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
       const SnackBar(content: Text('Expense added successfully!')),
     );
 
-    // Navigate back to the previous screen (HomeScreen)
     Navigator.of(context).pop();
+  }
+
+  Widget _buildRecurringSwitch() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Switch(
+            value: _isRecurring,
+            onChanged: (value) {
+              setState(() {
+                _isRecurring = value;
+                if (value) {
+                  _showRecurringSettingsModal();
+                } else {
+                  _recurringSettings = null;
+                }
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Make Recurring',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          if (_isRecurring && _recurringSettings != null)
+            TextButton(
+              onPressed: _showRecurringSettingsModal,
+              child: const Text('Edit Settings'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showRecurringSettingsModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: RecurringSettingsModal(
+          isExpense: true,
+          existingTransaction: _recurringSettings,
+          onSave: (transaction) {
+            setState(() {
+              _recurringSettings = transaction;
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -124,6 +203,8 @@ class _ExpenseLoggingScreenState extends State<ExpenseLoggingScreen>
                   _buildAmountField(),
                   const SizedBox(height: 16),
                   _buildDatePicker(),
+                  const SizedBox(height: 16),
+                  _buildRecurringSwitch(),
                   const SizedBox(height: 16),
                   _buildDescriptionField(),
                   const SizedBox(height: 24),
